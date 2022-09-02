@@ -13,11 +13,11 @@
 ![](https://robotistan.com/Data/EditorFiles/Shopify/5%20%282%29.jpg)
 
 ## Repository Contents
-- Bricks
-- #####Documents
-- #####Software
-- #####Examples
-- #####Issues
+- ##### Bricks
+- ##### Documents
+- ##### Software
+- ##### Examples
+- ##### Issues
 
-##Note
+## Note
 If you have any questions, please contact technical support on our [PicoBricks Community](http://community.picobricks.com/ "PicoBricks Community").
