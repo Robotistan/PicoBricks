@@ -12,10 +12,9 @@
 
 ![](https://robotistan.com/Data/EditorFiles/Shopify/5%20%282%29.jpg)
 
-## Repository Contents
+##Repository Contents
 - ##### Bricks
 - ##### Documents
-- ##### Software
 - ##### Examples
 - ##### Issues
 
