@@ -1,4 +1,5 @@
 # Bricks
+[![](https://robotistan.com/Data/EditorFiles/Shopify/5%20%282%29.jpg)](https://robotistan.com/Data/EditorFiles/Shopify/5%20%282%29.jpg)
 - ##### Pico Board
 Raspberry Pi Pico is a microcontroller that you can use in your embedded system projects, prototyping. Raspberry Pi Pico, powered by the RP2040 microcontroller, has a dual-core ARM Cortex M0+ processor. The low-cost Raspberry Pi Pico stands out with its low power consumption and high performance. The Raspberry Pi Pico, which can be programmed with both C/C++ and MicroPython, appeals to users of all ages.
 - ##### OLED Screen
