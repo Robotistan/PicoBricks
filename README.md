@@ -4,7 +4,7 @@
  ##### Pico Bricks is a fantastic project development kit for STEM educators and makers of all levels.
 ##### Pico Bricks is an electronic development board which is designed for use in maker projects. With 10 detachable modules included, Pico Bricks can be used to create a wide variety of projects. It also includes a protoboard that you can use to add your own modules!
 
-![](https://robotistan.com/Data/EditorFiles/Shopify/3.png)
+![] (https://robotistan.com/Data/EditorFiles/Shopify/3.png)
 
  ##### Once you have explored the Pico Bricks modules, you may want to use some of them in a project. Although Pico Bricks is compact, there's no need to build the entire thing into your project. By detaching the Pico Bricks modules, you can connect just the modules you need using cables with standard, easy-to-use Grove connectors.
 
