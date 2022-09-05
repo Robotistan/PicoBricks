@@ -10,7 +10,7 @@
 
  ##### After dividing the Pico Bricks into modules, you can easily reassemble them again on the specially designed base plate.
 
-![](https://cdn.shopify.com/s/files/1/0517/2396/0471/products/gorsel-4_2048x2048.jpg?v=1655128308)
+![](https://www.robotistan.com/Data/EditorFiles/image00164.jpg)
 
 ## Repository Contents
 - ##### Bricks
