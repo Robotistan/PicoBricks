@@ -19,4 +19,4 @@
 - ##### Issues
 
 ## Note
-If you have any questions, please contact technical support on our [PicoBricks Community](http://community.picobricks.com/ "PicoBricks Community").
+If you have any questions, please contact technical support on our [PicoBricks Community](http://community.robotistan.com/ "PicoBricks Community").
