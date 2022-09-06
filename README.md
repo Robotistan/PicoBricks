@@ -13,7 +13,7 @@
 ![](https://www.robotistan.com/Data/EditorFiles/image00164.jpg)
 
 ## Repository Contents
-- ##### Bricks
+- ##### [Bricks](https://github.com/Robotistan/PicoBricks/tree/main/Bricks "Heading link")
 - ##### Documents
 - ##### Examples
 - ##### Issues
