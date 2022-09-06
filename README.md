@@ -12,11 +12,11 @@
 
 ![](https://www.robotistan.com/Data/EditorFiles/image00164.jpg)
 
-## Repository Contents
+##Repository Contents
 - ##### Bricks
 - ##### Documents
 - ##### Examples
 - ##### Issues
 
 ## Note
-If you have any questions, please contact technical support on our [Robotistan Community](http://community.robotistan.com/ "Robotistan Community").
+If you have any questions, please contact technical support on our [Robotistan Community](https://community.robotistan.com/").
