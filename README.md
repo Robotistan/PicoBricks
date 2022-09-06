@@ -14,7 +14,7 @@
 
 ## Repository Contents
 - ##### [Bricks](https://github.com/Robotistan/PicoBricks/tree/main/Bricks "Heading link")
-- ##### Documents
+- ##### [Documents](https://github.com/Robotistan/PicoBricks/tree/main/Documents "Heading link")
 - ##### Examples
 - ##### Issues
 
