@@ -10,7 +10,7 @@
 
  ##### After dividing the Pico Bricks into modules, you can easily reassemble them again on the specially designed base plate.
 
-[![](https://img.youtube.com/vi/oICcxk4rrDQ.jpg)](https://www.youtube.com/watch?v=oICcxk4rrDQ)
+[![Watch the video](https://img.youtube.com/vi/oICcxk4rrDQ/maxresdefault.jpg)](https://www.youtube.com/watch?v=oICcxk4rrDQ)
 
 ## Repository Contents
 - ##### [Bricks](https://github.com/Robotistan/PicoBricks/tree/main/Bricks "Heading link")
