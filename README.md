@@ -7,10 +7,11 @@
 ![](https://robotistan.com/Data/EditorFiles/Shopify/3.png)
 
  ##### Once you have explored the Pico Bricks modules, you may want to use some of them in a project. Although Pico Bricks is compact, there's no need to build the entire thing into your project. By detaching the Pico Bricks modules, you can connect just the modules you need using cables with standard, easy-to-use Grove connectors.
-
  ##### After dividing the Pico Bricks into modules, you can easily reassemble them again on the specially designed base plate.
 
-[![Watch the video](https://i.imgur.com/oICcxk4rrDQ.png)](https://www.youtube.com/watch?v=oICcxk4rrDQ)
+
+[<img src="https://i.ytimg.com/vi/oICcxk4rrDQ/maxresdefault.jpg" width="70%">](https://www.youtube.com/watch?v=oICcxk4rrDQ "Now in Android: 70")
+
 
 ## Repository Contents
 - ##### [Bricks](https://github.com/Robotistan/PicoBricks/tree/main/Bricks "Heading link")
