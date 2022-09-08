@@ -12,4 +12,4 @@ At the heart of Picobricks is the Raspberry Pi Pico. The Thonny Raspberry Pi is 
 
 Picobricks offers us the opportunity to code with Arduino C. Getting started coding the Raspberry Pi Pico at the heart of Picobricks with the widely used Arduino IDE is pretty easy.
  ## Useful Information
- If you add main.py to the name of your code, your code will continue as a loop.
+ If you rename your code file to main.py, your code will run after every boot.
