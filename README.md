@@ -21,4 +21,4 @@
 - ##### [Examples](https://github.com/Robotistan/PicoBricks/tree/main/Examples "Heading link")
 
 ## Note
-If you have any questions, please contact technical support on our [Robotistan Community](https://community.robotistan.com/").
+If you have any questions, please contact technical support on our [Robotistan Community](https://community.robotistan.com/).
