@@ -9,7 +9,8 @@
 
  ##### Once you have explored the Pico Bricks modules, you may want to use some of them in a project. Although Pico Bricks is compact, there's no need to build the entire thing into your project. By detaching the Pico Bricks modules, you can connect just the modules you need using cables with standard, easy-to-use Grove connectors. After dividing the Pico Bricks into modules, you can easily reassemble them again on the specially designed base plate. 
  
- ![30f253bdda5c95c1d2c16fb5e37df9ef_original](https://user-images.githubusercontent.com/111511331/189281395-bed481f7-736a-4ee1-bc05-6f68cc99b02d.gif)
+<img src="https://ksr-ugc.imgix.net/assets/036/949/389/30f253bdda5c95c1d2c16fb5e37df9ef_original.gif?ixlib=rb-4.0.2&w=680&fit=max&v=1649674397&gif-q=50&q=92&s=b754098807bb17fdf23726d3761caf1f" width="700">
+
 
  
 ##### You can watch Picobricks unboxing video by clicking the picture.
