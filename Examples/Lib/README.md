@@ -1,0 +1,2 @@
+## How To Add Library
+There is a file named “picobricks.py” inside the Raspberry Pi Pico microcontroller board on the Picobricks board. This file contains all the libraries required for the modules on the Picobricks card. All you have to do is call the library required for the module you are using with the correct code block.
