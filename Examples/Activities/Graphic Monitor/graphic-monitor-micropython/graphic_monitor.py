@@ -11,7 +11,7 @@ led.freq(1000)
 while True:#while loop
     
     led.duty_u16(int((pot.read_u16())))
-    print((int((pot.read_u16()))))
+    print(str(int((pot.read_u16()))))
     #Turn on the LED according to the value from the potentiometer.
     
     sleep(0.1)#delay

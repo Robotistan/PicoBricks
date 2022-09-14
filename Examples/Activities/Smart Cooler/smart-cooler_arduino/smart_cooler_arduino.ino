@@ -1,8 +1,16 @@
-#include "EspDHT.h"
-EspDHT dht;
+#include <DHT.h>
+
+#define LIMIT_TEMPERATURE     27
+#define DHTPIN 11
+#define DHTTYPE DHT11
+
+DHT dht(DHTPIN, DHTTYPE);
+float temperature;
+
 void setup() {
   // put your setup code here, to run once:
-  dht.setup(11, EspDHT::DHT11);
+  Serial.begin(115200);
+  dht.begin();
   pinMode(21,OUTPUT);
 
 }
@@ -10,13 +18,13 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
   delay(100);
-  dht.readSensor();
-  float temperature = dht.getTemperature();
-
-  if(temperature>27){
+  temperature = dht.readTemperature();
+  Serial.print("Temp: ");
+  Serial.println(temperature);
+  if(temperature > LIMIT_TEMPERATURE){
     digitalWrite(21,HIGH);
   } else{
-    digitalWrite(21,HIGH);    
+    digitalWrite(21,LOW);    
   }
 
 

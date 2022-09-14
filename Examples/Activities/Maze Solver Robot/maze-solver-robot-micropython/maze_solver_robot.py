@@ -1,6 +1,6 @@
-from machine import Pin,
+from machine import Pin
 from utime import sleep
-import utime
+import utime #gereksiz import
 
 trigger = Pin(15, Pin.OUT)
 echo = Pin(14, Pin.IN)
@@ -10,7 +10,11 @@ m2 = Pin(22, Pin.OUT)
 
 m1.low()
 m2.low()
-def getDistance():
+signaloff = 0
+signalon = 0
+
+def getDistance():  # diger orneklerden getDistance alinabilir. Bu biraz hatali gibi
+
    trigger.low()
    utime.sleep_us(2)
    trigger.high()
@@ -23,7 +27,7 @@ def getDistance():
    timepassed = signalon - signaloff
    distance = (timepassed * 0.0343) / 2
    return distance
-measue=0
+measure=0
 while True:
     measure=int(getDistance())
     m1.high()

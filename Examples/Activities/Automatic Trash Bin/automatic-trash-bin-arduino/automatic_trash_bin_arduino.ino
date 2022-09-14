@@ -1,4 +1,4 @@
-#include <NewPing.h>
+#include <NewPing.h>// kutuphaneye gerek yok direk yapalim
 #include <Servo.h>
 Servo myservo;
 
@@ -6,7 +6,7 @@ Servo myservo;
 #define ECHO_PIN     14
 #define MAX_DISTANCE 400
 
-NewPing sonar(TRIGGER_PIN, ECHO_PIN, MAX_DISTANCE);
+NewPing sonar(TRIGGER_PIN, ECHO_PIN, MAX_DISTANCE); // kutuphaneye gerek yok direk yapalim
 
 void setup() {
   myservo.attach(21);
@@ -16,7 +16,7 @@ void setup() {
 void loop() {
   
   delay(50);
-  int distance=sonar.ping_cm();
+  int distance=sonar.ping_cm();// kutuphaneye gerek yok direk yapalim
 
   if(distance<10){
 

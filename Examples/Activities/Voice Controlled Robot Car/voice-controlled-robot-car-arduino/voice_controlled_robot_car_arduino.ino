@@ -29,13 +29,6 @@ void Forward(){
   digitalWrite(21,LOW);
   digitalWrite(22,LOW);
 }
-void Backward(){
-  digitalWrite(21,HIGH);
-  digitalWrite(22,LOW);
-  delay(1000);
-  digitalWrite(21,LOW);
-  digitalWrite(22,LOW);
-}
 void Turn_Left(){
   digitalWrite(21,LOW);
   digitalWrite(22,HIGH);

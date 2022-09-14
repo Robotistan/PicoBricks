@@ -1,6 +1,6 @@
 from machine import I2C, Pin, SPI, PWM
 from mfrc522 import MFRC522
-from ws2812 import NeoPixel
+from ws2812 import NeoPixel   # picobricks kutuphanesi
 from utime import sleep 
 
 servo = PWM(Pin(21))

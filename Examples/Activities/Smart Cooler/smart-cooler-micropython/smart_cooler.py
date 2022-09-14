@@ -1,16 +1,22 @@
 from machine import Pin
-from dht import DHT11
-from utime import sleep
-dht_sensor = DHT11(11)
+from picobricks import DHT11
+import utime
+
+LIMIT_TEMPERATURE = 27
+
+dht_sensor = DHT11(Pin(11, Pin.IN, Pin.PULL_DOWN))
 m1 = Pin(21, Pin.OUT)
 m1.low()
 
+dht_read_time = utime.time()
+
 while True:
-    sleep(1) # It was used for DHT11 to measure.
-    dht_sensor.measure() # Use the sleep() command before this line.
-    temp=dht_sensor.temperature()
-    print(temp)
-    if temp>=28.0:
-        m1.high()
-    else:
-        m1.low()
+    if utime.time() - dht_read_time >= 3:
+        dht_read_time = utime.time()
+        dht_sensor.measure()
+        temp= dht_sensor.temperature
+        print(temp)
+        if temp >= LIMIT_TEMPERATURE:
+            m1.high()
+        else:
+            m1.low()

@@ -1,9 +1,9 @@
 import utime
 import uos
-import machine
+import machine # gereksiz import
 from machine import Pin, ADC
-from dht import DHT11
-from utime import sleep
+from dht import DHT11  #picobricks olmali
+from utime import sleep # gereksiz import
 
 dht_sensor = DHT11(11)
 smo_sensor=ADC(27)

@@ -1,12 +1,12 @@
 #include <Wire.h>
 #include "ACROBOTIC_SSD1306.h"
-#include <NewPing.h>
+#include <NewPing.h>  // new png gerek yok
 
 #define TRIGGER_PIN  15
 #define ECHO_PIN     14
 #define MAX_DISTANCE 400
 
-NewPing sonar(TRIGGER_PIN, ECHO_PIN, MAX_DISTANCE);
+NewPing sonar(TRIGGER_PIN, ECHO_PIN, MAX_DISTANCE); // new png gerek yok
 
 #define T_B 493
 
@@ -39,7 +39,7 @@ void loop() {
 
     for (int i=0;i<20;i++){
 
-      measure=sonar.ping_cm();
+      measure=sonar.ping_cm(); // new png gerek yok
       total=total+measure;
       delay(50);      
     }

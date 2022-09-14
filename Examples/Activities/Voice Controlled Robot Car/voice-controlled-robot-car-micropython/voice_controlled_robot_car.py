@@ -15,9 +15,6 @@ while True:
     if cmd==b'F':
         m1.high()
         m2.high()
-    elif cmd==b'B':
-        m1.high()
-        m2.low()
     elif cmd==b'R':
         m1.high()
         m2.low()

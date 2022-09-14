@@ -1,6 +1,6 @@
 from machine import Pin, PWM, ADC
 from utime import sleep
-from ws2812 import NeoPixel
+from ws2812 import NeoPixel  #picobricks kutuphanesi olmali
 
 neo = NeoPixel(6, n=1, brightness=0.3, autowrite=False)
 ldr=ADC(27)
@@ -38,7 +38,7 @@ def down():
     sleep(0.1)
     buzzer.duty_u16(0)
 
-def oppen():
+def open():
     servo1.duty_u16(8200) #180 degree
     buzzer.duty_u16(2000)
     sleep(0.1)
@@ -50,7 +50,7 @@ def close():
     sleep(0.1)
     buzzer.duty_u16(0)
     
-oppen()
+open()
 servo2.duty_u16(angleupdown)
 neo.fill(BLACK)
 neo.show()
@@ -62,7 +62,7 @@ while True:
         buzzer.duty_u16(2000)
         sleep(1)
         buzzer.duty_u16(0)
-        oppen()
+        open()
         sleep(0.5)
         down()
         sleep(0.5)

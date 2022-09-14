@@ -14,7 +14,7 @@ gas=0
 while True:
     if button.value()==1:
         activated=1
-        gas=0
+        gas=0 # koymali miyiz acep
         sleep(3)
         redLed.value(1)
         buzzer.duty_u16(0)
@@ -22,9 +22,9 @@ while True:
         gas=1
     if activated==1:
         if PIR.value()==1:
-buzzer.duty_u16(6000)
+            buzzer.duty_u16(6000)
             buzzer.freq(440)
-	sleep(0.2)
+            sleep(0.2)
             buzzer.freq(330)
             sleep(0.1)
             buzzer.freq(494)
@@ -32,10 +32,10 @@ buzzer.duty_u16(6000)
             buzzer.freq(523)
             sleep(0.3)
     if gas==1:
-	buzzer.duty_u16(6000)
-            buzzer.freq(330)
-            sleep(0.5)
-            redLed.value(1)
-            buzzer.freq(523)
-            sleep(0.5)
-            redLed.value(0)
+        buzzer.duty_u16(6000)
+        buzzer.freq(330)
+        sleep(0.5)
+        redLed.value(1)
+        buzzer.freq(523)
+        sleep(0.5)
+        redLed.value(0)

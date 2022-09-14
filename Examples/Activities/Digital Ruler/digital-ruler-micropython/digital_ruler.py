@@ -1,7 +1,7 @@
 from machine import Pin, PWM, I2C
 from utime import sleep
-from ssd1306 import SSD1306_I2C
-import utime
+from ssd1306 import SSD1306_I2C  # picobricks kutuphanesi kullanilmali
+import utime  # gereksiz import
 
 redLed=Pin(7,Pin.OUT)
 button=Pin(10,Pin.IN,Pin.PULL_DOWN)

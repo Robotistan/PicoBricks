@@ -1,7 +1,7 @@
 from machine import Pin, PWM, I2C
 from utime import sleep
-import utime
-from ssd1306 import SSD1306_I2C
+import utime        # gereksiz import
+from ssd1306 import SSD1306_I2C  #picobricks kullanalım
 import _thread
 
 buzzer=PWM(Pin(20,Pin.OUT))

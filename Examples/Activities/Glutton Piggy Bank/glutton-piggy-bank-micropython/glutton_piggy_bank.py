@@ -1,5 +1,4 @@
 from machine import Pin, PWM
-from utime import sleep
 import utime
 
 servo=PWM(Pin(21,Pin.OUT))
