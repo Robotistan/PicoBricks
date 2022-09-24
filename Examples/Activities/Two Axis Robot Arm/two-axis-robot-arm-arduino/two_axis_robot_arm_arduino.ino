@@ -2,11 +2,11 @@
 #ifdef __AVR__
 #include <avr/power.h>
 #endif
-#define PIN        6 
+#define PIN        6
 #define NUMPIXELS 1
 Adafruit_NeoPixel pixels(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
 #define DELAYVAL 500
-
+// define required libraries
 #include <Servo.h>
 Servo myservo1;
 Servo myservo2;
@@ -17,25 +17,21 @@ void setup() {
 
   pinMode(20,OUTPUT);
   pinMode(27,INPUT);
-  
+  // define input and output pins
+
   pixels.begin();
-  pixels.clear(); 
+  pixels.clear();
 
   myservo1.attach(21);
-  myservo2.attach(22);
-  
-
-}
-
-void loop() {
-
+  myservo2.attach(22); // define servo motor pins
   Open();
   angleupdown=180;
   myservo2.write(angleupdown);
-  pixels.setPixelColor(0, pixels.Color(0, 0, 0));
-  pixels.show();
+  
+}
 
-  if(analogRead(27)>500){
+void loop() {
+  if(analogRead(27)>150){
 
     pixels.setPixelColor(0, pixels.Color(255, 0, 0));
     pixels.show();
@@ -53,7 +49,15 @@ void loop() {
     Up();
     pixels.setPixelColor(0, pixels.Color(0, 255, 0));
     pixels.show();
-    delay(10000);  
+    delay(10000);
+    pixels.setPixelColor(0, pixels.Color(0, 0, 0));
+    pixels.show();
+    Open();
+    angleupdown=180;
+    myservo2.write(angleupdown);
+    // If the LDR data is greater than the specified limit, the buzzer will sound, the RGB will turn red and servo motors will work
+    // The RGB will turn green when the movement is complete
+    
   }
 }
 
@@ -66,21 +70,21 @@ void Close(){
 }
 
 void Up(){
- 
+
   for (int i=0;i<45;i++){
-    
+
     angleupdown = angleupdown+2;
     myservo2.write(angleupdown);
     delay(30);
-    }
+  }
 }
 
 void Down(){
- 
+
   for (int i=0;i<45;i++){
-    
+
     angleupdown = angleupdown-2;
     myservo2.write(angleupdown);
     delay(30);
-    }
+  }
 }
