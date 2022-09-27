@@ -1,8 +1,8 @@
 from machine import Pin, PWM, ADC
 from utime import sleep
-from ws2812 import NeoPixel  #picobricks kutuphanesi olmali
+from picobricks import WS2812
 
-neo = NeoPixel(6, n=1, brightness=0.3, autowrite=False)
+ws = WS2812(6, brightness=0.3)
 ldr=ADC(27)
 buzzer=PWM(Pin(20, Pin.OUT))
 servo1=PWM(Pin(21))
@@ -52,12 +52,12 @@ def close():
     
 open()
 servo2.duty_u16(angleupdown)
-neo.fill(BLACK)
-neo.show()
+ws.pixels_fill(BLACK)
+ws.pixels_show()
 while True:
     if ldr.read_u16()>40000:
-        neo.fill(RED)
-        neo.show()
+        ws.pixels_fill(RED)
+        ws.pixels_show()
         sleep(1)
         buzzer.duty_u16(2000)
         sleep(1)
@@ -69,6 +69,6 @@ while True:
         close()
         sleep(0.5)
         up()
-        neo.fill(GREEN)
-        neo.show()
+        ws.pixels_fill(GREEN)
+        ws.pixels_show()
         sleep(0.5)

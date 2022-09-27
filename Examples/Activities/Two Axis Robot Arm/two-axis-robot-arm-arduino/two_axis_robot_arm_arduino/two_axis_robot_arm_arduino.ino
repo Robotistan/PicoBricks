@@ -23,19 +23,14 @@ void setup() {
 
   myservo1.attach(21);
   myservo2.attach(22);
-  
+  Open();
+  angleupdown=180;
+  myservo2.write(angleupdown);
 
 }
 
 void loop() {
-
-  Open();
-  angleupdown=180;
-  myservo2.write(angleupdown);
-  pixels.setPixelColor(0, pixels.Color(0, 0, 0));
-  pixels.show();
-
-  if(analogRead(27)>500){
+  if(analogRead(27)>150){
 
     pixels.setPixelColor(0, pixels.Color(255, 0, 0));
     pixels.show();
@@ -54,6 +49,11 @@ void loop() {
     pixels.setPixelColor(0, pixels.Color(0, 255, 0));
     pixels.show();
     delay(10000);  
+    pixels.setPixelColor(0, pixels.Color(0, 0, 0));
+    pixels.show();
+    Open();
+    angleupdown=180;
+    myservo2.write(angleupdown);
   }
 }
 

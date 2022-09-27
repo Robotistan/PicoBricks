@@ -1,18 +1,16 @@
 #include <Adafruit_NeoPixel.h>
-//#ifdef __AVR__
-//#include <avr/power.h>
-//#endif
 #define PIN        6 
 #define NUMPIXELS 1
 Adafruit_NeoPixel pixels(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
 #define DELAYVAL 500
 #include <Wire.h>
-#include "ACROBOTIC_SSD1306.h"
+#include "ACROBOTIC_SSD1306.h" //define libraries
 int OLED_color;
 int RGB_color;
 int score = 0;
 int x = 0;
 int button;
+
 
 
 void setup() {
@@ -21,9 +19,6 @@ void setup() {
   oled.init();                      
   oled.clearDisplay(); 
 
-#if defined(__AVR_ATtiny85__) && (F_CPU == 16000000)
-  clock_prescale_set(clock_div_1);
-#endif
 
   pixels.begin();
   pixels.clear(); 
@@ -72,15 +67,16 @@ void loop() {
   oled.putString(string_scrore);
   oled.setTextXY(6,5);              
   oled.putString("points");
-
+  // print final score on OLED screen
+  
   delay(10000);
 }
 
 void random_color(){
 
   OLED_color = random(1,5);
-  RGB_color = random(1,5);
-
+  RGB_color = random(1,5); 
+  // generate numbers between 1 and 5 randomly and print them on the screen
     if (OLED_color == 1){
       oled.setTextXY(3,7);              
       oled.putString("red");
