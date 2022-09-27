@@ -2,11 +2,11 @@
 #ifdef __AVR__
 #include <avr/power.h>
 #endif
-#define PIN        6 
+#define PIN        6
 #define NUMPIXELS 1
 Adafruit_NeoPixel pixels(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
 #define DELAYVAL 500
-
+// define required libraries
 #include <Servo.h>
 Servo myservo1;
 Servo myservo2;
@@ -17,16 +17,25 @@ void setup() {
 
   pinMode(20,OUTPUT);
   pinMode(27,INPUT);
-  
+  // define input and output pins
+
   pixels.begin();
-  pixels.clear(); 
+  pixels.clear();
 
   myservo1.attach(21);
+<<<<<<< HEAD:Examples/Activities/Two Axis Robot Arm/two-axis-robot-arm-arduino/two_axis_robot_arm_arduino/two_axis_robot_arm_arduino.ino
   myservo2.attach(22);
   Open();
   angleupdown=180;
   myservo2.write(angleupdown);
 
+=======
+  myservo2.attach(22); // define servo motor pins
+  Open();
+  angleupdown=180;
+  myservo2.write(angleupdown);
+  
+>>>>>>> 1c49a7ab30234584ea490fa4b6aca65d1a3f08f0:Examples/Activities/Two Axis Robot Arm/two-axis-robot-arm-arduino/two_axis_robot_arm_arduino.ino
 }
 
 void loop() {
@@ -48,12 +57,22 @@ void loop() {
     Up();
     pixels.setPixelColor(0, pixels.Color(0, 255, 0));
     pixels.show();
+<<<<<<< HEAD:Examples/Activities/Two Axis Robot Arm/two-axis-robot-arm-arduino/two_axis_robot_arm_arduino/two_axis_robot_arm_arduino.ino
     delay(10000);  
+=======
+    delay(10000);
+>>>>>>> 1c49a7ab30234584ea490fa4b6aca65d1a3f08f0:Examples/Activities/Two Axis Robot Arm/two-axis-robot-arm-arduino/two_axis_robot_arm_arduino.ino
     pixels.setPixelColor(0, pixels.Color(0, 0, 0));
     pixels.show();
     Open();
     angleupdown=180;
     myservo2.write(angleupdown);
+<<<<<<< HEAD:Examples/Activities/Two Axis Robot Arm/two-axis-robot-arm-arduino/two_axis_robot_arm_arduino/two_axis_robot_arm_arduino.ino
+=======
+    // If the LDR data is greater than the specified limit, the buzzer will sound, the RGB will turn red and servo motors will work
+    // The RGB will turn green when the movement is complete
+    
+>>>>>>> 1c49a7ab30234584ea490fa4b6aca65d1a3f08f0:Examples/Activities/Two Axis Robot Arm/two-axis-robot-arm-arduino/two_axis_robot_arm_arduino.ino
   }
 }
 
@@ -66,21 +85,21 @@ void Close(){
 }
 
 void Up(){
- 
+
   for (int i=0;i<45;i++){
-    
+
     angleupdown = angleupdown+2;
     myservo2.write(angleupdown);
     delay(30);
-    }
+  }
 }
 
 void Down(){
- 
+
   for (int i=0;i<45;i++){
-    
+
     angleupdown = angleupdown-2;
     myservo2.write(angleupdown);
     delay(30);
-    }
+  }
 }

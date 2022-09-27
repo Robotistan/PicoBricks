@@ -47,7 +47,7 @@ def getMeasure(pin):
     finalDistance = (measure/20) + 6
     oled.fill(0)
     oled.show()
-    oled.text(">Digital Ruller<", 2,5)
+    oled.text(">Digital Ruler<", 2,5)
     oled.text("Distance " + str(round(finalDistance)) +" cm", 0, 32)
     oled.show()
 #print the specified distance to the specified x and y coordinates on the OLED screen
@@ -58,4 +58,8 @@ def getMeasure(pin):
     measure=0
     finalDistance=0
 #sound the buzzer    
+<<<<<<< HEAD
 button.irq(trigger=machine.Pin.IRQ_RISING, handler=getMeasure)
+=======
+button.irq(trigger=machine.Pin.IRQ_RISING, handler=getMeasure)
+>>>>>>> 1c49a7ab30234584ea490fa4b6aca65d1a3f08f0
