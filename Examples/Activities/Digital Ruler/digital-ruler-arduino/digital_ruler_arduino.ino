@@ -49,7 +49,7 @@ void loop() {
     delay(1000);
     oled.clearDisplay();
     oled.setTextXY(2,1);              
-    oled.putString(">Dijital Ruler<");
+    oled.putString(">Digital Ruler<");
     oled.setTextXY(5,1);              
     oled.putString("Distance: ");
     oled.setTextXY(5,10);              
