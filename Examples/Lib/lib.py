@@ -125,7 +125,7 @@ class SSD1306_I2C(SSD1306):
     def write_data(self, buf):
         self.write_list[1] = buf
         self.i2c.writevto(self.addr, self.write_list)
-        
+       
 
 ##########WS2812 Library##########
 @rp2.asm_pio(sideset_init=rp2.PIO.OUT_LOW, out_shiftdir=rp2.PIO.SHIFT_LEFT, autopull=True, pull_thresh=24)
@@ -143,7 +143,7 @@ def ws2812():
     wrap()
 
 class WS2812():
-    
+   
     def __init__(self, num_leds=1, pin_num=6, brightness=0.2):
         self.num_leds = num_leds
         self.pin_num = pin_num
@@ -198,21 +198,21 @@ class WS2812():
                 self.pixels_set(i, self.wheel(rc_index & 255))
             self.pixels_show()
             time.sleep(wait)
-        
+       
 ##########Analog Value##########
 conversion_factor = 3.3 / (65535)
 class ReadADC():
-    
+   
     def __init__(self, pot_pin=26, ldr_pin=27):
         self.pot_pin=pot_pin
         self.ldr_pin=ldr_pin
-        
+       
     def read_potentiometer(self):
         potentiometer = machine.ADC(self.pot_pin)
         reading = potentiometer.read_u16() #Read Potentiometer ADC Value
         voltage = reading * conversion_factor #Read Potentiometer Voltage
         return reading, voltage
-    
+   
     def read_ldr(self):
         ldr = machine.ADC(self.ldr_pin)
         reading = ldr.read_u16() #Read LDR ADC Value
@@ -352,23 +352,23 @@ class music:
         self.song = songString
         self.looping = looping
         self.duty = duty
-        
+       
         self.stopped = False
-        
+       
         self.timer = -1
         self.beat = -1
         self.arpnote = 0
-        
+       
         self.pwms = []
-        
+       
         if (not (pin is None)):
             pins = [pin]
-            
+           
         i = 0
         for pin in pins:
             self.pwms.append(PWM(pins[i]))
             i = i + 1
-        
+       
         self.notes = []
 
         self.playingNotes = []
@@ -383,7 +383,7 @@ class music:
             testEnd = round(float(snote[0])) + ceil(float(snote[2]))
             if (testEnd > self.end):
                 self.end = testEnd
-                
+               
         #Create empty song structure
         while (self.end > len(self.notes)):
             self.notes.append(None)
@@ -392,7 +392,7 @@ class music:
         for note in splitSong:
             snote = note.split(" ")
             beat = round(float(snote[0]));
-            
+           
             if (self.notes[beat] == None):
                 self.notes[beat] = []
             self.notes[beat].append([snote[1],ceil(float(snote[2]))]) #Note, Duration
@@ -400,16 +400,16 @@ class music:
 
         #Round up end of song to nearest bar
         self.end = ceil(self.end / 8) * 8
-    
+   
     def stop(self):
         for pwm in self.pwms:
             pwm.deinit()
         self.stopped = True
-        
+       
     def tick(self):
         if (not self.stopped):
             self.timer = self.timer + 1
-            
+           
             #Loop
             if (self.timer % (self.tempo * self.end) == 0 and (not (self.timer == 0))):
                 if (not self.looping):
@@ -417,7 +417,7 @@ class music:
                     return False
                 self.beat = -1
                 self.timer = 0
-            
+           
             #On Beat
             if (self.timer % self.tempo == 0):
                 self.beat = self.beat + 1
@@ -431,9 +431,9 @@ class music:
                         self.playingDurations.pop(i)
                     else:
                         i = i + 1
-                        
+                       
                 #Add new notes and their durations to the playing list
-                
+               
                 """
                 #Old method runs for every note, slow to process on every beat and causes noticeable delay
                 ssong = song.split(";")
@@ -443,13 +443,13 @@ class music:
                         playingNotes.append(snote[1])
                         playingDurations.append(int(snote[2]))
                 """
-                
+               
                 if (self.beat < len(self.notes)):
                     if (self.notes[self.beat] != None):
                         for note in self.notes[self.beat]:
                             self.playingNotes.append(note[0])
                             self.playingDurations.append(note[1])
-                
+               
                 #Only need to run these checks on beats
                 i = 0
                 for pwm in self.pwms:
@@ -460,7 +460,7 @@ class music:
                         pwm.duty_u16(self.duty)
                         pwm.freq(tones[self.playingNotes[i]])
                     i = i + 1
-            
+           
 
             #Play arp of all playing notes
             if (len(self.playingNotes) > len(self.pwms)):
@@ -469,36 +469,36 @@ class music:
                     self.arpnote = 0
                 self.pwms[len(self.pwms)-1].freq(tones[self.playingNotes[self.arpnote+(len(self.pwms)-1)]])
                 self.arpnote = self.arpnote + 1
-                
+               
             return True
         else:
             return False
-    
+   
 
 ########WS2812##########
 class WS2812:
     """
     WS2812 driver class.
-    
-        
+   
+       
     Parameters
     --------------------
     pin : int
         GPIO number
-    
+   
     n : int
         Number of leds (default 1)
-    
+   
     brightness : float
         Percentage of brightness level (0.0~1.0, default 1.0)
-    
+   
     autowrite : bool
         Automatically call .show() whenever buffer is changed (default False)
-    
+   
     statemachine : int
         State machine id (0~7)
     """
-    
+   
     __slot__ = ['n', 'brightness', 'autowrite', 'buffer', '_sm']
 
     # PIO state machine assembly code
@@ -549,7 +549,7 @@ class WS2812:
     def fill(self, color):
         """
         Fill a specific color to all leds.
-        
+       
         Parameters
         --------------------
         color : list or tuple
@@ -558,7 +558,7 @@ class WS2812:
         self[:] = [color] * self.n
         if self.autowrite:
             self.show()
-    
+   
     def clear(self):
         """
         Clear all leds.
@@ -568,7 +568,7 @@ class WS2812:
     def rainbow_cycle(self, cycle=0):
         """
         Set rainbow colors accross all leds.
-        
+       
         Parameters
         --------------------
         cycle : int
@@ -577,11 +577,11 @@ class WS2812:
         self[:] = [WS2812._wheel((round(i * 255 / self.n) + cycle) & 255) for i in range(self.n)]
         if self.autowrite:
             self.show()
-            
+           
     def rotate(self, clockwise=True):
         """
         Rotate current buffer clockwise or counter-clockwise.
-        
+       
         Parameters
         --------------------
         clockwise : bool
@@ -628,25 +628,28 @@ class WS2812:
 ##########DHT11 Library##########
 class InvalidChecksum(Exception):
     pass
- 
+
+
 class InvalidPulseCount(Exception):
     pass
- 
+
+
 MAX_UNCHANGED = const(100)
 MIN_INTERVAL_US = const(200000)
 HIGH_LEVEL = const(50)
 EXPECTED_PULSES = const(84)
- 
+
+
 class DHT11:
-    _temperature: float
-    _humidity: float
- 
+    _temperature: int
+    _humidity: int
+
     def __init__(self, pin):
         self._pin = pin
         self._last_measure = utime.ticks_us()
         self._temperature = -1
         self._humidity = -1
- 
+
     def measure(self):
         current_ticks = utime.ticks_us()
         if utime.ticks_diff(current_ticks, self._last_measure) < MIN_INTERVAL_US and (
@@ -655,44 +658,45 @@ class DHT11:
             # Less than a second since last read, which is too soon according
             # to the datasheet
             return
- 
+
         self._send_init_signal()
+       
         pulses = self._capture_pulses()
         buffer = self._convert_pulses_to_buffer(pulses)
         self._verify_checksum(buffer)
- 
+
         self._humidity = buffer[0] + buffer[1] / 10
         self._temperature = buffer[2] + buffer[3] / 10
         self._last_measure = utime.ticks_us()
- 
+
     @property
     def humidity(self):
-        #self.measure()
+        self.measure()
         return self._humidity
- 
+
     @property
     def temperature(self):
-        #self.measure()
+        self.measure()
         return self._temperature
- 
+
     def _send_init_signal(self):
         self._pin.init(Pin.OUT, Pin.PULL_DOWN)
         self._pin.value(1)
         utime.sleep_ms(50)
         self._pin.value(0)
-        utime.sleep_ms(25)
- 
+        utime.sleep_ms(18)
+
     @micropython.native
     def _capture_pulses(self):
         pin = self._pin
         pin.init(Pin.IN, Pin.PULL_UP)
- 
+
         val = 1
         idx = 0
         transitions = bytearray(EXPECTED_PULSES)
         unchanged = 0
         timestamp = utime.ticks_us()
- 
+
         while unchanged < MAX_UNCHANGED:
             if val != pin.value():
                 if idx >= EXPECTED_PULSES:
@@ -703,17 +707,19 @@ class DHT11:
                 transitions[idx] = now - timestamp
                 timestamp = now
                 idx += 1
+
                 val = 1 - val
                 unchanged = 0
             else:
                 unchanged += 1
         pin.init(Pin.OUT, Pin.PULL_DOWN)
         if idx != EXPECTED_PULSES:
-            raise InvalidPulseCount(
-                "Expected {} but got {} pulses".format(EXPECTED_PULSES, idx)
-            )
+            print("WARNING: Could not read DHT, received pulses: " + str(idx))
+#             raise InvalidPulseCount(
+#                 "Expected {} but got {} pulses".format(EXPECTED_PULSES, idx)
+#             )
         return transitions[4:]
- 
+
     def _convert_pulses_to_buffer(self, pulses):
         """Convert a list of 80 pulses into a 5 byte buffer
         The resulting 5 bytes in the buffer will be:
@@ -727,13 +733,13 @@ class DHT11:
         binary = 0
         for idx in range(0, len(pulses), 2):
             binary = binary << 1 | int(pulses[idx] > HIGH_LEVEL)
- 
+
         # Split into 5 bytes
         buffer = array.array("B")
         for shift in range(4, -1, -1):
             buffer.append(binary >> shift * 8 & 0xFF)
         return buffer
- 
+
     def _verify_checksum(self, buffer):
         # Calculate checksum
         checksum = 0
