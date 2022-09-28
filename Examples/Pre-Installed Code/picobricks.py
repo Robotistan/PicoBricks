@@ -476,12 +476,10 @@ class music:
     
 
 ########WS2812##########
-class NeoPixel:
+class WS2812:
     """
-    NeoPixel (WS2812) driver class.
+    WS2812 driver class.
     
-    Initialize:
-        neo = neopixel.NeoPixel(pin, [n, brightness, autowrite])
         
     Parameters
     --------------------
@@ -522,7 +520,7 @@ class NeoPixel:
         self.brightness = brightness
         self.autowrite = autowrite
         self._sm = rp2.StateMachine(statemachine,
-                                    NeoPixel._ws2812,
+                                    WS2812._ws2812,
                                     freq=2400000,
                                     sideset_base=Pin(pin, Pin.OUT))
         self._sm.active(1)
@@ -576,7 +574,7 @@ class NeoPixel:
         cycle : int
             Cycle (0~255) of rainbow colors (default 0)
         """
-        self[:] = [NeoPixel._wheel((round(i * 255 / self.n) + cycle) & 255) for i in range(self.n)]
+        self[:] = [WS2812._wheel((round(i * 255 / self.n) + cycle) & 255) for i in range(self.n)]
         if self.autowrite:
             self.show()
             
@@ -597,14 +595,14 @@ class NeoPixel:
         """
         Write buffer to leds via state machine.
         """
-        self.brightness = NeoPixel._between(self.brightness, 0.0, 1.0)
+        self.brightness = WS2812._between(self.brightness, 0.0, 1.0)
         uint16_arr = array.array('I', [0] * self.n)
         for i, color in enumerate(self.buffer):
             if not isinstance(color, tuple) or len(color) != 3:
                 raise ValueError('Incorrect color data:' + str(color))
-            r = NeoPixel._between(round(color[0] * self.brightness), 0, 255)
-            g = NeoPixel._between(round(color[1] * self.brightness), 0, 255)
-            b = NeoPixel._between(round(color[2] * self.brightness), 0, 255)
+            r = WS2812._between(round(color[0] * self.brightness), 0, 255)
+            g = WS2812._between(round(color[1] * self.brightness), 0, 255)
+            b = WS2812._between(round(color[2] * self.brightness), 0, 255)
             uint16_arr[i] = (g << 16) | (r << 8) | b
         self._sm.put(uint16_arr, 8)
 #        time.sleep_us(50)
@@ -743,5 +741,3 @@ class DHT11:
             checksum += buf
         if checksum & 0xFF != buffer[4]:
             raise InvalidChecksum()
-
-

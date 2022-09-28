@@ -1,7 +1,7 @@
 from utime import sleep
 import time
 from machine import Pin, I2C, PWM, ADC
-from picobricks import SSD1306_I2C, NeoPixel, DHT11
+from picobricks import SSD1306_I2C, WS2812, DHT11
 import framebuf
 import random
 
@@ -31,18 +31,18 @@ light_level = ADC(27)
 conversion_factor = 3.3 / (65535) 
 dht_sensor = DHT11(Pin(11, Pin.OUT, Pin.PULL_DOWN))
 led = Pin(7, Pin.OUT)
-neo = NeoPixel(6, n=1, brightness=0.4, autowrite=False)
+ws = WS2812(6, n=1, brightness=0.4, autowrite=False)
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
 COLORS = (RED, GREEN, BLUE)
 
 for color in COLORS:
-        neo.fill(color)
-        neo.show()
+        ws.fill(color)
+        ws.show()
         time.sleep(0.1)
-neo.fill((0,0,0))
-neo.show()
+ws.fill((0,0,0))
+ws.show()
 
 buzzer.duty_u16(2000)
 buzzer.freq(831)
@@ -75,9 +75,3 @@ while True:
     oled.show()
     time.sleep(1)
     oled.fill(0)
-    
-
-
-
-
-

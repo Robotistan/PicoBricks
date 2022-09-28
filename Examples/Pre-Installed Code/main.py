@@ -1,7 +1,6 @@
-from utime import sleep
 import time
 from machine import Pin, I2C, PWM, ADC
-from picobricks import SSD1306_I2C, NeoPixel, DHT11
+from picobricks import SSD1306_I2C, WS2812, DHT11
 from resources import Note_img, Picobricks_img, Tones, Song
 import framebuf
 import random
@@ -37,7 +36,7 @@ def buttonInterruptHandler(event):    # Interrupt event, that will work when but
                 playtone(Tones[note[0]])
                 ws2812.fill((random.randint(0,255), random.randint(0,255), random.randint(0,255)))
                 ws2812.show()
-            sleep(NOTE_DURATION*note[1])
+            time.sleep(NOTE_DURATION*note[1])
 
 i2c = I2C(0, scl=Pin(5), sda=Pin(4), freq=200000)   # Init I2C using pins
 oled = SSD1306_I2C(WIDTH, HEIGHT, i2c, addr=0x3c)   # Init oled display
@@ -54,7 +53,7 @@ light_level = ADC(27)
 conversion_factor = 3.3 / (65535) 
 dht_sensor = DHT11(Pin(11, Pin.OUT, Pin.PULL_DOWN))
 led = Pin(7, Pin.OUT)
-ws2812 = NeoPixel(6, n=1, brightness=0.4, autowrite=False)
+ws2812 = WS2812(6, n=1, brightness=0.4, autowrite=False)
 
 button.irq(trigger=Pin.IRQ_RISING, handler=buttonInterruptHandler)  # Button 1 pressed interrupt is set. buttonInterruptHandler function will run when button is pressed
 
