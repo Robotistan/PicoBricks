@@ -38,11 +38,11 @@ BLUE = (0, 0, 255)
 COLORS = (RED, GREEN, BLUE)
 
 for color in COLORS:
-        ws.fill(color)
-        ws.show()
+        ws.pixels_fill(color)
+        ws.pixels_show()
         time.sleep(0.1)
-ws.fill((0,0,0))
-ws.show()
+ws.pixels_fill((0,0,0))
+ws.pixels_show()
 
 buzzer.duty_u16(2000)
 buzzer.freq(831)
