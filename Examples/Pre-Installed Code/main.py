@@ -1,9 +1,10 @@
 import time
 from machine import Pin, I2C, PWM, ADC
-from picobricks import SSD1306_I2C, WS2812, DHT11
+from picobricks import SSD1306_I2C, WS2812
 from resources import Note_img, Picobricks_img, Tones, Song
 import framebuf
 import random
+from dht import DHT11
 
 WIDTH  = 128   # oled display width
 HEIGHT = 64    # oled display height
@@ -51,7 +52,7 @@ button = Pin(10, Pin.IN) # setting GP10 PIN as input
 pot = ADC(26)
 light_level = ADC(27)
 conversion_factor = 3.3 / (65535)
-dht_sensor = DHT11(Pin(11, Pin.OUT, Pin.PULL_DOWN))
+dht_sensor = DHT11(Pin(11))
 led = Pin(7, Pin.OUT)
 ws2812 = WS2812(6, n=1, brightness=0.4, autowrite=False)
 
@@ -75,16 +76,19 @@ time.sleep(2)
 
 while True:
 
-    if time.time() - dht_read_time >= 5:  # Reading DHT11 every 5 seconds
+    if time.time() - dht_read_time >= 3:
         dht_read_time = time.time()
-        dht_sensor.measure()
+        try:
+            dht_sensor.measure()
+        except Exception as e:
+            print("Warning: could not measure: " + str(e))
    
     oled.fill(0)
     oled.text("PICOBRICKS",30, 0)
     oled.text("POT:      {0:.2f}V".format(pot.read_u16() * conversion_factor),0,20)
     oled.text("LIGHT:    {0:.2f}%".format((65535.0 - light_level.read_u16())/650.0),0,30)
-    oled.text("TEMP:     {0:.2f}C".format(dht_sensor._temperature),0,40)
-    oled.text("HUMIDITY: {0:.1f}%".format(dht_sensor._humidity),0,50)
+    oled.text("TEMP:     {0:.2f}C".format(dht_sensor.temperature()),0,40)
+    oled.text("HUMIDITY: {0:.1f}%".format(dht_sensor.humidity()),0,50)
     oled.show()
     time.sleep(1)
     oled.fill(0)
