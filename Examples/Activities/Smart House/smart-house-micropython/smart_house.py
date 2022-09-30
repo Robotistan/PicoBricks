@@ -14,7 +14,7 @@ gas=0
 while True:
     if button.value()==1:
         activated=1
-        gas=0 # koymali miyiz acep
+        gas=0 
         sleep(3)
         redLed.value(1)
         buzzer.duty_u16(0)
