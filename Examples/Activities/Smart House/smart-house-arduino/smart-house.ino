@@ -4,10 +4,10 @@ void actived (){
   {
     _loop();
   }
-  motion_dedected();
+  motion_detected();
 }
 
-void motion_dedected (){
+void motion_detected (){
   while(1) {
       // buzzer settings 
       tone(20,262,0.25*1000);
@@ -18,7 +18,7 @@ void motion_dedected (){
       delay(0.25*1000);
       tone(20,349,0.25*1000);
       delay(0.25*1000);
-// sound the buzzer when PIR dedected a motion 
+// sound the buzzer when PIR detected a motion 
       _loop();
   }
 }
