@@ -1,12 +1,12 @@
 from machine import Pin, PWM
 from utime import sleep
-
+# define libraries
 PIR=Pin(14, Pin.IN)
 MQ2=Pin(1,Pin.IN)
 buzzer=PWM(Pin(20,Pin.OUT))
 redLed=Pin(7,Pin.OUT)
 button=Pin(10,Pin.IN,Pin.PULL_DOWN)
-
+# define output and input pins
 
 activated=0
 gas=0
@@ -39,3 +39,4 @@ while True:
         buzzer.freq(523)
         sleep(0.5)
         redLed.value(0)
+        # LED will light and buzzer will sound when PIR detects motion or MQ2 detects toxic gas
