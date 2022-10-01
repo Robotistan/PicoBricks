@@ -1,30 +1,90 @@
-#include <NewPing.h>
+#include <Adafruit_NeoPixel.h>
+#ifdef __AVR__
+#include <avr/power.h>
+#endif
+#define PIN        6
+#define NUMPIXELS 1
+Adafruit_NeoPixel pixels(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
+#define DELAYVAL 500
+// define required libraries
 #include <Servo.h>
-Servo myservo;
+Servo myservo1;
+Servo myservo2;
 
-#define TRIGGER_PIN  15
-#define ECHO_PIN     14
-#define MAX_DISTANCE 400
-
-NewPing sonar(TRIGGER_PIN, ECHO_PIN, MAX_DISTANCE);
+int angleupdown;
 
 void setup() {
-  myservo.attach(21);
-  myservo.write(20);
+
+  pinMode(20,OUTPUT);
+  pinMode(27,INPUT);
+  // define input and output pins
+
+  pixels.begin();
+  pixels.clear();
+
+  myservo1.attach(21);
+  myservo2.attach(22); // define servo motor pins
+  Open();
+  angleupdown=180;
+  myservo2.write(angleupdown);
+  
 }
 
 void loop() {
-  
-  delay(50);
-  int distance=sonar.ping_cm();
+  if(analogRead(27)>150){
 
-  if(distance<10){
+    pixels.setPixelColor(0, pixels.Color(255, 0, 0));
+    pixels.show();
+    delay(1000);
+    tone(20,700);
+    delay(1000);
+    noTone(20);
 
-    int x=70;
-    int y=20;
-    delay(2000);
-    myservo.write(x);
-    delay(2000);
-    myservo.write(y);
+    Open();
+    delay(500);
+    Down();
+    delay(500);
+    Close();
+    delay(500);
+    Up();
+    pixels.setPixelColor(0, pixels.Color(0, 255, 0));
+    pixels.show();
+    delay(10000);
+    pixels.setPixelColor(0, pixels.Color(0, 0, 0));
+    pixels.show();
+    Open();
+    angleupdown=180;
+    myservo2.write(angleupdown);
+    // If the LDR data is greater than the specified limit, the buzzer will sound, the RGB will turn red and servo motors will work
+    // The RGB will turn green when the movement is complete
+    
+  }
+}
+
+void Open(){
+  myservo1.write(180);
+}
+
+void Close(){
+  myservo1.write(30);
+}
+
+void Up(){
+
+  for (int i=0;i<45;i++){
+
+    angleupdown = angleupdown+2;
+    myservo2.write(angleupdown);
+    delay(30);
+  }
+}
+
+void Down(){
+
+  for (int i=0;i<45;i++){
+
+    angleupdown = angleupdown-2;
+    myservo2.write(angleupdown);
+    delay(30);
   }
 }
