@@ -54,7 +54,7 @@ light_level = ADC(27)
 conversion_factor = 3.3 / (65535)
 dht_sensor = DHT11(Pin(11))
 led = Pin(7, Pin.OUT)
-ws2812 = WS2812(6, n=1, brightness=0.4, autowrite=False)
+ws2812 = WS2812(6,brightness=0.4)
 
 button.irq(trigger=Pin.IRQ_RISING, handler=buttonInterruptHandler)  # Button 1 pressed interrupt is set. buttonInterruptHandler function will run when button is pressed
 
