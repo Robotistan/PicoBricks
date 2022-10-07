@@ -1,16 +1,16 @@
 from machine import I2C, Pin, SPI, PWM
 from mfrc522 import MFRC522
-from ws2812 import NeoPixel   # picobricks kutuphanesi
+from picobricks import WS2812   # picobricks kutuphanesi
 from utime import sleep 
 
-servo = PWM(Pin(21))
+servo = PWM(Pin(22))
 servo.freq(50)
 servo.duty_u16(1350) #servo set 0 angle 8200 for 180.
 
 buzzer = PWM(Pin(20, Pin.OUT))
 buzzer.freq(440)
 
-neo = NeoPixel(6, n=1, brightness=0.3, autowrite=False)
+ws = WS2812(6, brightness=0.3)
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BLACK = (0, 0, 0)
@@ -21,7 +21,7 @@ miso = Pin(16, Pin.OUT)
 sda = Pin(17, Pin.OUT)
 rst = Pin(20, Pin.OUT)
 spi = SPI(0, baudrate=100000, polarity=0, phase=0, sck=sck, mosi=mosi, miso=miso)
-homeowner = "0x734762a3"
+homeowner = "0x6a57daa3"
 rdr = MFRC522(spi, sda, rst)
 
 while True:
@@ -37,18 +37,18 @@ while True:
             print(uid)
             sleep(1)
             if (uid==homeowner):
-                neo.fill(GREEN)
-                neo.show()
+                ws.pixels_fill(GREEN)
+                ws.pixels_show()
                 servo.duty_u16(6000)
                 sleep(3)
                 servo.duty_u16(1350)
-                neo.fill(BLACK)
-                neo.show()
+                ws.pixels_fill(BLACK)
+                ws.pixels_show()
                
             else:
-                neo.fill(RED)
-                neo.show()
+                ws.pixels_fill(RED)
+                ws.pixels_show()
                 sleep(3)
-                neo.fill(BLACK)
-                neo.show()
+                ws.pixels_fill(BLACK)
+                ws.pixels_show()
                 servo.duty_u16(1350)
