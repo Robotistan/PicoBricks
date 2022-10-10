@@ -1,20 +1,20 @@
 from machine import I2C, Pin, SPI, PWM
 from mfrc522 import MFRC522
-from picobricks import WS2812   # picobricks kutuphanesi
+from picobricks import WS2812
 from utime import sleep 
-
+#define libraries
 servo = PWM(Pin(22))
 servo.freq(50)
-servo.duty_u16(1350) #servo set 0 angle 8200 for 180.
+servo.duty_u16(1350) 
 
 buzzer = PWM(Pin(20, Pin.OUT))
 buzzer.freq(440)
-
+#define servo motor and buzzer pins
 ws = WS2812(6, brightness=0.3)
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BLACK = (0, 0, 0)
-
+#RGB LED color settings
 sck = Pin(18, Pin.OUT)
 mosi = Pin(19, Pin.OUT)
 miso = Pin(16, Pin.OUT)
@@ -23,6 +23,7 @@ rst = Pin(20, Pin.OUT)
 spi = SPI(0, baudrate=100000, polarity=0, phase=0, sck=sck, mosi=mosi, miso=miso)
 homeowner = "0x6a57daa3"
 rdr = MFRC522(spi, sda, rst)
+#define MFRC522 sensor pins and card serial number
 
 while True:
     
@@ -43,7 +44,8 @@ while True:
                 sleep(3)
                 servo.duty_u16(1350)
                 ws.pixels_fill(BLACK)
-                ws.pixels_show()
+                ws.pixels_show() #if the correct card is read to the sensor, the RGB LED turns green and the door opens thanks to the servo motor
+
                
             else:
                 ws.pixels_fill(RED)
@@ -52,3 +54,4 @@ while True:
                 ws.pixels_fill(BLACK)
                 ws.pixels_show()
                 servo.duty_u16(1350)
+                #if the wrong card is read to the sensor, the RGB LED turns red and the door does not open
