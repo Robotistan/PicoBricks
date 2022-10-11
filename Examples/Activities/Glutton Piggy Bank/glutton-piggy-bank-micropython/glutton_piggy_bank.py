@@ -8,7 +8,7 @@ echo = Pin(14, Pin.IN)
 #define the input and otput pins
 
 servo.freq(50)
-servo.duty_u16(4010) #70 degree
+servo.duty_u16(6750)
 
 def getDistance():
    trigger.low()
@@ -28,6 +28,6 @@ def getDistance():
 while True:
     utime.sleep(0.01)
     if int(getDistance())<=5:  #if the distance variable is less than 5
-        servo.duty_u16(7050) #150 degree
+        servo.duty_u16(4010) 
         utime.sleep(0.3)  #wait
-        servo.duty_u16(4010)  #70 degree
+        servo.duty_u16(6750)  
