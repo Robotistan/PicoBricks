@@ -158,7 +158,7 @@ void Wrong(){
   // write the score variable and the expressions is quotation marks to the coordinates determined on the OLED screen.
 
   digitalWrite(20,HIGH);  //turn on the buzzer
-  delay(1000);  //wait
+  delay(1000);   //wait
   digitalWrite(20,LOW); //turn off the buzzer
   counter=1;
 }
