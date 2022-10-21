@@ -16,7 +16,7 @@ COLORS = (RED, GREEN, BLUE)
 #RGB color Code
 
 while True:#while loop
-    print(ldr.read_u16()) #Print the value of the LDR sensor to the screen.
+    print(ldr.read_u16()) #print the value of the LDR sensor to the screen.
     
     if(ldr.read_u16()>10000):#let's check the ldr sensor
         for color in COLORS:
