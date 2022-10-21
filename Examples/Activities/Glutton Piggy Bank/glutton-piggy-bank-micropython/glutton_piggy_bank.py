@@ -5,7 +5,7 @@ import utime
 servo=PWM(Pin(21,Pin.OUT))
 trigger = Pin(15, Pin.OUT)
 echo = Pin(14, Pin.IN)
-#define the input and otput pins
+#define the input and output pins
 
 servo.freq(50)
 servo.duty_u16(6750)
