@@ -12,7 +12,7 @@ scl=machine.Pin(5)
 i2c=machine.I2C(0,sda=sda, scl=scl, freq=1000000)
 ws = WS2812(pin_num=6, num_leds=1, brightness=0.3)
 
-oled = SSD1306_I2C(128, 64, i2c)
+oled = SSD1306_I2C(WIDTH, HEIGHT, i2c)
 
 button = Pin(10,Pin.IN,Pin.PULL_DOWN)
 RED = (255, 0, 0)
