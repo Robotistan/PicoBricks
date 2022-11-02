@@ -11,7 +11,7 @@ scl=machine.Pin(5)
 #we define sda ​​and scl pins for inter-path communication
 i2c=machine.I2C(0,sda=sda, scl=scl, freq=1000000)#determine the frequency values
 
-oled = SSD1306_I2C(128, 64, i2c)
+oled = SSD1306_I2C(WIDTH, HEIGHT, i2c)
 pot = ADC(Pin(26))
 button = Pin(10,Pin.IN,Pin.PULL_DOWN)
 #determine our input and output pins
