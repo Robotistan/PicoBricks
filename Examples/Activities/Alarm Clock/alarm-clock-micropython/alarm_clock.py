@@ -14,7 +14,7 @@ scl=machine.Pin(5)
 i2c=machine.I2C(0,sda=sda, scl=scl, freq=1000000)
 neo = WS2812(pin_num=6, num_leds=1, brightness=0.3)#initialize digital pin 6 as an OUTPUT for NeoPixel
 
-oled = SSD1306_I2C(128, 64, i2c)
+oled = SSD1306_I2C(WIDTH, HEIGHT, i2c)
 ldr = ADC(Pin(27))#initialize digital pin 6 as an OUTPUT for NeoPixel
 button = Pin(10,Pin.IN,Pin.PULL_DOWN)#initialize digital pin 10 as an INPUT for button
 buzzer = PWM(Pin(20, Pin.OUT))#initialize digital pin 20 as an OUTPUT for buzzer
