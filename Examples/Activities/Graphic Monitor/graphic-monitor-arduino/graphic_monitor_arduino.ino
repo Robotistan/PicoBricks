@@ -11,7 +11,7 @@ void loop() {
   // put your main code here, to run repeatedly:
   int pot_val = analogRead(26);
   int led_val = map(pot_val, 0, 1023, 0, 255);
-  digitalWrite(7, led_val);
+  analogWrite(7, led_val);
   Serial.println(led_val);
   //trun on the LED according to the value from the potentiometer
   
