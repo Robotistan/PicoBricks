@@ -9,7 +9,7 @@ HEIGHT = 64
 sda=machine.Pin(4)#initialize digital pin 4 and 5 as an OUTPUT for OLED Communication
 scl=machine.Pin(5)
 i2c=machine.I2C(0,sda=sda, scl=scl, freq=1000000)
-oled = SSD1306_I2C(128, 64, i2c)
+oled = SSD1306_I2C(WIDTH, HEIGHT, i2c)
 
 wire=Pin(1,Pin.OUT)#initialize digital pin 1 as an OUTPUT 
 led = Pin(7,Pin.OUT)#initialize digital pin 7 and 5 as an OUTPUT for LED
