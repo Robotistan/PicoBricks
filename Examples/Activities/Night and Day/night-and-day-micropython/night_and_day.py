@@ -1,6 +1,5 @@
 from machine import Pin, I2C, Timer, ADC, PWM
 from picobricks import SSD1306_I2C
-from utime import sleep
 import utime
 import urandom
 #define the libraries
@@ -11,7 +10,7 @@ sda=machine.Pin(4)
 scl=machine.Pin(5)
 #initialize digital pin 4 and 5 as an OUTPUT for OLED Communication
 i2c=machine.I2C(0,sda=sda, scl=scl, freq=1000000)
-oled = SSD1306_I2C(128, 64, i2c)
+oled = SSD1306_I2C(WIDTH, HEIGHT, i2c)
 buzzer = PWM(Pin(20))
 buzzer.freq(440)
 ldr=ADC(Pin(27))
