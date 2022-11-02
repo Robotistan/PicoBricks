@@ -1,10 +1,9 @@
 import time
 from machine import Pin, I2C, PWM, ADC
-from picobricks import SSD1306_I2C, WS2812
+from picobricks import SSD1306_I2C, WS2812, DHT11
 from resources import Note_img, Picobricks_img, Tones, Song
 import framebuf
 import random
-from dht import DHT11
 
 WIDTH  = 128   # oled display width
 HEIGHT = 64    # oled display height
@@ -25,8 +24,8 @@ def buttonInterruptHandler(event):    # Interrupt event, that will work when but
         oled.show()
         for note in Song:
             if button.value() == 0:  # if button is released then reset ws2812, oled, buzzer and return
-                ws2812.fill((0,0,0))
-                ws2812.show()
+                ws2812.pixels_fill((0,0,0))
+                ws2812.pixels_show()
                 bequiet()
                 oled.fill(0)
                 oled.show()
@@ -35,8 +34,8 @@ def buttonInterruptHandler(event):    # Interrupt event, that will work when but
                 bequiet()
             else:
                 playtone(Tones[note[0]])
-                ws2812.fill((random.randint(0,255), random.randint(0,255), random.randint(0,255)))
-                ws2812.show()
+                ws2812.pixels_fill((random.randint(0,255), random.randint(0,255), random.randint(0,255)))
+                ws2812.pixels_show()
             time.sleep(NOTE_DURATION*note[1])
 
 i2c = I2C(0, scl=Pin(5), sda=Pin(4), freq=200000)   # Init I2C using pins
@@ -87,8 +86,9 @@ while True:
     oled.text("PICOBRICKS",30, 0)
     oled.text("POT:      {0:.2f}V".format(pot.read_u16() * conversion_factor),0,20)
     oled.text("LIGHT:    {0:.2f}%".format((65535.0 - light_level.read_u16())/650.0),0,30)
-    oled.text("TEMP:     {0:.2f}C".format(dht_sensor.temperature()),0,40)
-    oled.text("HUMIDITY: {0:.1f}%".format(dht_sensor.humidity()),0,50)
+    oled.text("TEMP:     {0:.2f}C".format(dht_sensor.temperature),0,40)
+    oled.text("HUMIDITY: {0:.1f}%".format(dht_sensor.humidity),0,50)
     oled.show()
     time.sleep(1)
     oled.fill(0)
+
