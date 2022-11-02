@@ -8,8 +8,7 @@ Adafruit_NeoPixel pixels(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
 int OLED_color;
 int RGB_color;
 int score = 0;
-int x = 0;
-int button;
+int button = 0;
 
 
 
@@ -22,6 +21,7 @@ void setup() {
 
   pixels.begin();
   pixels.clear(); 
+  randomSeed(analogRead(27));
 
 }
 
@@ -36,27 +36,28 @@ void loop() {
   oled.clearDisplay();
   
   for (int i=0;i<10;i++){
-    
+    button = digitalRead(10);
     random_color();
     pixels.show();
-    
-    button = digitalRead(10);
-    if (button == 1){
-
-      if(OLED_color==RGB_color & x==0){
-        score=score+10;
-        x=1;
-      }
-      if(OLED_color!=RGB_color & x==0){
-        score=score-10;
-        x=1;
-      }
+    unsigned long start_time = millis();
+    while (button == 0) {
+        button = digitalRead(10);
+        if (millis() - start_time > 2000)
+          break;
     }
-    delay(2000);
+    if (button == 1){
+  
+        if(OLED_color==RGB_color){
+          score=score+10;
+        }
+        if(OLED_color!=RGB_color){
+          score=score-10;
+        }
+        delay(200);
+    }
     oled.clearDisplay();
     pixels.setPixelColor(0, pixels.Color(0, 0, 0));
     pixels.show();
-    x=0;
   }
 
   String string_scrore=String(score);
