@@ -9,7 +9,7 @@ HEIGHT=64
 sda=machine.Pin(4)
 scl=machine.Pin(5)
 i2c=machine.I2C(0,sda=sda, scl=scl, freq=2000000)
-oled= SSD1306_I2C(128, 64, i2c)
+oled= SSD1306_I2C(WIDTH, HEIGHT, i2c)
 button = Pin(10,Pin.IN,Pin.PULL_DOWN)
 led=Pin(7,Pin.OUT)
 #define our input and output pins
