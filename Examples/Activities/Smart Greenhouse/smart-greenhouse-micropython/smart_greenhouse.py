@@ -1,13 +1,13 @@
 import utime
 import uos
-import machine # gereksiz import
+import machine 
 from machine import Pin, ADC
-from dht import DHT11  #picobricks olmali
-from utime import sleep # gereksiz import
+from picobricks import DHT11  
+from utime import sleep 
 
-dht_sensor = DHT11(11)
+dht_sensor = DHT11(Pin(11))
 smo_sensor=ADC(27)
-m1 = Pin(21, Pin.OUT)
+m1 = Pin(22, Pin.OUT)
 m1.low()
 
 print("Machine: \t" + uos.uname()[4])
@@ -15,6 +15,8 @@ print("MicroPython: \t" + uos.uname()[3])
 
 uart0 = machine.UART(0, baudrate=115200)
 print(uart0)
+
+dht_sensor.measure()
 
 def Connect_WiFi(cmd, uart=uart0, timeout=5000):
     print("CMD: " + cmd)
@@ -56,10 +58,10 @@ Send_AT_Cmd('AT+RESTORE\r\n')  #Restore Factory Default Settings
 Send_AT_Cmd('AT+CWMODE?\r\n')  #Query the WiFi mode
 Send_AT_Cmd('AT+CWMODE=1\r\n') #Set the WiFi mode = Station mode
 Send_AT_Cmd('AT+CWMODE?\r\n')  #Query the WiFi mode again
-Send_AT_Cmd('AT+CWJAP="YourWifiSSID","YourWifiPassword"\r\n', timeout=5000) #Connect to AP
-utime.sleep(3.0)
+Send_AT_Cmd('AT+CWJAP="MAD","11223344"\r\n', timeout=5000) #Connect to AP
+utime.sleep(2.0)
 Send_AT_Cmd('AT+CIFSR\r\n')    #Obtain the Local IP Address
-utime.sleep(3.0)
+utime.sleep(2.0)
 Send_AT_Cmd('AT+CIPMUX=1\r\n')    
 utime.sleep(1.0)
 Send_AT_Cmd('AT+CIPSERVER=1,80\r\n')    #Obtain the Local IP Address
@@ -95,8 +97,8 @@ while True:
         elif '/SERA' in res:
             #sleep(1) # It was used for DHT11 to measure.
             dht_sensor.measure() # Use the sleep() command before this line.
-            temp=dht_sensor.temperature()
-            hum=dht_sensor.humidity()
+            temp=dht_sensor.temperature
+            hum=dht_sensor.humidity
             smo=round((smo_sensor.read_u16()/65535)*100)
             sendStr="\"TEMP\":{}, \"Humidity\":{}, \"S.Moisture\":{}%".format(temp,hum,smo)
             sendText="{"+sendStr+"}"
