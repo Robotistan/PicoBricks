@@ -1,0 +1,840 @@
+module main
+author unknown
+version 1 0 
+description ''
+variables ESP01_server_ready _eol ESP01_tcp_req_queue ESP01_LogSize _espDisplayDelay _colon _comma ESP01_IPaddr _espBufferDelay timer ESP01_current_cmd cmdComplete ESP01_status ESP01_response _serbuffer _espLoopDelay 
+
+  spec ' ' 'ESP01_IP_address' 'ESP01_IP_address'
+  spec ' ' 'ESP01_connect_to' 'ESP01_connect_to _ Password _' 'auto auto' 'Network_Name' 'Network_Password'
+  spec 'r' 'ESP01_display_LOG' 'ESP01_display_LOG'
+  spec ' ' 'ESP01_log _' 'ESP01_log _' 'str' 'op result'
+  spec 'r' 'ESP01_path_of_request' 'ESP01_path_of_request _' 'auto' ''
+  spec ' ' 'ESP01_requests' 'ESP01_requests'
+  spec ' ' 'ESP01_restore' 'ESP01_restore'
+  spec ' ' 'ESP01_server' 'ESP01_server _' 'str.ServerMenu' 'Create Server'
+  spec ' ' 'ESP01_set_MUX' 'ESP01_set_MUX _' 'str.MuxMenu' 'Multiple Connections'
+  spec ' ' 'ESP01_set_WIFI_mode' 'ESP01_set_WIFI_mode _' 'str.ModeMenu' 'Station'
+  spec 'r' '_byteArray2string' '_byteArray2string _' 'auto' ''
+  spec 'r' '_cmdError' '_cmdError'
+  spec 'r' '_cmdGood' '_cmdGood'
+  spec ' ' '_handleIPD' '_handleIPD'
+  spec ' ' '_logging _' '_logging _' 'bool' true
+  spec 'r' '_queueRequest' '_queueRequest _' 'str' 'text'
+  spec ' ' '_sendATcmd' '_sendATcmd _' 'str' 'ATcmd'
+  spec 'r' '_tcpRequest' '_tcpRequest'
+  spec ' ' 'initializeCommands' 'initializeCommands'
+  spec ' ' 'initializeResponses' 'initializeResponses'
+  spec ' ' 'processRequest' 'processRequest'
+
+to ESP01_IP_address {
+  comment 'AT+CIPSTA?
+
++CIPSTA:ip:"192.168.1.35"
++CIPSTA:gateway:"192.168.1.1"
++CIPSTA:netmask:"255.255.255.0"
+
+OK'
+  ESP01_prev_status = ''
+  comment 'Obtain the local IP address and MAC address'
+  ESP01_current_cmd = 'CIPSTA'
+  '_sendATcmd' 'AT+CIPSTA?'
+  waitUntil ESP01_response
+  if ('ERROR' == ESP01_prev_status) {
+    'ESP01_log _' ('[data:join]' 'Get IP: ' ESP01_prev_status)
+    sayIt 'ERROR while getting IP address.'
+    waitMillis _espDisplayDelay
+    cmdComplete = (booleanConstant true)
+    stopTask
+  } else {
+    local 'searchIdx' ('[data:find]' '+CIPSTA:ip:"' savebuffer)
+    if (searchIdx > 0) {
+      ESP01_IPaddr = ('[data:copyFromTo]' savebuffer (searchIdx + 12) (('[data:find]' ('[data:join]' '"' _eol) savebuffer) - 1))
+    } else {
+      'ESP01_log _' 'GET IP: bad buffer content'
+      sayIt 'Bad buffer content while getting IP'
+      waitMillis _espDisplayDelay
+      cmdComplete = (booleanConstant true)
+      stopTask
+    }
+    if (or (0 == (size ESP01_IPaddr)) (or (ESP01_IPaddr == '0.0.0.0') (ESP01_IPaddr == 0))) {
+      'ESP01_log _' ('[data:join]' 'CONNECT to WIFI: ' 'no IP acquired')
+      sayIt 'IP Address not acquired.'
+      waitMillis _espDisplayDelay
+      cmdComplete = (booleanConstant true)
+      stopTask
+    } else {
+      'ESP01_log _' ('[data:join]' ESP01_current_cmd _colon ESP01_prev_status ' - ' ESP01_IPaddr)
+    }
+  }
+  cmdComplete = (booleanConstant true)
+}
+
+to ESP01_connect_to ssid password {
+  comment 'AT+CWJAP="ssid","passwd"
+WIFI DISCONNECT (If already connected)
+WIFI CONNECTED
+WIFI GOT IP
+OK
+
+On FAIL:
+AT+CWJAP="ssid","passwd"
+WIFI DISCONNECT
++CWJAP:2 (fail codes 1 - 5)
+FAIL
+
+FAIL CODES:
+1: connection timeout.
+2: wrong password.
+3: cannot find the target AP.
+4: connection failed.
+others: unknown error occurred.
+
+NOTE: CWJAP timeout is 15 secs.'
+  ESP01_ssid = ssid
+  ESP01_password = password
+  ESP01_prev_status = ''
+  comment 'Connect to an AP and get an IP address'
+  ESP01_current_cmd = 'CWJAP'
+  '_sendATcmd' ('[data:join]' 'AT+CWJAP="' ssid '","' password '"')
+  waitUntil ESP01_response
+  if ('FAIL' == ESP01_prev_status) {
+    local 'failCode' ('[data:find]' '+CWJAP:' savebuffer)
+    failCode = ('[data:copyFromTo]' savebuffer (failCode + 7) ('[data:find]' _eol savebuffer failCode))
+    'ESP01_log _' ('[data:join]' ESP01_current_cmd _colon ESP01_prev_status ' code - ' failCode)
+    sayIt 'WIFI Login Error.'
+    cmdComplete = (booleanConstant true)
+    stopAll
+    stopTask
+  } else {
+    'ESP01_log _' ('[data:join]' ESP01_current_cmd _colon ESP01_prev_status)
+  }
+  cmdComplete = (booleanConstant true)
+}
+
+to ESP01_display_LOG {
+  if (0 == (size ESP01_Log)) {
+    return 'LOG file is empty.'
+  } else {
+    return ('[data:joinStrings]' ESP01_Log _eol)
+  }
+}
+
+to 'ESP01_log _' entry {
+  if debug {
+    '[data:addLast]' entry ESP01_Log
+    if ((size ESP01_Log) > ESP01_LogSize) {
+      '[data:delete]' 1 ESP01_Log
+    }
+  }
+}
+
+to ESP01_path_of_request request {
+  return ('_byteArray2string' ('[data:copyFromTo]' request (('[data:find]' 'GET ' request) + 4) (('[data:find]' ' HTTP' request) - 1)))
+}
+
+to ESP01_requests {
+  comment 'VERIFY TIMINGS IN THIS FUNCTION
+
+IF POSSIBLE, USE SEND ATCM FUNCTION WITH RETURN CHECK
+
+NEW: use TCPDATA as command to send out multiple TCP  buffers with SEND OK
+returns.'
+  waitUntil ESP01_server_ready
+  ESP01_prev_status = ''
+  ESP01_current_cmd = 'TCPREQUEST'
+  local 'req' (at 1 ESP01_tcp_req_queue)
+  local 'ptr' (('[data:find]' '+IPD,' req) + 5)
+  _linkID = ('[data:copyFromTo]' req ptr (('[data:find]' _comma req ptr) - 1))
+  _reqPath = (ESP01_path_of_request req)
+  '_handleIPD'
+  ESP01_current_cmd = 'TCPREQUEST'
+  comment 'CONFIRM good process b4 DELETE'
+  '[data:delete]' 1 ESP01_tcp_req_queue
+}
+
+to ESP01_restore {
+  comment 'WIFI disconnects, IP:0.0.0.0
+UART:115200,8,1,0,0
+CWMODE:2, CWJAP:noAP, CIPMUX:0
+CIPSTO:180, '
+  ESP01_prev_status = ''
+  comment 'Restores the factory default settings of the module'
+  ESP01_current_cmd = 'RESTORE'
+  '_sendATcmd' 'AT+RESTORE'
+  waitUntil ESP01_response
+  'ESP01_log _' ('[data:join]' ESP01_current_cmd _colon ESP01_prev_status)
+  cmdComplete = (booleanConstant true)
+}
+
+to ESP01_server action {
+  comment 'Delete/create a TCP/SSL server
+action:
+– 0: delete a server.
+– 1: create a server.
+param:
+– 1: shutdown the server and close all connections.
+-80: port number for create server
+
+On repeated create, OK with "no change" received.
+'
+  if ('Delete Server' == action) {
+    local 'actionMode' 0
+    local 'param' 1
+  } ('Create Server' == action) {
+    local 'actionMode' 1
+    local 'param' 80
+  }
+  ESP01_prev_status = ''
+  ESP01_current_cmd = 'CIPSERVER'
+  '_sendATcmd' ('[data:join]' 'AT+CIPSERVER=' actionMode ',' param)
+  waitUntil ESP01_response
+  if ('OK' == ESP01_prev_status) {
+    ESP01_server_ready = (booleanConstant true)
+  } else {
+    ESP01_server_ready = (booleanConstant false)
+  }
+  'ESP01_log _' ('[data:join]' ESP01_current_cmd _colon actionMode ' - ' ESP01_prev_status)
+  cmdComplete = (booleanConstant true)
+}
+
+to ESP01_set_MUX mux {
+  if ('Single Connection' == mux) {
+    local 'muxMode' 0
+  } ('Multiple Connections' == mux) {
+    local 'muxMode' 1
+  }
+  ESP01_prev_status = ''
+  ESP01_current_cmd = 'CIPMUX'
+  comment 'Enable/disable the multiple connections mode'
+  '_sendATcmd' ('[data:join]' 'AT+CIPMUX=' muxMode)
+  waitUntil ESP01_response
+  if ('ERROR' == ESP01_prev_status) {
+    'ESP01_log _' ('[data:join]' ESP01_current_cmd _colon muxMode ' - ' ESP01_prev_status)
+    sayIt 'ERROR during MUX set.'
+    waitMillis _espDisplayDelay
+    cmdComplete = (booleanConstant true)
+    stopTask
+  }
+  'ESP01_log _' ('[data:join]' ESP01_current_cmd _colon muxMode ' - ' ESP01_prev_status)
+  cmdComplete = (booleanConstant true)
+}
+
+to ESP01_set_WIFI_mode mode {
+  comment 'AT+CWMODE=1
+OK'
+  if ('Station' == mode) {
+    local 'modeIn' 1
+  } ('SoftAP' == mode) {
+    local 'modeIn' 2
+  } ('Station&SoftAP' == mode) {
+    local 'modeIn' 3
+  }
+  ESP01_prev_status = ''
+  comment 'Set the Wi-Fi mode (Station/SoftAP/Station+SoftAP)'
+  ESP01_current_cmd = 'CWMODE'
+  '_sendATcmd' ('[data:join]' 'AT+CWMODE=' modeIn)
+  waitUntil ESP01_response
+  'ESP01_log _' ('[data:join]' 'WIFI Mode ' mode _colon ESP01_prev_status)
+  cmdComplete = (booleanConstant true)
+}
+
+to '_byteArray2string' aStringOrByteArray {
+  comment 'If argument is a byte array, convert it to a string. '
+  if (not (isType aStringOrByteArray 'string')) {
+    aStringOrByteArray = ('[data:join]' '' aStringOrByteArray)
+  }
+  return aStringOrByteArray
+}
+
+to '_cmdError' {
+  local 'cmdIndx' ('[data:find]' ESP01_current_cmd ATCommands)
+  comment 'need STRING compare'
+  if ('0' == (at (cmdIndx + 2) ATCommands)) {
+    return (booleanConstant false)
+  }
+  local 'target' (at (at (cmdIndx + 2) ATCommands) ATResponses)
+  _serFindIndex = ('[data:find]' target _serbuffer)
+  if (-1 == _serFindIndex) {
+    ESP01_prev_status = '<error> not found.'
+    return (booleanConstant false)
+  } else {
+    ESP01_prev_status = target
+    savebuffer = ('_byteArray2string' ('[data:copyFromTo]' _serbuffer 1 ((_serFindIndex + (size target)) + 2)))
+    return (booleanConstant true)
+  }
+}
+
+to '_cmdGood' {
+  if ('TCPREQUEST' == ESP01_current_cmd) {return (booleanConstant false)}
+  local 'cmdIndx' ('[data:find]' ESP01_current_cmd ATCommands)
+  local 'target' (at (at (cmdIndx + 1) ATCommands) ATResponses)
+  _serFindIndex = ('[data:find]' target _serbuffer)
+  if (-1 == _serFindIndex) {
+    ESP01_prev_status = '<good> not found.'
+    return (booleanConstant false)
+  } else {
+    ESP01_prev_status = target
+    if ('RESTORE' == ESP01_current_cmd) {
+      savebuffer = ('_byteArray2string' ('[data:join]' ('[data:copyFromTo]' _serbuffer 1 (('[data:find]' 'OK' _serbuffer) + 4)) ('[data:copyFromTo]' _serbuffer _serFindIndex)))
+    } else {
+      savebuffer = ('_byteArray2string' ('[data:copyFromTo]' _serbuffer 1 ((_serFindIndex + (size target)) + 2)))
+    }
+    return (booleanConstant true)
+  }
+}
+
+to '_handleIPD' {
+  for response responses {
+    if (_reqPath == (at 1 response)) {
+      processRequest
+      comment 'Following is a TCP messaging sequence to send back any feedback desired.'
+      ESP01_current_cmd = 'CIPSEND'
+      '_sendATcmd' ('[data:join]' 'AT+CIPSEND=' _linkID _comma (size (at 2 response)))
+      waitUntil ESP01_response
+      if (TCPprompt != ESP01_prev_status) {
+        'ESP01_log _' 'No TCP prompt received.'
+        cmdComplete = (booleanConstant true)
+        return 0
+      }
+      cmdComplete = (booleanConstant true)
+      comment 'TCP Prompt'
+      ESP01_current_cmd = 'TCPDATA'
+      '_sendATcmd' (at 2 response)
+      waitUntil ESP01_response
+      if ('SEND FAIL' == ESP01_prev_status) {
+        'ESP01_log _' ('[data:join]' ESP01_current_cmd _colon ESP01_prev_status)
+        cmdComplete = (booleanConstant true)
+        return 0
+      }
+      cmdComplete = (booleanConstant true)
+      comment 'Good SEND'
+      ESP01_current_cmd = 'CIPCLOSE'
+      '_sendATcmd' ('[data:join]' 'AT+CIPCLOSE=' _linkID)
+      waitUntil ESP01_response
+      if ('ERROR' == ESP01_prev_status) {
+        'ESP01_log _' ('[data:join]' ESP01_current_cmd _colon ESP01_prev_status)
+        cmdComplete = (booleanConstant true)
+        return 0
+      }
+      cmdComplete = (booleanConstant true)
+      comment 'Good CLOSE'
+      'ESP01_log _' ('[data:join]' 'TCPREQUEST' _colon _reqPath ' processed.')
+    }
+  }
+}
+
+to '_logging _' mode {
+  debug = mode
+}
+
+to '_queueRequest' req {
+  comment 'TCP Request Queue
+This will hold up to 5 requests sent from
+browsers or cell phones.
+Requests are differentiated by their LINK-ID.'
+  if ((size ESP01_tcp_req_queue) < 5) {
+    '[data:addLast]' req ESP01_tcp_req_queue
+    'ESP01_log _' ('[data:join]' ESP01_current_cmd _colon req)
+    return 'OK'
+  } else {
+    comment 'This might require an out-of-band ERROR reply
+regardless of queue status.'
+    'ESP01_log _' 'TCP Request Queue Full.'
+    return 'ERROR'
+  }
+}
+
+to '_sendATcmd' cmd {
+  comment 'Mandatory 1sec wait after each command.
+Also, TCPSend takes 20ms to send out 
+the buffer if it is shorter than stated length.
+One can also use the CIPSENDEX command
+and terminate strings with \0 to eliminate length
+matching and calculating.'
+  cmd = ('[data:join]' cmd _eol)
+  '[serial:write]' cmd
+  waitMillis _espCmdDelay
+}
+
+to '_tcpRequest' {
+  comment 'PARTIAL TCP Request:
+
+0,CONNECT
+
++IPD,0,444:GET / HTTP/1.1
+Host: 192.168.1.35
+Connection: keep-alive
+...
+
+Requests are differentiated by their LINK-ID.
+LINK-ID is the number before CONNECT, and after +IPD in buffer.
+
+TCP requests are queued and therefore do not need the transaction lock
+cmdComplete to be used. But we need to clear the _serBuffer.'
+  if (not ESP01_server_ready) {
+    return (booleanConstant false)
+  } ('TCPREQUEST' != ESP01_current_cmd) {
+    return (booleanConstant false)
+  }
+  local 'cmdIndx' ('[data:find]' ESP01_current_cmd ATCommands)
+  local 'target' (at (at (cmdIndx + 1) ATCommands) ATResponses)
+  _serFindIndex = ('[data:find]' target _serbuffer)
+  if (-1 == _serFindIndex) {
+    ESP01_prev_status = '<tcpRequest> not found.'
+    return (booleanConstant false)
+  } else {
+    ESP01_prev_status = target
+    local 'request' ('[data:copyFromTo]' _serbuffer _serFindIndex (('[data:find]' 'Host: ' _serbuffer) - 1))
+    _serbuffer = ('[data:newByteArray]' 0)
+    if ('OK' == ('_queueRequest' request)) {
+      return (booleanConstant true)
+    } else {
+      return (booleanConstant true)
+    }
+  }
+}
+
+to initializeCommands {
+  comment 'ESP Delays:
+_espBufferDelay: time between serial reads
+_espCmdDelay: time to wait after each command
+_espLoopDelay: time between COMM Loop cycles
+
+NOTE:
+- Do not reduce _espCmdDelay to less than 2000.
+- Reducing _espLoopDelay is just churn; does not help speed things up.'
+  comment 'Command / Response Pairs:
+ATCommands
+- command name, good index, error index
+ATResponses
+- List of good and error responses to the commands
+
+If you insert into ATResponses, adjust all ATCommand indexes.'
+  debug = (booleanConstant true)
+  _espBufferDelay = 500
+  _espCmdDelay = 1000
+  _espLoopDelay = 500
+  ESP01_Log = ('[data:makeList]')
+  ESP01_prev_status = ''
+  savebuffer = ''
+  TCPprompt = ('[data:join]' 'OK' _eol '>' ('[data:unicodeString]' 32))
+  ATCommands = ('[data:join]' 'RESTORE,6,0' _comma 'RST,1,2' _comma 'CWMODE,1,2' _comma 'CWJAP,1,7' _comma 'CIPSTA,1,2' _comma 'CIPMUX,1,2' _comma 'CIPSERVER,1,2' _comma 'TCPREQUEST,8,9' _comma 'CIPSEND,5,0' _comma 'TCPDATA,3,4' _comma 'CIPCLOSE,9,2')
+  ATCommands = ('[data:split]' ATCommands _comma)
+  ATResponses = ('[data:join]' 'OK' ',ERROR' ',SEND OK' ',SEND FAIL,' TCPprompt ',ready' ',FAIL' ',+IPD' ',CLOSED')
+  ATResponses = ('[data:split]' ATResponses _comma)
+}
+
+to initializeResponses {
+  comment 'APP Inventor APP processes 2 kinds of responses from this program:
+1. Web Page displays of info
+2. JSON data sent in response to HTTP GET /SERA  and /WATERING transactions 
+
+#1 type responses are processed in the WebViewer component and 
+do not require a header info.
+
+#2 type responses are true responses to HTTP GET and require 
+a proper header:
+    HTTP/1.1 200 OK\nContent-Type: text/html\n\n is 
+
+NOTE: timeout delay for the HTTTP GET has to be long enough 
+            to receive and process the data. Current setting is 10000ms.
+            However, if more data is sent than the example, it might need
+            extending.
+
+The browsers do an auto "favicon.ico" request after TCPclose, which causes another
+incoming request. To prevent it, browser requests are preceeded by a TCPSend of the
+/favicon item of responses as part of the HTML head.'
+  responses = ('[data:makeList]' ('[data:makeList]' '/' '<H1>CONNECTED...<br/></H1>
+<p>/SERA: Temp, Humidity, Soil Moisture<br/>
+/WATERING: Run Water Pump<br/>
+</p>') ('[data:makeList]' '/SERA' ('[data:join]' ('[data:join]' 'HTTP/1.1 200 OK' _eol 'Content-Type: text/html' _eol _eol) '{"TEMP":' (pb_temperature) ',"S.Moisture":' (((analogReadOp 27) / 1023) * 100) ',"Humidity":' (pb_humidity) '}')) ('[data:makeList]' '/WATERING' '<H1>SERA CONTROL<br/></H1>
+<p>Irrigation is complete..</p>') ('[data:makeList]' '/favicon' '<HEAD><link rel="icon" href="data:,"></HEAD>'))
+  'ESP01_log _' 'RESPONSES initialized.'
+}
+
+to processRequest {
+  comment 'Here is where all the program actions are evaluated and implemented.
+Provide processing code for each function with its specific evaluation.
+If the activity code is too long / large, then provide a call to a custom function.'
+  if ((ESP01_path_of_request (at 1 ESP01_tcp_req_queue)) == '/WATERING') {
+    pb_set_motor_speed 1 100
+    'ESP01_log _' 'SERA: Water pump started'
+    waitMillis 1000
+    pb_set_motor_speed 1 0
+    'ESP01_log _' 'SERA: Water pump stopped.'
+  }
+}
+
+script 587 40 {
+whenBroadcastReceived 'COMM Loop'
+if ESP01_server_ready {
+  sayIt 'COMM Loop running.' _eol 'SERVER ready.'
+  stopTask
+} else {
+  sayIt 'COMM Loop started' _eol 'SERVER not ready.'
+}
+}
+
+script 85 45 {
+whenStarted
+local 'delay' 50
+repeat 9 {
+  setUserLED true
+  waitMillis delay
+  setUserLED false
+  waitMillis delay
+}
+_eol = ('[data:join]' ('[data:unicodeString]' 13) ('[data:unicodeString]' 10))
+ESP01_tcp_req_queue = ('[data:makeList]')
+ESP01_LogSize = 25
+ESP01_server_ready = (booleanConstant false)
+_espDisplayDelay = 2000
+_colon = ('[data:unicodeString]' 58)
+_comma = ('[data:unicodeString]' 44)
+ESP01_IPaddr = ''
+initializeCommands
+initializeResponses
+'[serial:open]' 115200
+sendBroadcast 'COMM Loop'
+waitMillis _espBufferDelay
+'_logging _' true
+sayIt 'Preparing SERVER setup.
+Please wait till next prompt.'
+timer = (millisOp)
+ESP01_restore
+ESP01_set_WIFI_mode 'Station'
+ESP01_connect_to 'SSID' 'PASSWD'
+ESP01_IP_address
+ESP01_set_MUX 'Multiple Connections'
+ESP01_server 'Create Server'
+timer = ((millisOp) - timer)
+'ESP01_log _' ('[data:join]' 'Completed in ' timer 'ms')
+sayIt 'SERVER Ready for transactions.' _eol 'Open a browser tab and ' _eol '  use IP:' ESP01_IPaddr _eol 'Competed in' timer ' msecs.'
+sendBroadcast 'COMM Loop'
+ESP01_current_cmd = 'TCPREQUEST'
+}
+
+script 293 47 {
+comment 'There are two cycles: command & data.
+Command:
+- current Cmd = <one of them>
+- checks good/bad responses
+- cycle finishes with SERVER ON.
+
+Data:
+- current Cmd = TCPREQUEST.
+- checks for +IPD
+- any +IPD goes into Queu, 
+- When Q > 0:
+     If server ready process it 
+'
+}
+
+script 586 249 {
+whenCondition ((size ESP01_tcp_req_queue) > 0)
+sayIt (size ESP01_tcp_req_queue)
+if ESP01_server_ready {
+  ESP01_requests
+}
+sayIt (size ESP01_tcp_req_queue)
+}
+
+script 589 477 {
+whenBroadcastReceived 'COMM Loop'
+forever {
+  cmdComplete = (booleanConstant false)
+  ESP01_status = ''
+  ESP01_response = (booleanConstant false)
+  _serbuffer = ('[data:newByteArray]' 0)
+  local 'readBuffer' ('[serial:read]')
+  if ((size readBuffer) > 0) {
+    repeatUntil (and (0 == (size readBuffer)) (or (or ('_cmdGood') ('_cmdError')) ('_tcpRequest'))) {
+      _serbuffer = ('[data:join]' _serbuffer readBuffer)
+      waitMillis _espBufferDelay
+      readBuffer = ('[serial:read]')
+    }
+  }
+  comment 'We have a buffer with IPD or good or error '
+  if ((size _serbuffer) > 0) {
+    ESP01_response = (booleanConstant true)
+    waitUntil cmdComplete
+  }
+  waitMillis _espLoopDelay
+}
+}
+
+script 323 532 (ESP01_display_LOG)
+
+script 80 1129 {
+to ESP01_connect_to {}
+}
+
+
+module PicoBricks
+author MicroBlocks
+version 2 3 
+depends 'Temperature Humidity (DHT11, DHT22)' 
+description 'Robotistan PicoBricks Library
+
+This library controls these Pico Bricks components:
+- Red LED
+- RGB LED
+- DC Motors
+- Piezo speaker
+- Relay Switch (5V-250V, 5A)
+- Button
+- Potentiometer (variable resistor)
+- Light sensor (light dependent resistor)
+- Temperature and humidity sensor (DHT11)
+- switched to renamed DHT library
+
+Use separate libraries to control:
+- Servo motors
+- Graphic display (OLED)
+- WIFI/Bluetooth expansion board
+
+See https://www.robotistan.com, 
+https://wiki.microblocks.fun/boards/pico
+'
+variables _pb_initialized _pb_pin_RedLED _pb_pin_Button _pb_pin_DHT _pb_pin_Relay _pb_pin_Pot _pb_pin_LDR _pb_pin_Buzzer _pb_pin_Motor1 _pb_pin_Motor2 _pb_pin_RGB_LED _pb_pin_TX _pb_pin_RX _pb_i2c_Addr 
+
+  spec ' ' 'pb_beep' 'PicoBricks beep _ ms' 'auto' 500
+  spec 'r' 'pb_button' 'PicoBricks button'
+  spec 'r' 'pb_humidity' 'PicoBricks humidity'
+  spec 'r' 'pb_light_sensor' 'PicoBricks light sensor (0-100) %'
+  spec 'r' 'pb_potentiometer' 'PicoBricks potentiometer'
+  spec 'r' 'pb_random_color' 'PicoBricks random color'
+  spec 'r' 'pb_rgb_color' 'PicoBricks color r _ g _ b _ (0-255)' 'auto auto auto' 0 0 0
+  spec ' ' 'pb_set_motor_speed' 'PicoBricks set motor _ speed _ (0-100)' 'auto num' 1 100
+  spec ' ' 'pb_set_red_LED' 'PicoBricks set red LED _' 'bool' true
+  spec ' ' 'pb_set_relay' 'PicoBricks set relay _' 'bool' true
+  spec ' ' 'pb_set_rgb_color' 'PicoBricks set RGB LED color _' 'color'
+  spec 'r' 'pb_temperature' 'PicoBricks temperature (°C)'
+  spec ' ' 'pb_turn_off_RGB' 'PicoBricks turn off RGB LED'
+  spec ' ' '_pb_init_pins' '_pb_init_pins'
+
+to '_pb_init_pins' {
+  if _pb_initialized {return}
+  _pb_pin_RGB_LED = 6
+  _pb_pin_RedLED = 7
+  _pb_pin_Button = 10
+  _pb_pin_DHT = 11
+  _pb_pin_Relay = 12
+  _pb_pin_Buzzer = 20
+  _pb_pin_Motor1 = 21
+  _pb_pin_Motor2 = 22
+  _pb_pin_Pot = 26
+  _pb_pin_LDR = 27
+  _pb_pin_TX = 0
+  _pb_pin_RX = 1
+  _pb_i2c_Addr = '3C'
+  _pb_initialized = (booleanConstant true)
+}
+
+to pb_beep duration {
+  '_pb_init_pins'
+  local 'end time' ((millisOp) + duration)
+  repeatUntil ((millisOp) >= (v 'end time')) {
+    digitalWriteOp _pb_pin_Buzzer true
+    waitMicros 1900
+    digitalWriteOp _pb_pin_Buzzer false
+    waitMicros 1900
+  }
+}
+
+to pb_button {
+  '_pb_init_pins'
+  return (digitalReadOp _pb_pin_Button)
+}
+
+to pb_humidity {
+  '_pb_init_pins'
+  return (humidity_DHT11 _pb_pin_DHT)
+}
+
+to pb_light_sensor {
+  comment 'Returns Light Values s a percentage:
+0: dark,  100: light'
+  '_pb_init_pins'
+  return ('[misc:rescale]' (1023 - (analogReadOp _pb_pin_LDR)) 0 1023 0 100)
+}
+
+to pb_potentiometer {
+  '_pb_init_pins'
+  return (analogReadOp _pb_pin_Pot)
+}
+
+to pb_random_color {
+  local 'n1' (random 100 200)
+  local 'n2' (random 0 100)
+  if (1 == (random 1 3)) {
+    return ((n1 << 16) | (n2 << 8))
+  } (1 == (random 1 2)) {
+    return ((n2 << 16) | n1)
+  } else {
+    return ((n1 << 8) | n2)
+  }
+}
+
+to pb_rgb_color r g b {
+  r = (maximum 0 (minimum r 255))
+  g = (maximum 0 (minimum g 255))
+  b = (maximum 0 (minimum b 255))
+  return (((r << 16) | (g << 8)) | b)
+}
+
+to pb_set_motor_speed which speed {
+  '_pb_init_pins'
+  speed = (maximum 0 (minimum speed 100))
+  if (which == 1) {
+    analogWriteOp _pb_pin_Motor1 ((1023 * speed) / 100)
+  } (which == 2) {
+    analogWriteOp _pb_pin_Motor2 ((1023 * speed) / 100)
+  }
+}
+
+to pb_set_red_LED aBoolean {
+  '_pb_init_pins'
+  digitalWriteOp _pb_pin_RedLED aBoolean
+}
+
+to pb_set_relay aBoolean {
+  '_pb_init_pins'
+  digitalWriteOp _pb_pin_Relay aBoolean
+}
+
+to pb_set_rgb_color color {
+  '_pb_init_pins'
+  '[display:neoPixelSetPin]' _pb_pin_RGB_LED false
+  '[display:neoPixelSend]' color
+}
+
+to pb_temperature {
+  '_pb_init_pins'
+  return (temperature_DHT11 _pb_pin_DHT)
+}
+
+to pb_turn_off_RGB {
+  '_pb_init_pins'
+  '[display:neoPixelSetPin]' _pb_pin_RGB_LED false
+  '[display:neoPixelSend]' 0
+}
+
+
+module 'Temperature Humidity (DHT11, DHT22)' Input
+author MicroBlocks
+version 1 1 
+tags sensor dht11 dht22 temperature humidity 
+description 'Support for the DHT11 and DHT22 environmental sensors. These sensors provide temperature and humidity readings.'
+variables _dht_temperature _dht_humidity _dhtData _dhtLastReadTime 
+
+  spec 'r' 'temperature_DHT11' 'temperature (Celsius) DHT11 pin _' 'auto' 4
+  spec 'r' 'humidity_DHT11' 'humidity DHT11 pin _' 'auto' 4
+  spec 'r' 'temperature_DHT22' 'temperature (Celsius) DHT22 pin _' 'auto' 4
+  spec 'r' 'humidity_DHT22' 'humidity DHT22 pin _' 'auto' 4
+  spec ' ' '_dhtReadData' '_dhtReadData pin _' 'auto any' 4
+  spec 'r' '_dhtChecksumOkay' '_dhtChecksumOkay' 'any'
+  spec ' ' '_dhtUpdate' '_dhtUpdate _ isDHT11 _' 'auto bool any' 4 true
+  spec 'r' '_dhtReady' '_dhtReady' 'any'
+
+to '_dhtChecksumOkay' {
+  local 'checksum' 0
+  for i 4 {
+    checksum += (at i _dhtData)
+  }
+  checksum = (checksum & 255)
+  return (checksum == (at 5 _dhtData))
+}
+
+to '_dhtReadData' pin {
+  comment 'Create DHT data array the first time'
+  if (_dhtData == 0) {
+    _dhtData = (newList 5)
+  }
+  comment 'Pull pin low for >18msec to request data'
+  digitalWriteOp pin false
+  waitMillis 20
+  local 'useDHTPrimitive' (booleanConstant true)
+  if useDHTPrimitive {
+    result = ('[sensors:readDHT]' pin)
+    if ((booleanConstant false) != result) {
+      _dhtData = result
+    }
+    return 0
+  }
+  comment 'Read DHT start pulses (H L H L)'
+  waitUntil (digitalReadOp pin)
+  waitUntil (not (digitalReadOp pin))
+  waitUntil (digitalReadOp pin)
+  waitUntil (not (digitalReadOp pin))
+  local 'i' 1
+  local 'byte' 0
+  local 'bit' 1
+  comment 'Read 40 bits (5 bytes)'
+  repeat 40 {
+    waitUntil (digitalReadOp pin)
+    local 'start' (microsOp)
+    waitUntil (not (digitalReadOp pin))
+    if (((microsOp) - start) > 40) {
+      comment 'Long pulse - append a "1" bit'
+      byte += 1
+    }
+    if (bit == 8) {
+      atPut i _dhtData byte
+      i += 1
+      byte = 0
+      bit = 1
+    } else {
+      byte = (byte << 1)
+      bit += 1
+    }
+    waitUntil (not (digitalReadOp pin))
+  }
+}
+
+to '_dhtReady' {
+  local 'elapsed' ((millisOp) - _dhtLastReadTime)
+  return (or (elapsed < 0) (elapsed > 2000))
+}
+
+to '_dhtUpdate' pin isDHT11 {
+  if ('_dhtReady') {
+    '_dhtReadData' pin
+    _dhtLastReadTime = (millisOp)
+  }
+  if ('_dhtChecksumOkay') {
+    if isDHT11 {
+      _dht_temperature = (at 3 _dhtData)
+      _dht_humidity = (at 1 _dhtData)
+    } else {
+      local 'n' (((at 1 _dhtData) * 256) + (at 2 _dhtData))
+      _dht_humidity = ((n + 5) / 10)
+      n = ((((at 3 _dhtData) & 127) * 256) + (at 4 _dhtData))
+      if (((at 3 _dhtData) & 128) != 0) {
+        n = (0 - n)
+      }
+      _dht_temperature = ((n + 5) / 10)
+    }
+  }
+}
+
+to humidity_DHT11 pin {
+  '_dhtUpdate' pin true
+  return _dht_humidity
+}
+
+to humidity_DHT22 pin {
+  '_dhtUpdate' pin false
+  return _dht_humidity
+}
+
+to temperature_DHT11 pin {
+  '_dhtUpdate' pin true
+  return _dht_temperature
+}
+
+to temperature_DHT22 pin {
+  '_dhtUpdate' pin false
+  return _dht_temperature
+}
+
