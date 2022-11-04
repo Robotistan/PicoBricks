@@ -1,16 +1,17 @@
 module main
 author unknown
-version 1 1 
-description 'added 500ms delay'
+version 1 0 
+description ''
 
 script 100 50 {
 whenStarted
+waitMillis 1000
 OLEDInit_I2C 'OLED_0.96in' '3C' 0 false
 forever {
   OLEDwrite 'Temperature:' 15 10 false
   OLEDwrite ('[data:join]' (pb_temperature) '') 55 30 false
   OLEDwrite 'degree' 40 50 false
-  waitMillis 500
+  waitMillis 1000
 }
 }
 
