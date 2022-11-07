@@ -59,9 +59,9 @@ Send_AT_Cmd('AT+CWMODE?\r\n')  #Query the WiFi mode
 Send_AT_Cmd('AT+CWMODE=1\r\n') #Set the WiFi mode = Station mode
 Send_AT_Cmd('AT+CWMODE?\r\n')  #Query the WiFi mode again
 Send_AT_Cmd('AT+CWJAP="ID","Password"\r\n', timeout=5000) #Connect to AP
-utime.sleep(2.0)
+utime.sleep(3.0)
 Send_AT_Cmd('AT+CIFSR\r\n')    #Obtain the Local IP Address
-utime.sleep(2.0)
+utime.sleep(3.0)
 Send_AT_Cmd('AT+CIPMUX=1\r\n')    
 utime.sleep(1.0)
 Send_AT_Cmd('AT+CIPSERVER=1,80\r\n')    #Obtain the Local IP Address
