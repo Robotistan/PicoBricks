@@ -14,4 +14,4 @@ Project Details and Algorithm Picobricks has a DHT11 module. This module can sen
 
 ## Project Video
 
-[<img src="https://i.ytimg.com/vi/7dVtA_J19wc/maxresdefault.jpg" width="80%">](https://www.youtube.com/watch?v=Hmb4V0TCYb8 )
+[<img src="https://i.ytimg.com/vi/7dVtA_J19wc/maxresdefault.jpg" width="80%">](https://www.youtube.com/watch?v=7dVtA_J19wc )
