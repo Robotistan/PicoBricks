@@ -15,4 +15,4 @@ Different types of buttons are used in electronic systems. Locked buttons, push 
 
 ## Project Video
 
-[<img src="https://i.ytimg.com/vi/zAPENuFRzno/maxresdefault.jpg" width="80%">](https://www.youtube.com/watch?v=Hmb4V0TCYb8 "Now in Android: 55")
+[<img src="https://i.ytimg.com/vi/zAPENuFRzno/maxresdefault.jpg" width="80%">](https://www.youtube.com/watch?v=zAPENuFRzno "Now in Android: 55")
