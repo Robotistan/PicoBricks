@@ -15,4 +15,4 @@ When we look at the electronic items around us, you realize that they have many 
 
 ## Project Video
 
-[<img src="https://i.ytimg.com/vi/Oxkp8EBg4K0/maxresdefault.jpg" width="80%">](https://www.youtube.com/watch?v=Hmb4V0TCYb8 )
+[<img src="https://i.ytimg.com/vi/Oxkp8EBg4K0/maxresdefault.jpg" width="80%">](https://www.youtube.com/watch?v=Oxkp8EBg4K0)
