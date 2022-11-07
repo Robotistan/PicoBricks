@@ -20,4 +20,4 @@ In this project, you will make your own time measuring device using Picobircks, 
 
 
 
-[<img src="https://i.ytimg.com/vi/2pn-0tZ_USs/maxresdefault.jpg" width="80%">](https://www.youtube.com/watch?v=Hmb4V0TCYb8 )
+[<img src="https://i.ytimg.com/vi/2pn-0tZ_USs/maxresdefault.jpg" width="80%">](https://www.youtube.com/watch?v=2pn-0tZ_USs)
