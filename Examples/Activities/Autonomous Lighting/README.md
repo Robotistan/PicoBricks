@@ -14,5 +14,5 @@ It is called the state of being autonomous when electronic systems make a decisi
 
 ## Project Video
 
-[<img src="https://i.ytimg.com/vi/ZrCUB26m8Ak/maxresdefault.jpg" width="80%">](https://www.youtube.com/watch?v=Hmb4V0TCYb8 )
+[<img src="https://i.ytimg.com/vi/ZrCUB26m8Ak/maxresdefault.jpg" width="80%">](https://www.youtube.com/watch?v=ZrCUB26m8Ak )
 
