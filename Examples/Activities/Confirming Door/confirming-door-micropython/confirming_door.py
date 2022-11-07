@@ -44,7 +44,7 @@ while True:
                 sleep(3)
                 servo.duty_u16(1350)
                 ws.pixels_fill(BLACK)
-                ws.pixels_show() #if the correct card is read to the sensor, the RGB LED turns green and the door opens thanks to the servo motor
+                ws.pixels_show() #The RGB LED turns green and the door opens thanks to the servo motor, if the correct card is read to the sensor.
 
                
             else:
@@ -54,4 +54,4 @@ while True:
                 ws.pixels_fill(BLACK)
                 ws.pixels_show()
                 servo.duty_u16(1350)
-                #if the wrong card is read to the sensor, the RGB LED turns red and the door does not open
+                #The RGB LED turns red and the door does not open, if the wrong card is read to the sensor.
