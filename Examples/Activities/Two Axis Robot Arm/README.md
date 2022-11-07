@@ -11,18 +11,16 @@ In preparation for the installation, we will first write and upload the codes to
 
 Prepare the parts of the Pan-Tilt kit to prepare the project. Carry your 3D printed parts, waste cardboard pieces, hot silicone glue and scissors with you.
  
-![image](https://user-images.githubusercontent.com/111511331/200284827-480c1892-e13a-45d4-a904-a3a0e5efc0a4.png)
-
-
+![image](https://user-images.githubusercontent.com/111511331/200287259-2e44a84d-c206-44d3-8f2b-d6826ed2f50e.png)
 
 1.	First of all, we will prepare the fixed arm of the robot arm. Make an 8 cm high cardboard cylinder into the rounded part of part D. Place it on the D part and attach or glue it with silicone.
  
- ![image](https://user-images.githubusercontent.com/111511331/200284859-a883a1f2-e6b6-45ee-b128-051cf150ac2c.png)
+![image](https://user-images.githubusercontent.com/111511331/200287006-b906db01-cb30-4ee2-bc0f-41e721917be0.png)
 
 2.	Place the head that came out of the servo motor package on the C part by shortening it a little. Fix with the smallest screws from the Pan Tilt kit.
   
-  ![image](https://user-images.githubusercontent.com/111511331/200284886-c7dedd84-af78-4b6a-9f08-02c8bd3a812a.png)
- ![image](https://user-images.githubusercontent.com/111511331/200284918-3f8aac69-88ea-4b26-8f9d-de43a24ec72e.png)
+![image](https://user-images.githubusercontent.com/111511331/200287377-359c6172-257c-44d6-aa41-bbe1b0be5de9.png)
+![image](https://user-images.githubusercontent.com/111511331/200287408-c4d97732-0efd-4633-b540-ced032e47919.png)
 
 3.	Fix parts A and C together with 2 pointed screws.
  
@@ -30,36 +28,36 @@ Prepare the parts of the Pan-Tilt kit to prepare the project. Carry your 3D prin
 
 4.	Internally attach the servo motor to part C. Then place the servo motor on part B and screw it.
   
-  ![image](https://user-images.githubusercontent.com/111511331/200285113-0ece014b-d3e4-4d3d-bbc5-aa793fce45a1.png)
-![image](https://user-images.githubusercontent.com/111511331/200285147-5b7fee8d-5241-4c19-8958-08eb72bb5329.png)
+![image](https://user-images.githubusercontent.com/111511331/200287463-64126d7c-afd7-4c6c-8901-e4a3dbdb681d.png)
+![image](https://user-images.githubusercontent.com/111511331/200287496-ccf3bdf8-ddba-483b-89a5-4a569e6cde29.png)
 
 5.	For the holder, cut one of the servo motor heads in the middle of the gear part that you printed on the 3D printer and place it into the gear. Then screw it to the servo motor.
   
-  ![image](https://user-images.githubusercontent.com/111511331/200285172-02519527-d58d-4e81-bdce-9dbee4cd9912.png)
-![image](https://user-images.githubusercontent.com/111511331/200285199-e0c46432-5634-4dff-8b72-5c526fb8861d.png)
+![image](https://user-images.githubusercontent.com/111511331/200287634-60f11ce5-d658-4f78-b289-fee357c72f02.png)
+![image](https://user-images.githubusercontent.com/111511331/200287679-450e3f23-7348-43b9-abde-5656a840c30d.png)
 
 6.	Adhere together the 3D printed Linear gear and the handle with strong adhesive.
  
- ![image](https://user-images.githubusercontent.com/111511331/200285431-0374773a-3ddd-45ef-adf6-cd3765e4e106.png)
+![image](https://user-images.githubusercontent.com/111511331/200287731-ee08827e-53f7-47dd-80f1-cbe479ba9c70.png)
 
 7.	Place the servo in the 3D print holder and fix it. You can do this with hot silicone or by screwing. When placing the servo gear on the linear gear, make sure it is fully open.
  
- ![image](https://user-images.githubusercontent.com/111511331/200286437-71da362e-78a9-47d9-9cac-f2c5d89eddbb.png)
+![image](https://user-images.githubusercontent.com/111511331/200287967-c35cdae9-fd9b-4b97-8aab-7ecd59947ee3.png)
 
 8.	Attach the holding servo system to part B with silicone.
 
- ![image](https://user-images.githubusercontent.com/111511331/200286458-aac7b0e5-da19-4d9b-bd9f-d9b5c49c7017.png)
+![image](https://user-images.githubusercontent.com/111511331/200288239-6c7aebcb-f735-487d-b129-723c5876d326.png)
 
 9.	Pass the piece we prepared in step 3 over the cylinder we prepared from cardboard in the first step and fix it with silicone.
  
- ![image](https://user-images.githubusercontent.com/111511331/200286497-1290d18f-d06e-4d9f-bc66-0c76ff9a1ce5.png)
+![image](https://user-images.githubusercontent.com/111511331/200288556-36cc6a52-e8f7-424c-9992-2d76b8aa4109.png)
 
 10.	Put the motor drive jumpers on the Servo pins. Connect the cable of the holding servo to the GPIO21 and the cable of the tilting servo to the GPIO22.
  
- ![image](https://user-images.githubusercontent.com/111511331/200286526-71ae4bb1-9aad-4945-bba8-976bdd245887.png)
+![image](https://user-images.githubusercontent.com/111511331/200288950-e8018c08-3a15-4092-9105-82b14be223e2.png)
 
 11.	Place the motor driver, buzzer, LDR and RGB LED module on a platform and place the robot arm on the platform accordingly. With the 3D Pen printer, you can customize your project as you wish.
  
- ![image](https://user-images.githubusercontent.com/111511331/200286565-1739419b-ea5f-4a60-89d1-0ef6ff5c74ac.png)
+![image](https://user-images.githubusercontent.com/111511331/200286736-4fd9cc53-b112-4109-a18e-9b32bcd88267.png)
 
 12. You can operate the Robot arm if you feed Picobricks with USB or 3 pen batteries from the power jack on the Picoboard.
