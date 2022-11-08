@@ -68,7 +68,7 @@ while button.value()==0:#burda hata var 0>>>>1 olucak çalıştıramadığım i�
     oled.text("sec:" + str(sec),50,20)
     oled.text("ms:" + str(msec),50,30)
     oled.show()
-    utime.sleep(0.01)
+    utime.sleep(0.005)
     oled.fill(0)
     oled.show()
     if(setTimer==0 and sec==0 and msec==99):
