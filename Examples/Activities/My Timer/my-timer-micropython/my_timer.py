@@ -11,7 +11,7 @@ scl=machine.Pin(5)
 #we define sda ​​and scl pins for inter-path communication
 i2c=machine.I2C(0,sda=sda, scl=scl, freq=1000000)#determine the frequency values
 
-oled = SSD1306_I2C(WIDTH, HEIGHT, i2c)
+oled = SSD1306_I2C(128, 64, i2c)
 pot = ADC(Pin(26))
 button = Pin(10,Pin.IN,Pin.PULL_DOWN)
 #determine our input and output pins
@@ -63,12 +63,12 @@ time3.init(mode=Timer.PERIODIC,period=10, callback=msecond)
 #We determine the periods of minutes, seconds and milliseconds.
 utime.sleep(0.2)#wait for 0.2 second
 
-while button.value()==0:#burda hata var 0>>>>1 olucak çalıştıramadığım için denemedim.
+while button.value()==0:
     oled.text("min:" + str(setTimer),50,10)
     oled.text("sec:" + str(sec),50,20)
     oled.text("ms:" + str(msec),50,30)
     oled.show()
-    utime.sleep(0.005)
+    utime.sleep(0.008)
     oled.fill(0)
     oled.show()
     if(setTimer==0 and sec==0 and msec==99):
@@ -82,4 +82,4 @@ oled.text(str(sec),60,20)
 oled.text(str(msec),60,30)
 oled.text("Time is Over!",10,48)
 oled.show()
-#Print the minutes, seconds, milliseconds and "Time is Over" values ​​to the X and Y coordinates determined on the OLED screen.
+#Print the minutes, seconds, milliseconds and "Time is Over" values ​​to the X and Y coordinates determi
