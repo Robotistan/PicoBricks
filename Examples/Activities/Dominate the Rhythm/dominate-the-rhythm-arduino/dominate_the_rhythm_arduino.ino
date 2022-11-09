@@ -41,7 +41,7 @@ void loop()
     oled.clearDisplay(); 
     oled.setTextXY(3,2);              
     oled.putString("Now playing...");
-//print "Speed: "  and speed value on the OLED at x=3 y=4
+    //print "Speed: "  and speed value on the OLED at x=3 y=4
     tone(buzzer, La); delay (1000/(rithm+1));
     tone(buzzer, Mi); delay (500/(rithm+1));
     tone(buzzer, Mi); delay (500/(rithm+1));
@@ -54,7 +54,8 @@ void loop()
     tone(buzzer, Re); delay (500/(rithm+1));
     tone(buzzer, Fa); delay (500/(rithm+1));
     tone(buzzer, Mi); delay (1000/(rithm+1));
-//play the notes in the correct order and time when the button is pressed
+    
+    //play the notes in the correct order and time when the button is pressed
 
     oled.clearDisplay();
     //clear the screen
