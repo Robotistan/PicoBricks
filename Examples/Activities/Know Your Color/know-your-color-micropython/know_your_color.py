@@ -93,9 +93,8 @@ oled.show()
 utime.sleep(2)
 
 for i in range(10):
-    for j in range (10):
-        random_text()
-        random_rgb()
+    random_text()
+    random_rgb()
     button_pressed=False
     utime.sleep(1.5)
     oled.fill(0)
