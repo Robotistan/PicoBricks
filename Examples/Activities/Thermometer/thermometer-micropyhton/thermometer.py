@@ -22,8 +22,8 @@ while True:
         temperature=pico_temp.temperature
         humidity=pico_temp.humidity
         oled.text("Temperature: ",15,10)#print "Temperature: " on the OLED at x=15 y=10
-        oled.text(str(int(temperature)),55,20)
-        oled.text("Humidty: ", 15,40)
-        oled.text(str(int(humidity)),55,50)
+        oled.text(str(int(temperature)),55,25)
+        oled.text("Humidty: ", 30,40)
+        oled.text(str(int(humidity)),55,55)
         oled.show()#show on OLED
         utime.sleep(0.5)#wait for a half second
