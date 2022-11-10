@@ -6,7 +6,7 @@ sck = Pin(18, Pin.OUT)
 mosi = Pin(19, Pin.OUT)
 miso = Pin(16, Pin.OUT)
 sda = Pin(17, Pin.OUT)
-rst = Pin(20, Pin.OUT)
+rst = Pin(15, Pin.OUT)
 spi = SPI(0, baudrate=100000, polarity=0, phase=0, sck=sck, mosi=mosi, miso=miso)
 rdr = MFRC522(spi, sda, rst)
 #define MFRC522 pins
