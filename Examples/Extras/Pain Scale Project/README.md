@@ -1,18 +1,24 @@
-## Action-Reaction Project Details
-As Newton explained in his laws of motion, a reaction occurs against every action. Electronic systems receive commands from users and perform their tasks. Usually a keypad, touch screen or a button is used for this job. Electronic devices respond verbally, in writing or visually to inform the user that their task is over and what is going on during the task. In addition to informing the user of these reactions, it can help to understand where the fault may be in a possible malfunction. In this project, you will learn how to receive and react to a command from the user in your projects by coding the button-LED module of Picobricks.
+## Pain Scale Project Details
 
-Different types of buttons are used in electronic systems. Locked buttons, push buttons, switched buttons... There is 1 push button on Picobricks. They work like a switch, they conduct current when pressed and do not conduct current when released. In the project, we will understand the pressing status by checking whether the button conducts current or not. If it is pressed, it will light the LED, if it is not pressed, we will turn off the LED.
+Created by PeterMathijssen
+
+In healthcare, there are patients who have problems verbally expressing their pain. 
+Sometimes being only able to use a single finger. With this project, you could develop a system where patients could alert someone when their pain goes beyond a certain level.
+It uses a PicoBricks button, an OLED screen, and a buzzer.
+In this sample, the blocks for the buzzer are added but not used. As a nurse, you could "talk" to your patient and decide together when help is needed and whether the buzzer should make a noise or the message should get sent. 
+Think about adding a bigger button, a bigger OLED screen, a WIFI module, or a Bluetooth module so you can send an alert to a nurse. There is no casing for this project so you could also think about that.
 
 ## Wiring Diagram
 
-![image](https://user-images.githubusercontent.com/111511331/200255491-27eef2df-a4a6-438a-92a0-afeb4a0874b0.png)
-![image](https://user-images.githubusercontent.com/111511331/200255506-200e5118-a535-4fc0-bc80-1fa6797a1d82.png)
+![image](https://user-images.githubusercontent.com/111511331/201079362-d26680d1-ffe5-4bd3-9f13-011f4946a0fd.png)
 
 ## Project Image
 
-![image](https://user-images.githubusercontent.com/111511331/200255645-13977009-46b8-49ad-8287-deaa5b5e027f.png)
-![image](https://user-images.githubusercontent.com/111511331/200255663-5b9e0de8-018c-4caf-be62-d8b358e5ad27.png)
+![image](https://user-images.githubusercontent.com/111511331/201079417-0a8dae72-20ac-46a0-97ae-14e77e56e844.png)
+![image](https://user-images.githubusercontent.com/111511331/201079473-04e5665e-7873-44c5-93a0-f8a6aeb13146.png)
+![image](https://user-images.githubusercontent.com/111511331/201079507-e4ce31d1-e569-437c-90bd-9bf6a50cce12.png)
+![image](https://user-images.githubusercontent.com/111511331/201079533-77f84b90-7e14-4033-8004-444cbc62d6ae.png)
+![image](https://user-images.githubusercontent.com/111511331/201079553-10911cc2-ded1-444e-95eb-b5fb2a36b470.png)
+![image](https://user-images.githubusercontent.com/111511331/201079587-f1edbf00-0815-4a35-ba5e-f2aa008ddbda.png)
 
-## Project Video
 
-[<img src="https://i.ytimg.com/vi/zAPENuFRzno/maxresdefault.jpg" width="80%">](https://www.youtube.com/watch?v=zAPENuFRzno "Now in Android: 55")
