@@ -1,24 +1,41 @@
-## Pain Scale Project Details
+## Magic 8 Ball Project Details
 
 Created by PeterMathijssen
 
-In healthcare, there are patients who have problems verbally expressing their pain. 
-Sometimes being only able to use a single finger. With this project, you could develop a system where patients could alert someone when their pain goes beyond a certain level.
-It uses a PicoBricks button, an OLED screen, and a buzzer.
-In this sample, the blocks for the buzzer are added but not used. As a nurse, you could "talk" to your patient and decide together when help is needed and whether the buzzer should make a noise or the message should get sent. 
-Think about adding a bigger button, a bigger OLED screen, a WIFI module, or a Bluetooth module so you can send an alert to a nurse. There is no casing for this project so you could also think about that.
+This project could be the basis for a school project. 
+
+It is based upon the classic Magic 8 Ball game.
+
+* https://en.wikipedia.org/wiki/Magic_8_Ball
+
+Rules: Ask your PicoBricks a question and then press the button...
+
+How could you make this nicer? 
+
+Think about :
+
+* Add a bigger button
+
+* Add a bigger OLED screen
+
+* Add more LEDs
+
+* Make fancier/funnier sentences
+
+* Build a magician that waves his arms with the help of servos and then displays the message.
+
+Use your imagination... 
 
 ## Wiring Diagram
 
-![image](https://user-images.githubusercontent.com/111511331/201079362-d26680d1-ffe5-4bd3-9f13-011f4946a0fd.png)
+<img src="https://user-images.githubusercontent.com/111511331/201104340-04c772c2-00a0-40f4-b287-a3c2c6e512b9.jpg" width="750" height="800">
+
 
 ## Project Image
-<img src="https://user-images.githubusercontent.com/111511331/201079417-0a8dae72-20ac-46a0-97ae-14e77e56e844.png" width="800" height="800">
-<img src="https://user-images.githubusercontent.com/111511331/201079473-04e5665e-7873-44c5-93a0-f8a6aeb13146.png" width="800" height="800">
-<img src="https://user-images.githubusercontent.com/111511331/201079507-e4ce31d1-e569-437c-90bd-9bf6a50cce12.png" width="800" height="800">
-<img src="https://user-images.githubusercontent.com/111511331/201079533-77f84b90-7e14-4033-8004-444cbc62d6ae.png" width="800" height="800">
-<img src="https://user-images.githubusercontent.com/111511331/201079553-10911cc2-ded1-444e-95eb-b5fb2a36b470.png" width="800" height="800">
-<img src="https://user-images.githubusercontent.com/111511331/201079587-f1edbf00-0815-4a35-ba5e-f2aa008ddbda.png" width="800" height="800">
+
+<img src="https://user-images.githubusercontent.com/111511331/201104972-a8c70715-2b8e-42a5-a060-8e5ccbb246ad.png" width="750" height="800">
+<img src="https://user-images.githubusercontent.com/111511331/201104715-635206b0-cf84-4233-b833-e57848050156.png" width="750" height="800">
+
 
 
 
