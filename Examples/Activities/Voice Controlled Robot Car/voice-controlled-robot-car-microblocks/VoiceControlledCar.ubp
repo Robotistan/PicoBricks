@@ -2,49 +2,53 @@ module main
 author unknown
 version 1 0 
 description ''
-variables cmd buffer 
+variables buffer cmd 
 
-script 81 40 {
-comment 'PICO BT Receiver
+script 61 40 {
+comment 'PICO BT Receiver:
+Receives left, right, backward, forward, stop 
+from the mobile APP:
+https://play.google.com/store/apps/details?id=appinventor.ai_cempehlivan92.Arduino_Sesli_Kontrol&hl=tr
 
-Receives L, R, F, B, S from AI APP.
-
-Change baud rate to your connection speed.
-Add needed action routines.'
+To configure BT module, use the two block sets at the very bottom of the program.'
 }
 
-script 865 51 {
+script 653 40 {
 whenCondition (cmd == 'stop')
+sayIt cmd
 pb_set_motor_speed 1 0
 pb_set_motor_speed 2 0
 waitMillis 1000
 cmd = ''
 }
 
-script 540 66 {
-whenCondition (cmd == 'forward')
-pb_set_motor_speed 1 100
-pb_set_motor_speed 2 100
-waitMillis 1000
-cmd = ''
-pb_set_motor_speed 1 0
-pb_set_motor_speed 2 0
-}
-
-script 80 163 {
+script 60 162 {
 whenStarted
 '[serial:open]' 9600
 forever {
   buffer = ('[serial:read]')
   if ((size buffer) > 0) {
     cmd = ('[data:join]' '' ('[data:asByteArray]' buffer))
+    sayIt cmd
   }
-  waitMillis 50
+  waitMillis 200
 }
 }
 
-script 865 244 {
+script 397 172 {
+whenCondition (cmd == 'forward')
+sayIt cmd
+pb_set_motor_speed 1 100
+pb_set_motor_speed 2 100
+waitMillis 1000
+cmd = ''
+pb_set_motor_speed 1 0
+pb_set_motor_speed 2 0
+}
+
+script 693 235 {
 whenCondition (cmd == 'backward')
+sayIt cmd
 pb_set_motor_speed 1 100
 pb_set_motor_speed 2 0
 waitMillis 1000
@@ -53,8 +57,9 @@ pb_set_motor_speed 1 0
 pb_set_motor_speed 2 0
 }
 
-script 548 278 {
+script 395 454 {
 whenCondition (cmd == 'right')
+sayIt cmd
 pb_set_motor_speed 1 0
 pb_set_motor_speed 2 100
 waitMillis 500
@@ -63,14 +68,43 @@ pb_set_motor_speed 1 0
 pb_set_motor_speed 2 0
 }
 
-script 389 430 {
+script 56 462 {
 whenCondition (cmd == 'left')
+sayIt cmd
 pb_set_motor_speed 1 100
 pb_set_motor_speed 2 0
 waitMillis 500
 cmd = ''
 pb_set_motor_speed 1 0
 pb_set_motor_speed 2 0
+}
+
+script 495 750 {
+comment 'Use for BT Configuration:
+press and hold the RESET button
+and then insert the BT module into
+its slot. RED LED should be flashing 
+in 2sec intervals.
+Run this script first. Then use the other
+to send commands.'
+'[serial:open]' 38400
+forever {
+  buffer = ('[serial:read]')
+  if ((size buffer) > 0) {
+    cmd = ('[data:join]' '' ('[data:asByteArray]' buffer))
+  }
+  sayIt cmd
+  waitMillis 1000
+}
+}
+
+script 52 752 {
+comment 'Use for BT Configuration:
+Type in AT commands for BT into the
+first text area below and then click on the 
+serial write block to transmit.
+Responses will be displayed in the LOOP script.'
+'[serial:write]' ('[data:join]' 'AT' ('[data:unicodeString]' 13) ('[data:unicodeString]' 10))
 }
 
 
@@ -227,7 +261,7 @@ to pb_turn_off_RGB {
 
 module 'Temperature Humidity (DHT11, DHT22)' Input
 author MicroBlocks
-version 1 1 
+version 1 2 
 tags sensor dht11 dht22 temperature humidity 
 description 'Support for the DHT11 and DHT22 environmental sensors. These sensors provide temperature and humidity readings.'
 variables _dht_temperature _dht_humidity _dhtData _dhtLastReadTime 
@@ -242,6 +276,7 @@ variables _dht_temperature _dht_humidity _dhtData _dhtLastReadTime
   spec 'r' '_dhtReady' '_dhtReady' 'any'
 
 to '_dhtChecksumOkay' {
+  if (not (isType _dhtData 'list')) {return (booleanConstant false)}
   local 'checksum' 0
   for i 4 {
     checksum += (at i _dhtData)
@@ -255,6 +290,8 @@ to '_dhtReadData' pin {
   if (_dhtData == 0) {
     _dhtData = (newList 5)
   }
+  comment 'fill with 1''s set checksum will be bad if read fails'
+  atPut 'all' _dhtData 1
   comment 'Pull pin low for >18msec to request data'
   digitalWriteOp pin false
   waitMillis 20
@@ -303,6 +340,8 @@ to '_dhtReady' {
 
 to '_dhtUpdate' pin isDHT11 {
   if ('_dhtReady') {
+    _dht_temperature = 0
+    _dht_humidity = 0
     '_dhtReadData' pin
     _dhtLastReadTime = (millisOp)
   }
