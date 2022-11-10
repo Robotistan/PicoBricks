@@ -1,40 +1,20 @@
-## Magic 8 Ball Project Details
+## Crazy Frog Project Details
 
-Created by PeterMathijssen
 
-This project could be the basis for a school project. 
 
-It is based upon the classic Magic 8 Ball game.
 
-* https://en.wikipedia.org/wiki/Magic_8_Ball
-
-Rules: Ask your PicoBricks a question and then press the button...
-
-How could you make this nicer? 
-
-Think about :
-
-* Add a bigger button
-
-* Add a bigger OLED screen
-
-* Add more LEDs
-
-* Make fancier/funnier sentences
-
-* Build a magician that waves his arms with the help of servos and then displays the message.
-
-Use your imagination... 
-
-## Wiring Diagram
-
-<img src="https://user-images.githubusercontent.com/111511331/201104340-04c772c2-00a0-40f4-b287-a3c2c6e512b9.jpg" width="750" height="800">
 
 
 ## Project Image
 
-<img src="https://user-images.githubusercontent.com/111511331/201104972-a8c70715-2b8e-42a5-a060-8e5ccbb246ad.png" width="750" height="800">
-<img src="https://user-images.githubusercontent.com/111511331/201104715-635206b0-cf84-4233-b833-e57848050156.png" width="750" height="800">
+
+![image9](https://user-images.githubusercontent.com/111511331/201110727-6656e440-f025-4d21-8e0e-417aeb16eede.jpeg)
+![image8](https://user-images.githubusercontent.com/111511331/201110767-13f07319-e1cf-4bf0-9c23-02edbc17f1d7.jpeg)
+![image7](https://user-images.githubusercontent.com/111511331/201110802-ca761fc0-95c7-4f63-be4e-62b51fedd726.jpeg)
+![image6](https://user-images.githubusercontent.com/111511331/201110832-e6712895-c1a4-49ce-8183-54f6a191a35e.jpeg)
+![image5](https://user-images.githubusercontent.com/111511331/201110846-05064574-37c9-42d8-b70c-30a4edc087f8.jpeg)
+![image4](https://user-images.githubusercontent.com/111511331/201110862-ae14376e-15aa-485f-83de-277349255119.jpeg)
+
 
 
 
