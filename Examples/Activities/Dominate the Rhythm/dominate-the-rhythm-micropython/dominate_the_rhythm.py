@@ -47,11 +47,13 @@ played_time = 0
 while True:
     current_time = utime.ticks_ms()
     oled.show()
-    oled.text("Dominate ",30,10)
-    oled.text("the ",45,25)
-    oled.text("Rhythm ",35,40)
-
+    oled.text("Press the button",0,0)
+    
     if (note_count < len(mysong)):
+        oled.fill(0)
+        oled.text("Dominate ",30,10)
+        oled.text("the ",45,25)
+        oled.text("Rhythm ",35,40)
         rithm=((pot.read_u16()/65535.0)*20) +1
         if (current_time - played_time)/1000.0 >= noteTime[note_count]/rithm:
             played_time = utime.ticks_ms()
@@ -59,6 +61,7 @@ while True:
             note_count += 1
     else:
         buzzer.duty_u16(0)
+        
     if pressed:
         
         note_count = 0
