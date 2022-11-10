@@ -13,12 +13,12 @@ Think about adding a bigger button, a bigger OLED screen, a WIFI module, or a Bl
 ![image](https://user-images.githubusercontent.com/111511331/201079362-d26680d1-ffe5-4bd3-9f13-011f4946a0fd.png)
 
 ## Project Image
+<img src="https://user-images.githubusercontent.com/111511331/201079417-0a8dae72-20ac-46a0-97ae-14e77e56e844.png" width="800" height="800">
+<img src="https://user-images.githubusercontent.com/111511331/201079473-04e5665e-7873-44c5-93a0-f8a6aeb13146.png" width="800" height="800">
+<img src="https://user-images.githubusercontent.com/111511331/201079507-e4ce31d1-e569-437c-90bd-9bf6a50cce12.png" width="800" height="800">
+<img src="https://user-images.githubusercontent.com/111511331/201079533-77f84b90-7e14-4033-8004-444cbc62d6ae.png" width="800" height="800">
+<img src="https://user-images.githubusercontent.com/111511331/201079553-10911cc2-ded1-444e-95eb-b5fb2a36b470.png" width="800" height="800">
+<img src="https://user-images.githubusercontent.com/111511331/201079587-f1edbf00-0815-4a35-ba5e-f2aa008ddbda.png" width="800" height="800">
 
-![image](https://user-images.githubusercontent.com/111511331/201079417-0a8dae72-20ac-46a0-97ae-14e77e56e844.png)
-![image](https://user-images.githubusercontent.com/111511331/201079473-04e5665e-7873-44c5-93a0-f8a6aeb13146.png)
-![image](https://user-images.githubusercontent.com/111511331/201079507-e4ce31d1-e569-437c-90bd-9bf6a50cce12.png)
-![image](https://user-images.githubusercontent.com/111511331/201079533-77f84b90-7e14-4033-8004-444cbc62d6ae.png)
-![image](https://user-images.githubusercontent.com/111511331/201079553-10911cc2-ded1-444e-95eb-b5fb2a36b470.png)
-![image](https://user-images.githubusercontent.com/111511331/201079587-f1edbf00-0815-4a35-ba5e-f2aa008ddbda.png)
 
 
