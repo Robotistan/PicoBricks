@@ -1,6 +1,5 @@
 ## Crazy Frog Project Details
-
-
+This example shows how to play music and make pictures with Micropython. It plays Crazy Frog melody you may have heard before.
 
 
 
