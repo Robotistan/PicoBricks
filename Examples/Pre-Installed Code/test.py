@@ -1,10 +1,9 @@
 from utime import sleep
 import time
 from machine import Pin, I2C, PWM, ADC
-from picobricks import SSD1306_I2C, WS2812
+from picobricks import SSD1306_I2C, WS2812, DHT11
 import framebuf
 import random
-from dht import DHT11
 
 WIDTH  = 128   # oled display width
 HEIGHT = 64    # oled display height
