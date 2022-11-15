@@ -1,11 +1,13 @@
 module main
 author 'Turgut Guneysu'
-version 1 0 
+version 1 3 
 choices MuxMenu 'Single Connection' 'Multiple Connections' 
 choices ServerMenu 'Delete Server' 'Create Server' 
 choices ModeMenu Station SoftAP 'Station&SoftAP' 
-description 'ESP01 Demo using RASPICO Board'
-variables savebuffer responses _request _linkID _colon _comma _eol _serbuffer _response ESP01_password ESP01_ssid ESP01_IPaddr ESP01_status ESP01_Log ssid password ESP01_response modeIn mode ESP01_prev_status cmdComplete _espBufferDelay _espLoopDelay _espDisplayDelay _espCmdDelay debug TCPprompt _serFindIndex LED timer ATCommands ATResponses ESP01_current_cmd serialFindsList ESP01_tcp_req_queue ESP01_server_ready ESP01_LogSize _reqPath 
+description 'ESP01 Demo using RASPICO Board
+Changes: IPD content refresh corrected
+'
+variables savebuffer responses _request _linkID _colon _comma _eol _serbuffer _response ESP01_password ESP01_ssid ESP01_IPaddr ESP01_status ESP01_Log ssid password ESP01_response modeIn mode ESP01_prev_status cmdComplete _espBufferDelay _espLoopDelay _espDisplayDelay _espCmdDelay debug TCPprompt _serFindIndex LED timer ATCommands ATResponses ESP01_current_cmd serialFindsList ESP01_tcp_req_queue ESP01_server_ready ESP01_LogSize _reqPath temperature humidity soilMoisture 
 
   spec ' ' 'ESP01_connect_to' 'ESP01_connect_to _ Password _' 'auto auto' 'Network_Name' 'Network_Password'
   spec ' ' 'ESP01_set_WIFI_mode' 'ESP01_set_WIFI_mode _' 'str.ModeMenu' 'Station'
@@ -345,6 +347,7 @@ from messing up the processing; eg: RESTORE'
 }
 
 to '_handleIPD' {
+  atPut 2 responses ('[data:makeList]' '/SERA' ('[data:join]' ('[data:join]' 'HTTP/1.1 200 OK' _eol 'Content-Type: text/html' _eol _eol) '{"TEMP":' (pb_temperature) ',"S.Moisture":' (((analogReadOp 27) * 100) / 1023) ',"Humidity":' (pb_humidity) '}'))
   for response responses {
     if (_reqPath == (at 1 response)) {
       processRequest
@@ -508,7 +511,7 @@ incoming request. To prevent it, browser requests are preceeded by a TCPSend of 
   responses = ('[data:makeList]' ('[data:makeList]' '/' '<H1>CONNECTED...<br/></H1>
 <p>/SERA: Temp, Humidity, Soil Moisture<br/>
 /WATERING: Run Water Pump<br/>
-</p>') ('[data:makeList]' '/SERA' ('[data:join]' ('[data:join]' 'HTTP/1.1 200 OK' _eol 'Content-Type: text/html' _eol _eol) '{"TEMP":' (pb_temperature) ',"S.Moisture":' (((analogReadOp 27) / 1023) * 100) ',"Humidity":' (pb_humidity) '}')) ('[data:makeList]' '/WATERING' '<H1>SERA CONTROL<br/></H1>
+</p>') ('[data:makeList]' '/SERA' ('[data:join]' ('[data:join]' 'HTTP/1.1 200 OK' _eol 'Content-Type: text/html' _eol _eol) '{"TEMP":' temperature ',"S.Moisture":' soilMoisture ',"Humidity":' humidity '}')) ('[data:makeList]' '/WATERING' '<H1>SERA CONTROL<br/></H1>
 <p>Irrigation is complete..</p>') ('[data:makeList]' '/favicon' '<HEAD><link rel="icon" href="data:,"></HEAD>'))
   'ESP01_log _' 'RESPONSES initialized.'
 }
@@ -526,7 +529,26 @@ If the activity code is too long / large, then provide a call to a custom functi
   }
 }
 
-script 558 43 {
+script 262 40 {
+comment 'There are two cycles: command & data.
+Command:
+- current Cmd = <one of the AT cmds>
+- checks good/bad responses
+- cycle finishes with SERVER ON.
+
+Data:
+- current Cmd = TCPREQUEST.
+- checks for +IPD
+- any +IPD goes into Queu, 
+- When Q > 0:
+     If server ready process it 
+
+Since OLED is not used, run once with cable attached
+to get the IP address of the Server. Then disconnect if
+needed.'
+}
+
+script 643 61 {
 whenBroadcastReceived 'COMM Loop'
 if ESP01_server_ready {
   sayIt 'COMM Loop running.' _eol 'SERVER ready.'
@@ -536,7 +558,7 @@ if ESP01_server_ready {
 }
 }
 
-script 56 48 {
+script 56 71 {
 whenStarted
 local 'delay' 50
 repeat 9 {
@@ -564,7 +586,7 @@ Please wait till next prompt.'
 timer = (millisOp)
 ESP01_restore
 ESP01_set_WIFI_mode 'Station'
-ESP01_connect_to 'SSID' 'PASSWD'
+ESP01_connect_to 'SSID' 'PASSWORD'
 ESP01_IP_address
 ESP01_set_MUX 'Multiple Connections'
 ESP01_server 'Create Server'
@@ -575,23 +597,7 @@ sendBroadcast 'COMM Loop'
 ESP01_current_cmd = 'TCPREQUEST'
 }
 
-script 264 50 {
-comment 'There are two cycles: command & data.
-Command:
-- current Cmd = <one of them>
-- checks good/bad responses
-- cycle finishes with SERVER ON.
-
-Data:
-- current Cmd = TCPREQUEST.
-- checks for +IPD
-- any +IPD goes into Queu, 
-- When Q > 0:
-     If server ready process it 
-'
-}
-
-script 557 252 {
+script 557 275 {
 whenCondition ((size ESP01_tcp_req_queue) > 0)
 sayIt (size ESP01_tcp_req_queue)
 if ESP01_server_ready {
@@ -600,7 +606,7 @@ if ESP01_server_ready {
 sayIt (size ESP01_tcp_req_queue)
 }
 
-script 560 480 {
+script 560 503 {
 whenBroadcastReceived 'COMM Loop'
 forever {
   cmdComplete = (booleanConstant false)
@@ -624,11 +630,7 @@ forever {
 }
 }
 
-script 294 535 (ESP01_display_LOG)
-
-script 51 1132 {
-to ESP01_connect_to {}
-}
+script 294 558 (ESP01_display_LOG)
 
 
 module PicoBricks
@@ -784,7 +786,7 @@ to pb_turn_off_RGB {
 
 module 'Temperature Humidity (DHT11, DHT22)' Input
 author MicroBlocks
-version 1 1 
+version 1 2 
 tags sensor dht11 dht22 temperature humidity 
 description 'Support for the DHT11 and DHT22 environmental sensors. These sensors provide temperature and humidity readings.'
 variables _dht_temperature _dht_humidity _dhtData _dhtLastReadTime 
@@ -799,6 +801,7 @@ variables _dht_temperature _dht_humidity _dhtData _dhtLastReadTime
   spec 'r' '_dhtReady' '_dhtReady' 'any'
 
 to '_dhtChecksumOkay' {
+  if (not (isType _dhtData 'list')) {return (booleanConstant false)}
   local 'checksum' 0
   for i 4 {
     checksum += (at i _dhtData)
@@ -812,6 +815,8 @@ to '_dhtReadData' pin {
   if (_dhtData == 0) {
     _dhtData = (newList 5)
   }
+  comment 'fill with 1''s set checksum will be bad if read fails'
+  atPut 'all' _dhtData 1
   comment 'Pull pin low for >18msec to request data'
   digitalWriteOp pin false
   waitMillis 20
@@ -860,6 +865,8 @@ to '_dhtReady' {
 
 to '_dhtUpdate' pin isDHT11 {
   if ('_dhtReady') {
+    _dht_temperature = 0
+    _dht_humidity = 0
     '_dhtReadData' pin
     _dhtLastReadTime = (millisOp)
   }
