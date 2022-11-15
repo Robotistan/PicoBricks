@@ -1,4 +1,3 @@
-
 from machine import Pin,ADC,PWM
 from utime import sleep
 #define libraries
