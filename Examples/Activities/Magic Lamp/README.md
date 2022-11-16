@@ -6,7 +6,8 @@ In this project, we will turn a lamp we use at home on and off with sound. In ou
 
 ## Wiring Diagram
 
-![image](https://user-images.githubusercontent.com/111511331/200277535-2cb3873b-f474-467f-a20f-1fd11eb8bab5.png)
+![image](https://user-images.githubusercontent.com/112697142/202174578-13a9f40e-93e0-4a10-bcbe-48847ed6c55b.jpg)
+
 
 ## Project Image
 
