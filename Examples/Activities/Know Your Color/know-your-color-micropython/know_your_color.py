@@ -10,7 +10,7 @@ HEIGHT = 64
 sda=machine.Pin(4)
 scl=machine.Pin(5)
 i2c=machine.I2C(0,sda=sda, scl=scl, freq=1000000)
-ws = WS2812(pin_num=6, num_leds=1, brightness=0.3)
+ws = WS2812(6, brightness=0.1)
 
 oled = SSD1306_I2C(WIDTH, HEIGHT, i2c)
 
@@ -24,8 +24,8 @@ BLACK = (0, 0, 0)
 oled.fill(0)
 oled.show()
 
-ws.pixels_fill(BLACK)
-ws.pixels_show()
+ws.fill(BLACK)
+ws.show()
 
 global button_pressed
 score=0
@@ -35,17 +35,17 @@ def random_rgb():
     global ledcolor
     ledcolor=int(urandom.uniform(1,4))
     if ledcolor == 1:
-        ws.pixels_fill(RED)
-        ws.pixels_show()
+        ws.fill(RED)
+        ws.show()
     elif ledcolor == 2:
-        ws.pixels_fill(GREEN)
-        ws.pixels_show()
+        ws.fill(GREEN)
+        ws.show()
     elif ledcolor == 3:
-        ws.pixels_fill(BLUE)
-        ws.pixels_show()
+        ws.fill(BLUE)
+        ws.show()
     elif ledcolor == 4:
-        ws.pixels_fill(WHİTE)
-        ws.pixels_show()
+        ws.fill(WHİTE)
+        ws.show()
 
 def random_text():
     global oledtext
@@ -99,11 +99,10 @@ for i in range(10):
     utime.sleep(1.5)
     oled.fill(0)
     oled.show()
-    ws.pixels_fill(BLACK)
-    ws.pixels_show()
+    ws.fill(BLACK)
+    ws.show()
 utime.sleep(1.5)
 oled.fill(0)
-oled.show()
 oled.text("Your total score:",0,20)
 oled.text(str(score), 30,40)
 oled.show()
