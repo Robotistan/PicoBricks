@@ -10,8 +10,6 @@ void loop() {
       
       if (sread == 'f') {
       Forward();
-    } else if(sread == 'b'){
-      Backward();
     } else if(sread == 'r'){
       Turn_Right();
     } else if(sread == 'l'){
@@ -25,13 +23,6 @@ void loop() {
 void Forward(){
   digitalWrite(21,HIGH);
   digitalWrite(22,HIGH);
-  delay(1000);
-  digitalWrite(21,LOW);
-  digitalWrite(22,LOW);
-}
-void Backward(){
-  digitalWrite(21,HIGH);
-  digitalWrite(22,LOW);
   delay(1000);
   digitalWrite(21,LOW);
   digitalWrite(22,LOW);
