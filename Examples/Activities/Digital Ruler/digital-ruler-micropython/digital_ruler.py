@@ -58,8 +58,8 @@ def getMeasure(pin):
     measure=0
     finalDistance=0
 #sound the buzzer    
-<<<<<<< HEAD
+#<<<<<<< HEAD
 button.irq(trigger=machine.Pin.IRQ_RISING, handler=getMeasure)
-=======
+#=======
 button.irq(trigger=machine.Pin.IRQ_RISING, handler=getMeasure)
->>>>>>> 1c49a7ab30234584ea490fa4b6aca65d1a3f08f0
+#>>>>>>> 1c49a7ab30234584ea490fa4b6aca65d1a3f08f0
