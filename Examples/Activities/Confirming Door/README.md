@@ -6,8 +6,8 @@ In this project, we will prepare a card entry system on a model house. The elect
 Set the door to the closed position when Picobricks starts. Make the buzzer beep when a card is shown to the RFID reader. If the serial number of the card being read matches the serial number in the homeowner variable, turn the RGB LED on green. Then let the door open. Make sure the door is closed 3 seconds after the door is opened. If the serial number of the card being read does not match the homeowner variable, turn the RGB LED on red. A different tone sounds from the buzzer.
 
 ## Wiring Diagram
+![WhatsApp Image 2022-11-21 at 16 44 40](https://user-images.githubusercontent.com/112697142/203070823-10d5a115-b78d-4a9c-ac13-83ae1c5574bc.jpeg)
 
- ![image](https://user-images.githubusercontent.com/111511331/200292663-f1bbc724-f4ff-4c01-b0db-495e1bc70bd9.png)
 
 ## Cable Connections
 
