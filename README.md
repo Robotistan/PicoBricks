@@ -1,5 +1,11 @@
 # Make, Run, Split, Merge
+Shield: [![CC BY-NC-SA 4.0][cc-by-nc-sa-shield]][cc-by-nc-sa]
+
 <img src="https://ksr-ugc.imgix.net/assets/036/949/333/19d4e8370190a56be1389832d344876f_original.jpg?ixlib=rb-4.0.2&w=680&fit=max&v=1649673985&gif-q=50&q=92&s=bf2c8ff527cd06c6e021dbbebd50887b" width="600" height="400">
+
+
+
+
 
 ## [Pico Bricks](https://shop.robotistan.com/products/pico-bricks "Heading link")
  ##### Pico Bricks is a fantastic project development kit for STEM educators and makers of all levels.
@@ -27,5 +33,17 @@ https://user-images.githubusercontent.com/112697142/189288729-d2767b4b-97cd-40d8
 - ##### [Documents](https://github.com/Robotistan/PicoBricks/tree/main/Documents "Heading link")
 - ##### [Examples](https://github.com/Robotistan/PicoBricks/tree/main/Examples "Heading link")
 
+## License
+
+This work is licensed under a
+[Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License][cc-by-nc-sa].
+
+[![CC BY-NC-SA 4.0][cc-by-nc-sa-image]][cc-by-nc-sa]
+
+[cc-by-nc-sa]: http://creativecommons.org/licenses/by-nc-sa/4.0/
+[cc-by-nc-sa-image]: https://licensebuttons.net/l/by-nc-sa/4.0/88x31.png
+[cc-by-nc-sa-shield]: https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg
+
 ## Note
 If you have any questions, please contact technical support on our [Robotistan Community](https://community.robotistan.com/).
+
