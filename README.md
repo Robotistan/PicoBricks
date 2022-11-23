@@ -1,5 +1,4 @@
 
-![Website]( https://img.shields.io/website?up_message=PicoBricks&url=https%3A%2F%2Fpicobricks.com%2F ) 
 ![YouTube Channel Subscribers](https://img.shields.io/youtube/channel/subscribers/UCxrzbtC5y-5kGx7gMlFRG6A?style=social)
 ![Twitter URL](https://img.shields.io/twitter/url?style=social&url=https%3A%2F%2Ftwitter.com%2Fpicobricks%3Flang%3Dbg)
 ![GitHub followers](https://img.shields.io/github/followers/Robotistan?style=social)
@@ -8,8 +7,6 @@
 # Make, Run, Split, Merge
 
 <img src="https://ksr-ugc.imgix.net/assets/036/949/333/19d4e8370190a56be1389832d344876f_original.jpg?ixlib=rb-4.0.2&w=680&fit=max&v=1649673985&gif-q=50&q=92&s=bf2c8ff527cd06c6e021dbbebd50887b" width="600" height="400">
-
-
 
 
 
