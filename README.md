@@ -32,9 +32,13 @@ https://user-images.githubusercontent.com/112697142/189288729-d2767b4b-97cd-40d8
 
 
 ## Repository Contents
+
+- ##### [Bootloader](https://github.com/Robotistan/PicoBricks/tree/main/Bootloader)
 - ##### [Bricks](https://github.com/Robotistan/PicoBricks/tree/main/Bricks "Heading link")
 - ##### [Documents](https://github.com/Robotistan/PicoBricks/tree/main/Documents "Heading link")
+- ##### [Education](https://github.com/Robotistan/PicoBricks/tree/main/Education) 
 - ##### [Software](https://github.com/Robotistan/PicoBricks/tree/main/Software) 
+
 
 ## License
 
