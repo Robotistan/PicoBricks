@@ -44,7 +44,7 @@ https://user-images.githubusercontent.com/112697142/189288729-d2767b4b-97cd-40d8
    * [MicroBlocks Test Code](https://github.com/Robotistan/PicoBricks/tree/main/Education/Microblocks%20Test%20Code)
 - ##### [Software](https://github.com/Robotistan/PicoBricks/tree/main/Software) 
    * [Activities](https://github.com/Robotistan/PicoBricks/tree/main/Software/Activities)
-   * [Examples](https://github.com/Robotistan/PicoBricks/tree/main/Software/Examples]
+   * [Examples](https://github.com/Robotistan/PicoBricks/tree/main/Software/Examples)
    * [Images Library](https://github.com/Robotistan/PicoBricks/tree/main/Software/Images%20Libraries)
    * [Pre-Installed Code](https://github.com/Robotistan/PicoBricks/tree/main/Software/Pre-Installed%20Code)
    * [lib](https://github.com/Robotistan/PicoBricks/tree/main/Software/lib)
