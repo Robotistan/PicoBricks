@@ -14,6 +14,8 @@ Picoâ€™s BOOTSEL mode lives in read-only memory inside the RP2040 chip, and canâ
 
 
 
-## Code on GitHub
+## <img src="https://user-images.githubusercontent.com/112697142/203996612-835d1fad-e125-44e7-8f3c-1b46440e6333.png" width="80" height="80">  Code on GitHub 
+
+
  You can start [here](https://github.com/raspberrypi/pico-examples/blob/master/flash/nuke/nuke.c "here").
 
