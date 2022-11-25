@@ -1,12 +1,22 @@
 from utime import sleep
 import time
 from machine import Pin, I2C, PWM, ADC
-from picobricks import SSD1306_I2C, WS2812, DHT11
+from picobricks import SSD1306_I2C, WS2812, DHT11, NEC_16
 import framebuf
 import random
 
 WIDTH  = 128   # oled display width
 HEIGHT = 64    # oled display height
+
+data_rcvd = False
+def ir_callback(data, addr, ctrl):
+    global ir_data
+    global ir_addr, data_rcvd
+    if data > 0:
+        ir_data = data
+        ir_addr = addr
+        print('Data {:02x} Addr {:04x}'.format(data, addr))
+        data_rcvd = True
 
 def button_push(event):
     if button.value() == 1:
@@ -32,10 +42,12 @@ conversion_factor = 3.3 / (65535)
 dht_sensor = DHT11(Pin(11))
 led = Pin(7, Pin.OUT)
 ws = WS2812(6, brightness=0.4)
+ir = NEC_16(Pin(0, Pin.IN), ir_callback)
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
 COLORS = (RED, GREEN, BLUE)
+ir_data = 0
 
 for color in COLORS:
         ws.pixels_fill(color)
@@ -78,3 +90,9 @@ while True:
     oled.show()
     time.sleep(1)
     oled.fill(0)
+    
+    if data_rcvd == True:
+        data_rcvd = False
+        if ir_data == 0x45:   # 0
+            relay.toggle()
+
