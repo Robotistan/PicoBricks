@@ -1,40 +1,30 @@
 module main
-author 'Turgut Guneysu'
-version 1 3 
-choices MuxMenu 'Single Connection' 'Multiple Connections' 
-choices ServerMenu 'Delete Server' 'Create Server' 
-choices ModeMenu Station SoftAP 'Station&SoftAP' 
-description 'ESP01 Demo using RASPICO Board
-Changes: IPD content refresh corrected
-'
-variables savebuffer responses _request _linkID _colon _comma _eol _serbuffer _response ESP01_password ESP01_ssid ESP01_IPaddr ESP01_status ESP01_Log ssid password ESP01_response modeIn mode ESP01_prev_status cmdComplete _espBufferDelay _espLoopDelay _espDisplayDelay _espCmdDelay debug TCPprompt _serFindIndex LED timer ATCommands ATResponses ESP01_current_cmd serialFindsList ESP01_tcp_req_queue ESP01_server_ready ESP01_LogSize _reqPath temperature humidity soilMoisture 
+author unknown
+version 1 0 
+description ''
+variables ESP01_prev_status ESP01_current_cmd ESP01_response _espDisplayDelay cmdComplete savebuffer ESP01_IPaddr _eol _colon ESP01_ssid ESP01_password ESP01_Log debug ESP01_LogSize ESP01_server_ready ESP01_tcp_req_queue _linkID _comma _reqPath ATCommands ATResponses _serFindIndex _serbuffer responses TCPprompt _espCmdDelay _espBufferDelay _espLoopDelay temperature soilMoisture humidity ESP01_status timer 
 
-  spec ' ' 'ESP01_connect_to' 'ESP01_connect_to _ Password _' 'auto auto' 'Network_Name' 'Network_Password'
-  spec ' ' 'ESP01_set_WIFI_mode' 'ESP01_set_WIFI_mode _' 'str.ModeMenu' 'Station'
-  spec ' ' 'ESP01_set_MUX' 'ESP01_set_MUX _' 'str.MuxMenu' 'Multiple Connections'
-  spec ' ' 'ESP01_server' 'ESP01_server _' 'str.ServerMenu' 'Create Server'
-  spec ' ' 'ESP01_restore' 'ESP01_restore'
-  spec 'r' 'ESP01_method_of_request' 'ESP01_method_of_request _' 'auto' ''
-  spec 'r' 'ESP01_path_of_request' 'ESP01_path_of_request _' 'auto' ''
   spec ' ' 'ESP01_IP_address' 'ESP01_IP_address'
-  spec 'r' '_byteArray2string' '_byteArray2string _' 'auto' ''
-  spec ' ' 'initializeResponses' 'initializeResponses'
-  spec ' ' '_handleIPD' '_handleIPD'
+  spec ' ' 'ESP01_connect_to' 'ESP01_connect_to _ Password _' 'auto auto' 'Network_Name' 'Network_Password'
   spec 'r' 'ESP01_display_LOG' 'ESP01_display_LOG'
-  spec ' ' 'processRequest' 'processRequest'
-  spec ' ' 'ESP01_set_server_timeout _' 'ESP01_set_server_timeout _ secs' 'num' 180
-  spec ' ' '_sendATcmd' '_sendATcmd _' 'str' 'ATcmd'
   spec ' ' 'ESP01_log _' 'ESP01_log _' 'str' 'op result'
-  spec ' ' 'ESP01_reset' 'ESP01_reset'
-  spec ' ' '_TCPbusy' '_TCPbusy'
+  spec 'r' 'ESP01_path_of_request' 'ESP01_path_of_request _' 'auto' ''
   spec ' ' 'ESP01_requests' 'ESP01_requests'
+  spec ' ' 'ESP01_restore' 'ESP01_restore'
+  spec ' ' 'ESP01_server' 'ESP01_server _' 'str.ServerMenu' 'Create Server'
+  spec ' ' 'ESP01_set_MUX' 'ESP01_set_MUX _' 'str.MuxMenu' 'Multiple Connections'
+  spec ' ' 'ESP01_set_WIFI_mode' 'ESP01_set_WIFI_mode _' 'str.ModeMenu' 'Station'
+  spec 'r' '_byteArray2string' '_byteArray2string _' 'auto' ''
   spec 'r' '_cmdError' '_cmdError'
   spec 'r' '_cmdGood' '_cmdGood'
-  spec ' ' '_cmdREADY' '_cmdREADY'
+  spec ' ' '_handleIPD' '_handleIPD'
   spec ' ' '_logging _' '_logging _' 'bool' true
   spec 'r' '_queueRequest' '_queueRequest _' 'str' 'text'
+  spec ' ' '_sendATcmd' '_sendATcmd _' 'str' 'ATcmd'
   spec 'r' '_tcpRequest' '_tcpRequest'
   spec ' ' 'initializeCommands' 'initializeCommands'
+  spec ' ' 'initializeResponses' 'initializeResponses'
+  spec ' ' 'processRequest' 'processRequest'
 
 to ESP01_IP_address {
   comment 'AT+CIPSTA?
@@ -138,10 +128,6 @@ to 'ESP01_log _' entry {
   }
 }
 
-to ESP01_method_of_request request {
-  return ('_byteArray2string' ('[data:copyFromTo]' request (('[data:find]' _colon request) + 1) (('[data:find]' ' ' request) - 1)))
-}
-
 to ESP01_path_of_request request {
   return ('_byteArray2string' ('[data:copyFromTo]' request (('[data:find]' 'GET ' request) + 4) (('[data:find]' ' HTTP' request) - 1)))
 }
@@ -164,16 +150,6 @@ returns.'
   ESP01_current_cmd = 'TCPREQUEST'
   comment 'CONFIRM good process b4 DELETE'
   '[data:delete]' 1 ESP01_tcp_req_queue
-}
-
-to ESP01_reset {
-  ESP01_prev_status = ''
-  comment 'Resets ESP01 and restores any existing WIFI connections'
-  ESP01_current_cmd = 'RST'
-  '_sendATcmd' 'AT+RST'
-  waitUntil ESP01_response
-  'ESP01_log _' ('[data:join]' ESP01_current_cmd _colon ESP01_prev_status)
-  cmdComplete = (booleanConstant true)
 }
 
 to ESP01_restore {
@@ -262,31 +238,6 @@ OK'
   cmdComplete = (booleanConstant true)
 }
 
-to 'ESP01_set_server_timeout _' timeout {
-  comment 'Default timeout is 180secs
-AT+CIPSTO?
-
-+CIPSTO:180
-
-OK'
-  waitUntil (0 == (size ('[serial:read]')))
-  repeatUntil ('OK' == ESP01_status) {
-    comment 'Set Server timeout in seconds'
-    '[serial:write]' ('[data:join]' 'AT+CIPSTO=' timeout _eol)
-    waitUntil ESP01_response
-  }
-  '[data:addLast]' ('[data:join]' 'Server timeout:' ESP01_status _eol) ESP01_Log
-}
-
-to '_TCPbusy' {
-  '[data:addLast]' 'BUSY detected' ESP01_Log
-  ESP01_status = 'BUSY'
-  ESP01_response = (booleanConstant true)
-  sayIt 'BUSY while processing.'
-  waitMillis _espDisplayDelay
-  waitUntil cmdComplete
-}
-
 to '_byteArray2string' aStringOrByteArray {
   comment 'If argument is a byte array, convert it to a string. '
   if (not (isType aStringOrByteArray 'string')) {
@@ -330,20 +281,6 @@ to '_cmdGood' {
     }
     return (booleanConstant true)
   }
-}
-
-to '_cmdREADY' {
-  'ESP01_log _' '_cmdREADY entered'
-  ESP01_status = 'READY'
-  ESP01_prev_status = ESP01_status
-  comment 'For each response received, copy the serial buffer
-till past the detected anticipated response:
-OK, ERROR, BUSY, etc.
-This prevents long replies including binary data
-from messing up the processing; eg: RESTORE'
-  savebuffer = ('_byteArray2string' ('[data:join]' ('[data:copyFromTo]' _serbuffer 1 (('[data:find]' 'OK' _serbuffer) + 4)) ('[data:copyFromTo]' _serbuffer _serFindIndex)))
-  ESP01_response = (booleanConstant true)
-  'ESP01_log _' '_cmdREADY exit'
 }
 
 to '_handleIPD' {
@@ -529,7 +466,7 @@ If the activity code is too long / large, then provide a call to a custom functi
   }
 }
 
-script 262 40 {
+script 221 52 {
 comment 'There are two cycles: command & data.
 Command:
 - current Cmd = <one of the AT cmds>
@@ -548,7 +485,7 @@ to get the IP address of the Server. Then disconnect if
 needed.'
 }
 
-script 643 61 {
+script 605 254 {
 whenBroadcastReceived 'COMM Loop'
 if ESP01_server_ready {
   sayIt 'COMM Loop running.' _eol 'SERVER ready.'
@@ -558,7 +495,7 @@ if ESP01_server_ready {
 }
 }
 
-script 56 71 {
+script 105 258 {
 whenStarted
 local 'delay' 50
 repeat 9 {
@@ -597,7 +534,9 @@ sendBroadcast 'COMM Loop'
 ESP01_current_cmd = 'TCPREQUEST'
 }
 
-script 557 275 {
+script 369 372 (ESP01_display_LOG)
+
+script 606 462 {
 whenCondition ((size ESP01_tcp_req_queue) > 0)
 sayIt (size ESP01_tcp_req_queue)
 if ESP01_server_ready {
@@ -606,7 +545,7 @@ if ESP01_server_ready {
 sayIt (size ESP01_tcp_req_queue)
 }
 
-script 560 503 {
+script 609 690 {
 whenBroadcastReceived 'COMM Loop'
 forever {
   cmdComplete = (booleanConstant false)
@@ -629,8 +568,6 @@ forever {
   waitMillis _espLoopDelay
 }
 }
-
-script 294 558 (ESP01_display_LOG)
 
 
 module PicoBricks
