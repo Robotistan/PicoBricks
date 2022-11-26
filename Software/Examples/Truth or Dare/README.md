@@ -1,5 +1,10 @@
-## Turth or Dare Project Details
+## Truth or Dare Project Details
 Play the very popular game truth or dare, this time with Picobricks. You can change the questions and commands in the code as you wish.
+## Rules
+- Run the code
+- Choose truth or dare by using the potentiometer
+- Then, push the button
+- If you choose the dare, complete the mission. Else, answer the question correctly.
 
 
 ![allScripts10506782](https://user-images.githubusercontent.com/112697142/204086059-f6268c34-5158-4b41-a07b-8140123718f5.png)
