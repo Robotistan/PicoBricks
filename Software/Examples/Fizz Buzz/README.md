@@ -1,43 +1,11 @@
-## Rock Paper Scissors Details
+## Fizz Buzz Game Details
 
 Created by PeterMathijssen
+Fizz buzz is a group word game for children to teach them about division. Players take turns to count incrementally, replacing any number divisible by three with the word "fizz", and any number divisible by five with the word "buzz".
 
-This project could be the basis for a school project. 
+Players generally sit in a circle. The player designated to go first says the number "1", and the players then count upwards in turn. However, any number divisible by three is replaced by the word fizz, and any number divisible by five by the word buzz. Numbers divisible by both three and five (i.e. divisible by 15) become fizz buzz. A player who hesitates or makes a mistake is eliminated.
 
-RULES:
+For example, a typical round of fizz buzz would start as follows:
 
-* Scissors cuts Paper
-
-* Paper covers Rock
-
-* Rock crushes Scissors
-
-How could you make this nicer? 
-
-Think about :
-
-* Add a bigger button
-
-* Add a bigger OLED screen
-
-* Use images instead of text
-
-* Using a 3d printed arrow and board.
-
-
-
-Use your imagination... 
-
-## Wiring Diagram
-
-<img src="https://user-images.githubusercontent.com/111511331/201471175-cc40b779-f411-4e2c-892e-3e0ada267c23.png" width="600" height="1000">
-
-![image](https://user-images.githubusercontent.com/111511331/201471238-37a43eda-66ab-4970-ab5e-546cf320d260.png)
-
-
-
-## Project Image
-
-<img src="https://user-images.githubusercontent.com/111511331/201471266-a198bd82-8ffc-48bb-9730-5983ed2903d2.png" width="600" height="800">
-
-
+1, 2, Fizz, 4, Buzz, Fizz, 7, 8, Fizz, Buzz, 11, Fizz, 13, 14, Fizz Buzz, 16, 17, Fizz, 19, Buzz, Fizz, 22, 23, Fizz, Buzz, 26, Fizz, 28, 29, Fizz Buzz, 31, 32, Fizz, 34, Buzz, Fizz, ...
+* https://en.wikipedia.org/wiki/Fizz_buzz
