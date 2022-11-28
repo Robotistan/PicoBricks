@@ -19,7 +19,7 @@
 ##### [- Smart House](https://github.com/Robotistan/PicoBricks/tree/main/Software/Activities/Smart%20House "Heading Link")
 ##### [- Hungry Piggy Bank](https://github.com/Robotistan/PicoBricks/tree/main/Software/Activities/Hungry%20Piggy%20Bank "Heading Link") 
 ##### [- Confirming Door](https://github.com/Robotistan/PicoBricks/tree/main/Software/Activities/Confirming%20Door "Heading Link")
-##### [- Automatic Trash Bin](https://github.com/Robotistan/PicoBricks/tree/main/Software/Activities/Automatic%20Trash%20Binn "Heading Link") 
+##### [- Automatic Trash Bin](https://github.com/Robotistan/PicoBricks/tree/main/Software/Activities/Automatic%20Trash%20Bin "Heading Link") 
 ##### [- Digital Ruler](https://github.com/Robotistan/PicoBricks/tree/main/Software/Activities/Digital%20Ruler "Heading Link")
 ##### [- Air Piano](https://github.com/Robotistan/PicoBricks/tree/main/Software/Activities/Air%20Piano "Heading Link")
 ##### [- Maze Solver Robot](https://github.com/Robotistan/PicoBricks/tree/main/Software/Activities/Maze%20Solver%20Robot "Heading Link")
