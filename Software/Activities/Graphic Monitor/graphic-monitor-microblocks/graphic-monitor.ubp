@@ -3,13 +3,10 @@ author unknown
 version 1 0 
 description ''
 
-script 80 40 {
-whenCondition ((pb_light_sensor) < 94)
-setServoSpeed 21 100
-setServoAngle 21 90
-waitMillis 100
-setServoAngle 21 0
-waitMillis 500
+script 105 52 {
+whenCondition true
+analogWriteOp _pb_pin_RedLED (pb_potentiometer)
+printIt ('[misc:rescale]' (pb_potentiometer) 0 1023 0 100)
 }
 
 
@@ -164,113 +161,9 @@ to pb_turn_off_RGB {
 }
 
 
-module Servo Output
-author MicroBlocks
-version 1 1 
-tags servo motor angle rotation position 
-description 'Control both positional (angle) and rotational servo motors.'
-variables _servoPin _servoPulseWidth 
-
-  spec ' ' 'setServoAngle' 'set servo _ to _ degrees (-90 to 90)' 'num num' 1 90
-  spec ' ' 'setServoSpeed' 'set servo _ to speed _ (-100 to 100)' 'num num' 1 100
-  spec ' ' 'stopServo' 'stop servo _' 'num' 1
-  spec 'r' '_servoIndex' '_servoIndex _' 'num' 1
-  spec ' ' '_servoPulse' '_servoPulse pin _ usecs _' 'num num' 1 1500
-  spec ' ' '_servoUpdateLoop' '_servoUpdateLoop'
-
-to '_servoIndex' which {
-  if (_servoPin == 0) {
-    _servoPin = ('[data:makeList]')
-    _servoPulseWidth = ('[data:makeList]')
-    sendBroadcast '_servoUpdateLoop'
-  }
-  local 'i' ('[data:find]' which _servoPin)
-  if (i < 0) {
-    comment 'Add new pin'
-    '[data:addLast]' which _servoPin
-    '[data:addLast]' '1500' _servoPulseWidth
-    i = (size _servoPin)
-  }
-  return i
-}
-
-to '_servoPulse' pin usecs {
-  if (usecs == 0) {
-    comment 'Servo stopped; do nothing'
-    return 0
-  }
-  usecs = (maximum 850 (minimum usecs 2150))
-  comment 'Split wait into a long wait followed by a wait of <= 30 usecs for greater accuracy'
-  local 'endTime' ((microsOp) + usecs)
-  digitalWriteOp pin true
-  waitMicros (usecs - 30)
-  waitMicros (endTime - (microsOp))
-  digitalWriteOp pin false
-}
-
-to '_servoUpdateLoop' {
-  forever {
-    if (_servoPin != 0) {
-      comment 'If the _servoPin list is not 0, update the servos'
-      for i (size _servoPin) {
-        local 'pin' (at i _servoPin)
-        local 'usecs' (at i _servoPulseWidth)
-        if (and (pin >= 0) (usecs != 0)) {
-          '_servoPulse' pin usecs
-        }
-      }
-      waitMillis 15
-    }
-  }
-}
-
-to setServoAngle which degrees optionalReverse {
-  local 'reversed' false
-  if ((pushArgCount) > 2) {
-    reversed = optionalReverse
-  }
-  if reversed {
-    degrees = (0 - degrees)
-  }
-  local 'pulseWidth' (1500 - (10 * degrees))
-  if ('[io:hasServo]') {
-    '[io:setServo]' which pulseWidth
-  } else {
-    atPut ('_servoIndex' which) _servoPulseWidth pulseWidth
-  }
-}
-
-to setServoSpeed which speed optionalReverse {
-  local 'reversed' false
-  if ((pushArgCount) > 2) {
-    reversed = optionalReverse
-  }
-  if reversed {
-    speed = (0 - speed)
-  }
-  local 'pulseWidth' (1500 - (10 * speed))
-  if ((absoluteValue speed) < 2) {
-    pulseWidth = 0
-  }
-  if ('[io:hasServo]') {
-    '[io:setServo]' which pulseWidth
-  } else {
-    atPut ('_servoIndex' which) _servoPulseWidth pulseWidth
-  }
-}
-
-to stopServo which {
-  if ('[io:hasServo]') {
-    '[io:setServo]' which 0
-  } else {
-    atPut ('_servoIndex' which) _servoPulseWidth 0
-  }
-}
-
-
 module 'Temperature Humidity (DHT11, DHT22)' Input
 author MicroBlocks
-version 1 1 
+version 1 2 
 tags sensor dht11 dht22 temperature humidity 
 description 'Support for the DHT11 and DHT22 environmental sensors. These sensors provide temperature and humidity readings.'
 variables _dht_temperature _dht_humidity _dhtData _dhtLastReadTime 
@@ -285,6 +178,7 @@ variables _dht_temperature _dht_humidity _dhtData _dhtLastReadTime
   spec 'r' '_dhtReady' '_dhtReady' 'any'
 
 to '_dhtChecksumOkay' {
+  if (not (isType _dhtData 'list')) {return (booleanConstant false)}
   local 'checksum' 0
   for i 4 {
     checksum += (at i _dhtData)
@@ -298,6 +192,8 @@ to '_dhtReadData' pin {
   if (_dhtData == 0) {
     _dhtData = (newList 5)
   }
+  comment 'fill with 1''s set checksum will be bad if read fails'
+  atPut 'all' _dhtData 1
   comment 'Pull pin low for >18msec to request data'
   digitalWriteOp pin false
   waitMillis 20
@@ -346,6 +242,8 @@ to '_dhtReady' {
 
 to '_dhtUpdate' pin isDHT11 {
   if ('_dhtReady') {
+    _dht_temperature = 0
+    _dht_humidity = 0
     '_dhtReadData' pin
     _dhtLastReadTime = (millisOp)
   }

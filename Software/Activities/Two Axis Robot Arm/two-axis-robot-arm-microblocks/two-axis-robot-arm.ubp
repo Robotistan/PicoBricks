@@ -2,68 +2,88 @@ module main
 author unknown
 version 1 0 
 description ''
-variables homeowner 
+variables angleupdown 
 
-script 105 52 {
-comment 'Use RFID (RC522) Library - SPI Mode
+  spec ' ' 'close' 'close'
+  spec ' ' 'down' 'down'
+  spec ' ' 'open' 'open'
+  spec ' ' 'up' 'up'
 
-Pico Connections:
-RC522 Pico
-===== ====
-VCC    3v3
-GND    GND
-MISO   GPIO 16 
-MOSI   GPIO 19
-SCK     GPIO 18
-SDA     GPIO 17 (this is SPI ssPin)
-RST     do not connect'
+to close {
+  setServoAngle _pb_pin_Motor1 -60
+  'play tone' 'D' 2 100
+  sayIt 'CLOSE'
+  waitMillis 1000
 }
 
-script 106 227 {
+to down {
+  repeat 45 {
+    angleupdown += -2
+    setServoAngle _pb_pin_Motor2 angleupdown
+    sayIt angleupdown
+    waitMillis 30
+  }
+  'play tone' 'C' 1 100
+}
+
+to open {
+  setServoAngle _pb_pin_Motor1 90
+  'play tone' 'D' 2 100
+  sayIt 'OPEN'
+  waitMillis 1000
+}
+
+to up {
+  repeat 45 {
+    angleupdown += 2
+    setServoAngle _pb_pin_Motor2 angleupdown
+    sayIt angleupdown
+    waitMillis 30
+  }
+  'play tone' 'C' 1 100
+}
+
+script 556 52 {
+whenCondition ((pb_light_sensor) < 90)
+sayIt 'OBJECT detected.'
+pb_set_rgb_color (colorSwatch 190 46 18 255)
+waitMillis 1000
+pb_beep 1000
+open
+waitMillis 500
+down
+waitMillis 500
+close
+waitMillis 500
+up
+waitMillis 500
+pb_set_rgb_color (colorSwatch 87 190 59 255)
+pb_beep 1000
+sayIt 'OBJECT moved.'
+}
+
+script 106 53 {
 whenStarted
-rc522_initialize_SPI 17
-homeowner = ('[data:makeList]' 64 171 134 25)
-setServoAngle 22 90
-forever {
-  if (rc522_card_present) {
-    pb_beep 100
-    if (('[data:joinStrings]' homeowner) == ('[data:joinStrings]' (rc522_read_uid))) {
-      sayIt 'Login Confirmed'
-      pb_set_rgb_color (colorSwatch 35 190 30 255)
-      setServoAngle 22 0
-      waitMillis 3000
-      setServoAngle 22 90
-    } else {
-      sayIt 'invalid user'
-      pb_set_rgb_color (colorSwatch 190 40 8 255)
-      waitMillis 3000
-    }
-  } else {
-    sayIt 'No Card Detected'
-    pb_turn_off_RGB
-  }
-  waitMillis 100
-}
+close
+angleupdown = 90
+setServoAngle _pb_pin_Motor1 angleupdown
+pb_turn_off_RGB
 }
 
-script 468 230 {
-comment 'Click on Code to test and obtain the RFID code from your card.
-Update the other script''s homeowner variable with your UUID.
-Then just run the program for normal operation with your project.'
-rc522_initialize_SPI 17
-forever {
-  if (rc522_connected) {
-    if (rc522_card_present) {
-      sayIt 'Card Reader detected' ('[data:unicodeString]' 10) 'Card detected' ('[data:unicodeString]' 10) 'UUID:' ('[data:joinStrings]' (rc522_read_uid) ',')
-    } else {
-      sayIt 'Card Reader detected' ('[data:unicodeString]' 10) 'No Card detected'
-      waitMillis 1000
-    }
-  } else {
-    sayIt 'NO Card Reader detected'
-    waitMillis 1000
-  }
+script 106 196 {
+to up {}
 }
+
+script 107 412 {
+to down {}
+}
+
+script 105 662 {
+to open {}
+}
+
+script 474 663 {
+to close {}
 }
 
 
@@ -215,178 +235,6 @@ to pb_turn_off_RGB {
   '_pb_init_pins'
   '[display:neoPixelSetPin]' _pb_pin_RGB_LED false
   '[display:neoPixelSend]' 0
-}
-
-
-module 'RFID (RC522)' Input
-author MicroBlocks
-version 1 3 
-description 'Support for RC522 RFID card with I2C and SPI interfaces.
-Based on José Garcia RC522 MicroBlocks library which itself was based on:
-        https://github.com/m5stack/UIFlow-Code/blob/master/units/_rfid.py
-        and Arduino SPI Library: https://github.com/miguelbalboa/rfid/
-
-Tested with:
-        https://www.microcenter.com/product/639731/inland-ks0067-rc522-rfid-module-for-arduino
-        https://techatronic.com/rfid-rc522-module-rfid-sensor-working-description/
-        https://shop.m5stack.com/products/rfid-unit-2-ws1850s
-        https://shop.m5stack.com/products/rfid-sensor-unit
-'
-variables _rc522_mode _rc522_i2cAddr _rc522_initialized _rc522_nssPin 
-
-  spec ' ' 'rc522_initialize_I2C' 'RC522 initialize I2C addr _' 'num' 40
-  spec ' ' 'rc522_initialize_SPI' 'RC522 initialize SPI ssPin _' 'num' 17
-  spec 'r' 'rc522_connected' 'RC522 is connected'
-  spec 'r' 'rc522_card_present' 'RC522 is card present'
-  spec 'r' 'rc522_read_uid' 'RC522 card UID'
-  spec 'r' 'rc522_equal_ids' 'RC522 _ = _' 'auto auto' 'uid1' 'uid2'
-  spec ' ' '_rc522_antenna_on' '_rc522_antenna_on'
-  spec 'r' '_rc522_request' '_rc522_request'
-  spec 'r' '_rc522_send_to_card' '_rc522_send_to_card _ _' 'auto auto' 0 'list'
-  spec ' ' '_rc522_bitset' '_rc522_bitset reg _ mask _' 'num num' 0 128
-  spec ' ' '_rc522_bitclear' '_rc522_bitclear reg _ mask _' 'num num' 0 128
-  spec 'r' '_rc522_read_reg' '_rc522_read_reg _' 'num' 55
-  spec ' ' '_rc522_write_reg' '_rc522_write_reg _ value _' 'num num' 1 15
-
-to '_rc522_antenna_on' {
-  local 'value' ('_rc522_read_reg' (hexToInt '14'))
-  if ((value & 3) != 3) {
-    '_rc522_write_reg' (hexToInt '14') (value | 3)
-  }
-}
-
-to '_rc522_bitclear' reg mask {
-  '_rc522_write_reg' reg (('_rc522_read_reg' reg) & ('~' mask))
-}
-
-to '_rc522_bitset' reg mask {
-  '_rc522_write_reg' reg (('_rc522_read_reg' reg) | mask)
-}
-
-to '_rc522_read_reg' reg {
-  local 'result' 0
-  if ('SPI' == _rc522_mode) {
-    digitalWriteOp _rc522_nssPin false
-    spiSend (128 | (reg << 1))
-    result = (spiRecv)
-    digitalWriteOp _rc522_nssPin true
-  } ('I2C' == _rc522_mode) {
-    result = (i2cGet _rc522_i2cAddr reg)
-  }
-  return result
-}
-
-to '_rc522_request' {
-  '_rc522_write_reg' (hexToInt '0D') 7
-  return ('_rc522_send_to_card' (hexToInt '0C') ('[data:makeList]' (hexToInt '26')))
-}
-
-to '_rc522_send_to_card' cmd send {
-  '_rc522_write_reg' 2 ((hexToInt '77') | (hexToInt '80'))
-  '_rc522_bitclear' (hexToInt '04') (hexToInt '80')
-  '_rc522_bitset' (hexToInt '0A') (hexToInt '80')
-  for i (size send) {
-    '_rc522_write_reg' 9 (at i send)
-  }
-  '_rc522_write_reg' 1 cmd
-  '_rc522_bitset' (hexToInt '0D') (hexToInt '80')
-  waitMillis 10
-  '_rc522_bitclear' (hexToInt '0D') (hexToInt '80')
-  local 'response' (newList 1)
-  atPut 1 response (('_rc522_read_reg' 6) & (hexToInt '1B'))
-  if ((at 1 response) == 0) {
-    local 'n' ('_rc522_read_reg' (hexToInt '0A'))
-    for i n {
-      '[data:addLast]' ('_rc522_read_reg' 9) response
-    }
-  }
-  return response
-}
-
-to '_rc522_write_reg' reg value {
-  if ('SPI' == _rc522_mode) {
-    digitalWriteOp _rc522_nssPin false
-    spiSend (reg << 1)
-    spiSend value
-    digitalWriteOp _rc522_nssPin true
-  } ('I2C' == _rc522_mode) {
-    i2cSet _rc522_i2cAddr reg value
-  }
-}
-
-to rc522_card_present {
-  local 'res' ('_rc522_request')
-  if ((at 1 res) == 0) {
-    if ((size res) == 3) {
-      return (booleanConstant true)
-    } else {
-      waitMillis 5
-      res = ('_rc522_request')
-      return ((size res) == 3)
-    }
-  } else {
-    return (booleanConstant false)
-  }
-}
-
-to rc522_connected {
-  local 'version' ('_rc522_read_reg' (hexToInt '37'))
-  return (('[data:find]' version ('[data:makeList]' 21 136 144 145 146)) > 0)
-}
-
-to rc522_equal_ids id1 id2 {
-  if (or (id1 == 0) (id2 == 0)) {return (booleanConstant false)}
-  if ((size id1) != (size id2)) {return (booleanConstant false)}
-  for i (size id1) {
-    if ((at i id1) != (at i id2)) {return (booleanConstant false)}
-  }
-  return (booleanConstant true)
-}
-
-to rc522_initialize_I2C i2cAddr {
-  _rc522_mode = 'I2C'
-  _rc522_i2cAddr = i2cAddr
-  if (_rc522_initialized == 0) {
-    _rc522_initialized = (booleanConstant true)
-    '_rc522_write_reg' 1 (hexToInt 'F')
-    waitMillis 50
-    '_rc522_write_reg' (hexToInt '2A') (hexToInt '80')
-    '_rc522_write_reg' (hexToInt '2B') (hexToInt 'A9')
-    '_rc522_write_reg' (hexToInt '2C') (hexToInt '03')
-    '_rc522_write_reg' (hexToInt '2D') (hexToInt 'E8')
-    '_rc522_write_reg' (hexToInt '15') (hexToInt '40')
-    '_rc522_write_reg' (hexToInt '11') (hexToInt '3D')
-    '_rc522_antenna_on'
-  }
-}
-
-to rc522_initialize_SPI ssPin {
-  _rc522_mode = 'SPI'
-  _rc522_nssPin = ssPin
-  if (_rc522_initialized == 0) {
-    _rc522_initialized = (booleanConstant true)
-    '_rc522_write_reg' 1 (hexToInt 'F')
-    waitMillis 1
-    '_rc522_write_reg' (hexToInt '2A') (hexToInt '80')
-    '_rc522_write_reg' (hexToInt '2B') (hexToInt 'A9')
-    '_rc522_write_reg' (hexToInt '2C') (hexToInt '03')
-    '_rc522_write_reg' (hexToInt '2D') (hexToInt 'E8')
-    '_rc522_write_reg' (hexToInt '15') (hexToInt '40')
-    '_rc522_write_reg' (hexToInt '11') (hexToInt '3D')
-    '_rc522_antenna_on'
-  }
-}
-
-to rc522_read_uid {
-  if (rc522_card_present) {
-    '_rc522_write_reg' (hexToInt '0D') 0
-    local 'res' ('_rc522_send_to_card' (hexToInt '0C') ('[data:makeList]' (hexToInt '93') (hexToInt '20')))
-    '[data:delete]' 1 res
-    '[data:delete]' 'last' res
-    return res
-  } else {
-    return ('[data:makeList]')
-  }
 }
 
 
@@ -614,5 +462,157 @@ to temperature_DHT11 pin {
 to temperature_DHT22 pin {
   '_dhtUpdate' pin false
   return _dht_temperature
+}
+
+
+module Tone Output
+author MicroBlocks
+version 1 6 
+tags tone sound music audio note speaker 
+description 'Audio tone generation. Make music with MicroBlocks!'
+variables _tonePin _toneInitalized _toneLoopOverhead _toneNoteNames _toneArezzoNotes _toneFrequencies 
+
+  spec ' ' 'play tone' 'play note _ octave _ for _ ms' 'auto num num' 'C' 0 500
+  spec ' ' 'playMIDIKey' 'play midi key _ for _ ms' 'num num' 60 500
+  spec ' ' 'play frequency' 'play frequency _ for _ ms' 'num num' 261 500
+  spec ' ' 'attach buzzer to pin' 'attach buzzer to pin _' 'auto' ''
+  spec 'r' '_measureLoopOverhead' '_measureLoopOverhead'
+  spec 'r' '_baseFreqForNote' '_baseFreqForNote _' 'auto' 'c'
+  spec 'r' '_baseFreqForSemitone' '_baseFreqForSemitone _' 'num' 0
+  spec ' ' '_toneLoop' '_toneLoop _ for _ ms' 'num num' 440000 100
+  spec 'r' '_trimmedLowercase' '_trimmedLowercase _' 'str' 'A. b C...'
+
+to '_baseFreqForNote' note {
+  comment 'Return the frequency for the given note in the middle-C octave
+scaled by 1000. For example, return 440000 (440Hz) for A.
+Note names may be upper or lower case. Note names
+may be followed by # for a sharp or b for a flat.'
+  local 'normalized note' ('_trimmedLowercase' note)
+  if (_toneNoteNames == 0) {
+    _toneNoteNames = ('[data:makeList]' 'c' 'c#' 'd' 'd#' 'e' 'f' 'f#' 'g' 'g#' 'a' 'a#' 'b' 'c_' 'db' 'd_' 'eb' 'e_' 'e#' 'f_' 'gb' 'g_' 'ab' 'a_' 'bb' 'b_' 'b#')
+    _toneArezzoNotes = ('[data:makeList]' 'do' 'do#' 're' 're#' 'mi' 'fa' 'fa#' 'sol' 'sol#' 'la' 'la#' 'si' 'do_' 'dob' 're_' 'reb' 'mi_' 'mi#' 'fa_' 'solb' 'sol_' 'lab' 'la_' 'sib' 'si_' 'si#')
+  }
+  if (('[data:find]' (v 'normalized note') _toneArezzoNotes) > 0) {
+    return ('_baseFreqForSemitone' ('[data:find]' (v 'normalized note') _toneArezzoNotes))
+  } else {
+    return ('_baseFreqForSemitone' ('[data:find]' (v 'normalized note') _toneNoteNames))
+  }
+}
+
+to '_baseFreqForSemitone' semitone {
+  if (_toneFrequencies == 0) {_toneFrequencies = ('[data:makeList]' 261626 277183 293665 311127 329628 349228 369994 391995 415305 440000 466164 493883 246942 277183 277183 311127 311127 349228 329628 369994 369994 415305 415305 466164 466164 523252)}
+  if (and (1 <= semitone) (semitone <= (size _toneFrequencies))) {
+    return (at semitone _toneFrequencies)
+  } else {
+    comment 'Bad note name; return 10 Hz'
+    return 10000
+  }
+}
+
+to '_measureLoopOverhead' {
+  comment 'Measure the loop overhead on this device'
+  local 'halfCycle' 100
+  local 'startT' (microsOp)
+  repeat 100 {
+    digitalWriteOp _tonePin false
+    waitMicros halfCycle
+    digitalWriteOp _tonePin false
+    waitMicros halfCycle
+  }
+  local 'usecs' ((microsOp) - startT)
+  return ((usecs - 20000) / 200)
+}
+
+to '_toneLoop' scaledFreq ms {
+  if (_toneInitalized == 0) {'attach buzzer to pin' ''}
+  if ('[io:hasTone]') {
+    '[io:playTone]' _tonePin (scaledFreq / 1000)
+    waitMillis ms
+    '[io:playTone]' _tonePin 0
+  } else {
+    local 'halfCycle' ((500000000 / scaledFreq) - _toneLoopOverhead)
+    local 'cycles' ((ms * 500) / halfCycle)
+    repeat cycles {
+      digitalWriteOp _tonePin true
+      waitMicros halfCycle
+      digitalWriteOp _tonePin false
+      waitMicros halfCycle
+    }
+  }
+}
+
+to '_trimmedLowercase' s {
+  comment 'Return a copy of the given string without whitespace
+or periods and all lowercase.'
+  local 'result' (newList (size s))
+  '[data:delete]' 'all' result
+  for i (size s) {
+    local 'ch' ('[data:unicodeAt]' i s)
+    if (and (ch > 32) (ch != 46)) {
+      if (and (65 <= ch) (ch <= 90)) {ch = (ch + 32)}
+      '[data:addLast]' ch result
+    }
+  }
+  return ('[data:unicodeString]' result)
+}
+
+to 'attach buzzer to pin' pinNumber {
+  if (pinNumber == '') {
+    comment 'Pin number not specified; use default pin for this device'
+    if ((boardType) == 'Citilab ED1') {
+      _tonePin = 26
+    } ((boardType) == 'M5Stack-Core') {
+      _tonePin = 25
+    } ((boardType) == 'M5StickC') {
+      _tonePin = 26
+    } ((boardType) == 'Calliope') {
+      digitalWriteOp 23 true
+      digitalWriteOp 24 true
+      _tonePin = 25
+    } ((boardType) == 'D1-Mini') {
+      _tonePin = 12
+    } else {
+      _tonePin = -1
+    }
+  } else {
+    _tonePin = pinNumber
+  }
+  _toneLoopOverhead = ('_measureLoopOverhead')
+  _toneInitalized = (booleanConstant true)
+}
+
+to 'play frequency' freq ms {
+  '_toneLoop' (freq * 1000) ms
+}
+
+to 'play tone' note octave ms {
+  local 'freq' ('_baseFreqForNote' note)
+  if (freq <= 10000) {
+    waitMillis ms
+    return 0
+  }
+  if (octave < 0) {
+    repeat (absoluteValue octave) {
+      freq = (freq / 2)
+    }
+  }
+  repeat octave {
+    freq = (freq * 2)
+  }
+  '_toneLoop' freq ms
+}
+
+to playMIDIKey key ms {
+  local 'freq' ('_baseFreqForSemitone' ((key % 12) + 1))
+  local 'octave' ((key / 12) - 5)
+  if (octave < 0) {
+    repeat (absoluteValue octave) {
+      freq = (freq / 2)
+    }
+  }
+  repeat octave {
+    freq = (freq * 2)
+  }
+  '_toneLoop' freq ms
 }
 

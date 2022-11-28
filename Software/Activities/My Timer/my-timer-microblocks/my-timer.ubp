@@ -2,81 +2,58 @@ module main
 author unknown
 version 1 0 
 description ''
-variables OLED_color RGB_color x skor 
+variables space sec msec setTimer min 
 
-  spec ' ' 'random_color' 'random_color'
-
-to random_color {
-  OLED_color = (random 1 4)
-  RGB_color = (random 1 4)
-  if (RGB_color == 1) {
-    pb_set_rgb_color (colorSwatch 255 32 6 255)
-  }
-  if (RGB_color == 2) {
-    pb_set_rgb_color (colorSwatch 21 255 41 255)
-  }
-  if (RGB_color == 3) {
-    pb_set_rgb_color (colorSwatch 19 50 255 255)
-  }
-  if (RGB_color == 4) {
-    pb_set_rgb_color (colorSwatch 255 238 241 255)
-  }
-  if (OLED_color == 1) {
-    OLEDclear
-    OLEDwrite 'red' 50 32 false
-  }
-  if (OLED_color == 2) {
-    OLEDclear
-    OLEDwrite 'green' 45 32 false
-  }
-  if (OLED_color == 3) {
-    OLEDclear
-    OLEDwrite 'blue' 50 32 false
-  }
-  if (OLED_color == 4) {
-    OLEDclear
-    OLEDwrite 'white' 45 32 false
-  }
+script 105 52 {
+whenStarted
+space = ('[data:unicodeString]' 32)
+sec = 59
+msec = 9
+OLEDInit_I2C 'OLED_0.96in' '3C' 0 false
+OLEDwrite '<<My Timer>>' 10 0 false
+OLEDwrite 'Please use the' 0 12 false
+OLEDwrite 'Potentiometer' 0 24 false
+OLEDwrite 'to set the Timer' 0 36 false
+repeatUntil (pb_button) {
+  waitUntil (not (pb_button))
+  setTimer = ('[misc:rescale]' (pb_potentiometer) 0 1023 0 60)
+  OLEDwrite ('[data:join]' 'set to: ' setTimer space 'min.') 0 48 false
   waitMillis 20
 }
-
-script 511 40 {
-whenCondition (pb_button)
-if (and (OLED_color == RGB_color) (x == 0)) {
-  skor += 10
-  x = 1
-}
-if (and (OLED_color != RGB_color) (x == 0)) {
-  skor += -10
-  x = 1
-}
-}
-
-script 80 42 {
-whenStarted
-OLEDInit_I2C 'OLED_0.96in' '3C' 0 false
-pb_turn_off_RGB
-skor = 0
-x = 0
 OLEDclear
-OLEDwrite 'The game begins' 10 30 false
-waitMillis 2000
-repeat 10 {
-  repeat 10 {
-    random_color
-  }
-  x = 0
-  waitMillis 1500
-  OLEDclear
-  pb_turn_off_RGB
-}
-waitMillis 1500
-OLEDwrite 'Your Total Score' 0 20 false
-OLEDwrite ('[data:join]' skor ' points') 30 40 false
+waitMillis 100
+sendBroadcast 'go!'
 }
 
-script 83 523 {
-to random_color {}
+script 596 58 {
+whenBroadcastReceived 'go!'
+OLEDwrite 'The Countdown' 10 12 false
+OLEDwrite 'has' 55 24 false
+OLEDwrite 'BEGUN!' 45 36 false
+resetTimer
+repeatUntil (pb_button) {
+  local 'timer_ms' (timer)
+  msec = (9 - ((timer_ms % 100) / 10))
+  sec = (59 - ((timer_ms % 60000) / 1000))
+  min = ((setTimer - 1) - ((timer_ms % 3600000) / 60000))
+  if ((size ('[data:join]' '' min)) < 2) {
+    min = ('[data:join]' '0' min)
+  }
+  if ((size ('[data:join]' '' sec)) < 2) {
+    sec = ('[data:join]' '0' sec)
+  }
+  OLEDwrite ('[data:join]' min ':' sec ':' msec space) 35 52 false
+}
+OLEDclear
+OLEDwrite ('[data:join]' min ':' sec ':' msec) 35 52 false
+}
+
+script 106 573 {
+whenCondition (and (min == '00') (and (sec == '00') (msec == 0)))
+stopAll
+OLEDclear
+OLEDwrite '-FINISHED-' 25 35 false
+stopTask
 }
 
 
@@ -1075,7 +1052,7 @@ to pb_turn_off_RGB {
 
 module 'Temperature Humidity (DHT11, DHT22)' Input
 author MicroBlocks
-version 1 1 
+version 1 2 
 tags sensor dht11 dht22 temperature humidity 
 description 'Support for the DHT11 and DHT22 environmental sensors. These sensors provide temperature and humidity readings.'
 variables _dht_temperature _dht_humidity _dhtData _dhtLastReadTime 
@@ -1090,6 +1067,7 @@ variables _dht_temperature _dht_humidity _dhtData _dhtLastReadTime
   spec 'r' '_dhtReady' '_dhtReady' 'any'
 
 to '_dhtChecksumOkay' {
+  if (not (isType _dhtData 'list')) {return (booleanConstant false)}
   local 'checksum' 0
   for i 4 {
     checksum += (at i _dhtData)
@@ -1103,6 +1081,8 @@ to '_dhtReadData' pin {
   if (_dhtData == 0) {
     _dhtData = (newList 5)
   }
+  comment 'fill with 1''s set checksum will be bad if read fails'
+  atPut 'all' _dhtData 1
   comment 'Pull pin low for >18msec to request data'
   digitalWriteOp pin false
   waitMillis 20
@@ -1151,6 +1131,8 @@ to '_dhtReady' {
 
 to '_dhtUpdate' pin isDHT11 {
   if ('_dhtReady') {
+    _dht_temperature = 0
+    _dht_humidity = 0
     '_dhtReadData' pin
     _dhtLastReadTime = (millisOp)
   }

@@ -1,26 +1,37 @@
 module main
 author unknown
-version 1 1 
-description 'double OLED init removed'
+version 1 0 
+description ''
+variables score 
 
-script 100 50 {
+script 105 52 {
 whenStarted
 OLEDInit_I2C 'OLED_0.96in' '3C' 0 false
-OLEDwrite 'Good night' 25 32 false
-waitMillis 2000
+OLEDwrite 'Press the button' 0 10 false
+OLEDwrite 'TO START!' 25 35 false
 }
 
-script 102 189 {
-whenCondition ((pb_light_sensor) > 90)
-waitMillis 3000
-repeatUntil (pb_button) {
-  OLEDwrite 'Good morning' 15 32 true
-  pb_set_rgb_color (colorSwatch 255 255 255 255)
-  pb_beep 500
+script 578 62 {
+whenCondition (pb_button)
+for i ('[data:range]' 3 1) {
+  OLEDclear
+  OLEDwrite ('[data:join]' i '...') 25 35 false
+  waitMillis 1000
 }
-OLEDwrite 'have a nice day' 0 32 false
-pb_turn_off_RGB
-stopTask
+OLEDclear
+OLEDwrite 'GO!!!' 35 35 false
+waitMillis (random 1000 5000)
+pb_set_red_LED true
+resetTimer
+waitUntil (pb_button)
+score = (timer)
+pb_set_red_LED false
+pb_beep 200
+OLEDclear
+OLEDwrite 'Press the ' 28 8 false
+OLEDwrite 'BUTTON' 40 24 false
+OLEDwrite 'to Repeat!' 26 40 false
+OLEDwrite ('[data:join]' 'Score:' score 'ms') 10 56 false
 }
 
 
@@ -1019,7 +1030,7 @@ to pb_turn_off_RGB {
 
 module 'Temperature Humidity (DHT11, DHT22)' Input
 author MicroBlocks
-version 1 1 
+version 1 2 
 tags sensor dht11 dht22 temperature humidity 
 description 'Support for the DHT11 and DHT22 environmental sensors. These sensors provide temperature and humidity readings.'
 variables _dht_temperature _dht_humidity _dhtData _dhtLastReadTime 
@@ -1034,6 +1045,7 @@ variables _dht_temperature _dht_humidity _dhtData _dhtLastReadTime
   spec 'r' '_dhtReady' '_dhtReady' 'any'
 
 to '_dhtChecksumOkay' {
+  if (not (isType _dhtData 'list')) {return (booleanConstant false)}
   local 'checksum' 0
   for i 4 {
     checksum += (at i _dhtData)
@@ -1047,6 +1059,8 @@ to '_dhtReadData' pin {
   if (_dhtData == 0) {
     _dhtData = (newList 5)
   }
+  comment 'fill with 1''s set checksum will be bad if read fails'
+  atPut 'all' _dhtData 1
   comment 'Pull pin low for >18msec to request data'
   digitalWriteOp pin false
   waitMillis 20
@@ -1095,6 +1109,8 @@ to '_dhtReady' {
 
 to '_dhtUpdate' pin isDHT11 {
   if ('_dhtReady') {
+    _dht_temperature = 0
+    _dht_humidity = 0
     '_dhtReadData' pin
     _dhtLastReadTime = (millisOp)
   }

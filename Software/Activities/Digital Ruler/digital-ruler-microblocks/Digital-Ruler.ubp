@@ -2,25 +2,32 @@ module main
 author unknown
 version 1 0 
 description ''
-variables distance measure 
+variables measure distance 
 
-script 105 68 {
-whenCondition (pb_button)
-measure = 0
-pb_set_red_LED true
-pb_beep 50
-measure += ('distance (cm)' 15 14)
-waitMillis 50
-distance = measure
-pb_set_red_LED false
-sendBroadcast 'go to OLED'
+script 105 52 {
+whenStarted
+OLEDInit_I2C 'OLED_0.96in' '3C' 0 false
+OLEDwrite '               
+ DIGITAL RULER 
+               ' 0 0 true
+OLEDwrite 'Press BUTTON
+  to start
+ measuring' 8 32 false
 }
 
-script 515 74 {
-whenBroadcastReceived 'go to OLED'
-OLEDInit_I2C 'OLED_0.96in' '3C' 0 false
-OLEDwrite '>Digital Ruler<' 3 5 false
-OLEDwrite ('[data:join]' 'Distance:' distance 'cm') 15 32 false
+script 105 243 {
+whenCondition (pb_button)
+pb_set_red_LED true
+pb_beep 50
+measure = ('distance (cm)' 15 14)
+waitMillis 50
+distance = (measure + 6)
+pb_set_red_LED false
+OLEDclear
+OLEDwrite '               
+ DIGITAL RULER 
+               ' 0 0 true
+OLEDwrite ('[data:join]' 'Distance:' distance 'cm') 8 32 false
 'play tone' 'C' 2 50
 }
 

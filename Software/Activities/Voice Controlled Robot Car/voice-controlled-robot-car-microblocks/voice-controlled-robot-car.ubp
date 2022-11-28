@@ -2,9 +2,9 @@ module main
 author unknown
 version 1 0 
 description ''
-variables buffer cmd 
+variables cmd buffer 
 
-script 61 40 {
+script 114 52 {
 comment 'PICO BT Receiver:
 Receives left, right, backward, forward, stop 
 from the mobile APP:
@@ -13,7 +13,7 @@ https://play.google.com/store/apps/details?id=appinventor.ai_cempehlivan92.Ardui
 To configure BT module, use the two block sets at the very bottom of the program.'
 }
 
-script 653 40 {
+script 706 52 {
 whenCondition (cmd == 'stop')
 sayIt cmd
 pb_set_motor_speed 1 0
@@ -22,7 +22,7 @@ waitMillis 1000
 cmd = ''
 }
 
-script 60 162 {
+script 113 174 {
 whenStarted
 '[serial:open]' 9600
 forever {
@@ -35,7 +35,7 @@ forever {
 }
 }
 
-script 397 172 {
+script 450 184 {
 whenCondition (cmd == 'forward')
 sayIt cmd
 pb_set_motor_speed 1 100
@@ -46,7 +46,7 @@ pb_set_motor_speed 1 0
 pb_set_motor_speed 2 0
 }
 
-script 693 235 {
+script 746 247 {
 whenCondition (cmd == 'backward')
 sayIt cmd
 pb_set_motor_speed 1 100
@@ -57,7 +57,7 @@ pb_set_motor_speed 1 0
 pb_set_motor_speed 2 0
 }
 
-script 395 454 {
+script 448 466 {
 whenCondition (cmd == 'right')
 sayIt cmd
 pb_set_motor_speed 1 0
@@ -68,7 +68,7 @@ pb_set_motor_speed 1 0
 pb_set_motor_speed 2 0
 }
 
-script 56 462 {
+script 109 474 {
 whenCondition (cmd == 'left')
 sayIt cmd
 pb_set_motor_speed 1 100
@@ -79,7 +79,7 @@ pb_set_motor_speed 1 0
 pb_set_motor_speed 2 0
 }
 
-script 495 750 {
+script 548 762 {
 comment 'Use for BT Configuration:
 press and hold the RESET button
 and then insert the BT module into
@@ -98,7 +98,7 @@ forever {
 }
 }
 
-script 52 752 {
+script 105 764 {
 comment 'Use for BT Configuration:
 Type in AT commands for BT into the
 first text area below and then click on the 

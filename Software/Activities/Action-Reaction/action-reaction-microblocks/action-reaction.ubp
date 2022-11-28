@@ -3,139 +3,21 @@ author unknown
 version 1 0 
 description ''
 
-script 105 49 {
+script 105 52 {
 whenCondition (pb_button)
 pb_set_red_LED true
 }
 
-script 112 141 {
+script 110 175 {
 whenCondition (not (pb_button))
 pb_set_red_LED false
 }
 
 
-module DHT Input
+module PicoBricks
 author MicroBlocks
-version 1 1 
-tags sensor dht11 dht22 temperature humidity 
-description 'Support for the DHT11 and DHT22 environmental sensors. These sensors provide temperature and humidity readings.'
-variables _dht_temperature _dht_humidity _dhtData _dhtLastReadTime 
-
-  spec 'r' 'temperature_DHT11' 'temperature (Celsius) DHT11 pin _' 'auto' 4
-  spec 'r' 'humidity_DHT11' 'humidity DHT11 pin _' 'auto' 4
-  spec 'r' 'temperature_DHT22' 'temperature (Celsius) DHT22 pin _' 'auto' 4
-  spec 'r' 'humidity_DHT22' 'humidity DHT22 pin _' 'auto' 4
-  spec ' ' '_dhtReadData' '_dhtReadData pin _' 'auto any' 4
-  spec 'r' '_dhtChecksumOkay' '_dhtChecksumOkay' 'any'
-  spec ' ' '_dhtUpdate' '_dhtUpdate _ isDHT11 _' 'auto bool any' 4 true
-  spec 'r' '_dhtReady' '_dhtReady' 'any'
-
-to '_dhtChecksumOkay' {
-  local 'checksum' 0
-  for i 4 {
-    checksum += (at i _dhtData)
-  }
-  checksum = (checksum & 255)
-  return (checksum == (at 5 _dhtData))
-}
-
-to '_dhtReadData' pin {
-  comment 'Create DHT data array the first time'
-  if (_dhtData == 0) {
-    _dhtData = (newList 5)
-  }
-  comment 'Pull pin low for >18msec to request data'
-  digitalWriteOp pin false
-  waitMillis 20
-  local 'useDHTPrimitive' (booleanConstant true)
-  if useDHTPrimitive {
-    result = ('[sensors:readDHT]' pin)
-    if ((booleanConstant false) != result) {
-      _dhtData = result
-    }
-    return 0
-  }
-  comment 'Read DHT start pulses (H L H L)'
-  waitUntil (digitalReadOp pin)
-  waitUntil (not (digitalReadOp pin))
-  waitUntil (digitalReadOp pin)
-  waitUntil (not (digitalReadOp pin))
-  local 'i' 1
-  local 'byte' 0
-  local 'bit' 1
-  comment 'Read 40 bits (5 bytes)'
-  repeat 40 {
-    waitUntil (digitalReadOp pin)
-    local 'start' (microsOp)
-    waitUntil (not (digitalReadOp pin))
-    if (((microsOp) - start) > 40) {
-      comment 'Long pulse - append a "1" bit'
-      byte += 1
-    }
-    if (bit == 8) {
-      atPut i _dhtData byte
-      i += 1
-      byte = 0
-      bit = 1
-    } else {
-      byte = (byte << 1)
-      bit += 1
-    }
-    waitUntil (not (digitalReadOp pin))
-  }
-}
-
-to '_dhtReady' {
-  local 'elapsed' ((millisOp) - _dhtLastReadTime)
-  return (or (elapsed < 0) (elapsed > 2000))
-}
-
-to '_dhtUpdate' pin isDHT11 {
-  if ('_dhtReady') {
-    '_dhtReadData' pin
-    _dhtLastReadTime = (millisOp)
-  }
-  if ('_dhtChecksumOkay') {
-    if isDHT11 {
-      _dht_temperature = (at 3 _dhtData)
-      _dht_humidity = (at 1 _dhtData)
-    } else {
-      local 'n' (((at 1 _dhtData) * 256) + (at 2 _dhtData))
-      _dht_humidity = ((n + 5) / 10)
-      n = ((((at 3 _dhtData) & 127) * 256) + (at 4 _dhtData))
-      if (((at 3 _dhtData) & 128) != 0) {
-        n = (0 - n)
-      }
-      _dht_temperature = ((n + 5) / 10)
-    }
-  }
-}
-
-to humidity_DHT11 pin {
-  '_dhtUpdate' pin true
-  return _dht_humidity
-}
-
-to humidity_DHT22 pin {
-  '_dhtUpdate' pin false
-  return _dht_humidity
-}
-
-to temperature_DHT11 pin {
-  '_dhtUpdate' pin true
-  return _dht_temperature
-}
-
-to temperature_DHT22 pin {
-  '_dhtUpdate' pin false
-  return _dht_temperature
-}
-
-
-module PicoBricks Output
-author 'Turgut Guneysu'
-version 2 1 
-depends DHT 
+version 2 3 
+depends 'Temperature Humidity (DHT11, DHT22)' 
 description 'Robotistan PicoBricks Library
 
 This library controls these Pico Bricks components:
@@ -148,8 +30,9 @@ This library controls these Pico Bricks components:
 - Potentiometer (variable resistor)
 - Light sensor (light dependent resistor)
 - Temperature and humidity sensor (DHT11)
+- switched to renamed DHT library
 
-Use separate librares to control:
+Use separate libraries to control:
 - Servo motors
 - Graphic display (OLED)
 - WIFI/Bluetooth expansion board
@@ -162,7 +45,7 @@ variables _pb_initialized _pb_pin_RedLED _pb_pin_Button _pb_pin_DHT _pb_pin_Rela
   spec ' ' 'pb_beep' 'PicoBricks beep _ ms' 'auto' 500
   spec 'r' 'pb_button' 'PicoBricks button'
   spec 'r' 'pb_humidity' 'PicoBricks humidity'
-  spec 'r' 'pb_light_sensor (0-100) %' 'PicoBricks light sensor (0-100) %'
+  spec 'r' 'pb_light_sensor' 'PicoBricks light sensor (0-100) %'
   spec 'r' 'pb_potentiometer' 'PicoBricks potentiometer'
   spec 'r' 'pb_random_color' 'PicoBricks random color'
   spec 'r' 'pb_rgb_color' 'PicoBricks color r _ g _ b _ (0-255)' 'auto auto auto' 0 0 0
@@ -172,7 +55,6 @@ variables _pb_initialized _pb_pin_RedLED _pb_pin_Button _pb_pin_DHT _pb_pin_Rela
   spec ' ' 'pb_set_rgb_color' 'PicoBricks set RGB LED color _' 'color'
   spec 'r' 'pb_temperature' 'PicoBricks temperature (°C)'
   spec ' ' 'pb_turn_off_RGB' 'PicoBricks turn off RGB LED'
-  spec 'r' '_pb_rescale' '_pb_rescale _ from  ( _ , _ ) to ( _ , _ )' 'auto auto auto auto auto' 0 0 0 0 0
   spec ' ' '_pb_init_pins' '_pb_init_pins'
 
 to '_pb_init_pins' {
@@ -193,13 +75,6 @@ to '_pb_init_pins' {
   _pb_initialized = (booleanConstant true)
 }
 
-to '_pb_rescale' val in_min in_max out_min out_max {
-  comment 'map(long val, long in_min, long in_max, long out_min, long out_max) {
-  return (val - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
-}'
-  return ((((val - in_min) * (out_max - out_min)) / (in_max - in_min)) + out_min)
-}
-
 to pb_beep duration {
   '_pb_init_pins'
   local 'end time' ((millisOp) + duration)
@@ -218,15 +93,14 @@ to pb_button {
 
 to pb_humidity {
   '_pb_init_pins'
-  '_dhtUpdate' _pb_pin_DHT true
-  return _dht_humidity
+  return (humidity_DHT11 _pb_pin_DHT)
 }
 
-to 'pb_light_sensor (0-100) %' {
+to pb_light_sensor {
   comment 'Returns Light Values s a percentage:
 0: dark,  100: light'
   '_pb_init_pins'
-  return ('_pb_rescale' (1023 - (analogReadOp _pb_pin_LDR)) 0 1023 0 100)
+  return ('[misc:rescale]' (1023 - (analogReadOp _pb_pin_LDR)) 0 1023 0 100)
 }
 
 to pb_potentiometer {
@@ -281,13 +155,135 @@ to pb_set_rgb_color color {
 
 to pb_temperature {
   '_pb_init_pins'
-  '_dhtUpdate' _pb_pin_DHT true
-  return _dht_temperature
+  return (temperature_DHT11 _pb_pin_DHT)
 }
 
 to pb_turn_off_RGB {
   '_pb_init_pins'
   '[display:neoPixelSetPin]' _pb_pin_RGB_LED false
   '[display:neoPixelSend]' 0
+}
+
+
+module 'Temperature Humidity (DHT11, DHT22)' Input
+author MicroBlocks
+version 1 2 
+tags sensor dht11 dht22 temperature humidity 
+description 'Support for the DHT11 and DHT22 environmental sensors. These sensors provide temperature and humidity readings.'
+variables _dht_temperature _dht_humidity _dhtData _dhtLastReadTime 
+
+  spec 'r' 'temperature_DHT11' 'temperature (Celsius) DHT11 pin _' 'auto' 4
+  spec 'r' 'humidity_DHT11' 'humidity DHT11 pin _' 'auto' 4
+  spec 'r' 'temperature_DHT22' 'temperature (Celsius) DHT22 pin _' 'auto' 4
+  spec 'r' 'humidity_DHT22' 'humidity DHT22 pin _' 'auto' 4
+  spec ' ' '_dhtReadData' '_dhtReadData pin _' 'auto any' 4
+  spec 'r' '_dhtChecksumOkay' '_dhtChecksumOkay' 'any'
+  spec ' ' '_dhtUpdate' '_dhtUpdate _ isDHT11 _' 'auto bool any' 4 true
+  spec 'r' '_dhtReady' '_dhtReady' 'any'
+
+to '_dhtChecksumOkay' {
+  if (not (isType _dhtData 'list')) {return (booleanConstant false)}
+  local 'checksum' 0
+  for i 4 {
+    checksum += (at i _dhtData)
+  }
+  checksum = (checksum & 255)
+  return (checksum == (at 5 _dhtData))
+}
+
+to '_dhtReadData' pin {
+  comment 'Create DHT data array the first time'
+  if (_dhtData == 0) {
+    _dhtData = (newList 5)
+  }
+  comment 'fill with 1''s set checksum will be bad if read fails'
+  atPut 'all' _dhtData 1
+  comment 'Pull pin low for >18msec to request data'
+  digitalWriteOp pin false
+  waitMillis 20
+  local 'useDHTPrimitive' (booleanConstant true)
+  if useDHTPrimitive {
+    result = ('[sensors:readDHT]' pin)
+    if ((booleanConstant false) != result) {
+      _dhtData = result
+    }
+    return 0
+  }
+  comment 'Read DHT start pulses (H L H L)'
+  waitUntil (digitalReadOp pin)
+  waitUntil (not (digitalReadOp pin))
+  waitUntil (digitalReadOp pin)
+  waitUntil (not (digitalReadOp pin))
+  local 'i' 1
+  local 'byte' 0
+  local 'bit' 1
+  comment 'Read 40 bits (5 bytes)'
+  repeat 40 {
+    waitUntil (digitalReadOp pin)
+    local 'start' (microsOp)
+    waitUntil (not (digitalReadOp pin))
+    if (((microsOp) - start) > 40) {
+      comment 'Long pulse - append a "1" bit'
+      byte += 1
+    }
+    if (bit == 8) {
+      atPut i _dhtData byte
+      i += 1
+      byte = 0
+      bit = 1
+    } else {
+      byte = (byte << 1)
+      bit += 1
+    }
+    waitUntil (not (digitalReadOp pin))
+  }
+}
+
+to '_dhtReady' {
+  local 'elapsed' ((millisOp) - _dhtLastReadTime)
+  return (or (elapsed < 0) (elapsed > 2000))
+}
+
+to '_dhtUpdate' pin isDHT11 {
+  if ('_dhtReady') {
+    _dht_temperature = 0
+    _dht_humidity = 0
+    '_dhtReadData' pin
+    _dhtLastReadTime = (millisOp)
+  }
+  if ('_dhtChecksumOkay') {
+    if isDHT11 {
+      _dht_temperature = (at 3 _dhtData)
+      _dht_humidity = (at 1 _dhtData)
+    } else {
+      local 'n' (((at 1 _dhtData) * 256) + (at 2 _dhtData))
+      _dht_humidity = ((n + 5) / 10)
+      n = ((((at 3 _dhtData) & 127) * 256) + (at 4 _dhtData))
+      if (((at 3 _dhtData) & 128) != 0) {
+        n = (0 - n)
+      }
+      _dht_temperature = ((n + 5) / 10)
+    }
+  }
+}
+
+to humidity_DHT11 pin {
+  '_dhtUpdate' pin true
+  return _dht_humidity
+}
+
+to humidity_DHT22 pin {
+  '_dhtUpdate' pin false
+  return _dht_humidity
+}
+
+to temperature_DHT11 pin {
+  '_dhtUpdate' pin true
+  return _dht_temperature
+}
+
+to temperature_DHT22 pin {
+  '_dhtUpdate' pin false
+  return _dht_temperature
 }
 

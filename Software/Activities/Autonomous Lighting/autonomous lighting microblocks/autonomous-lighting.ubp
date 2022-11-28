@@ -3,14 +3,14 @@ author unknown
 version 1 0 
 description ''
 
-script 105 52 {
-whenStarted
-forever {
-  pb_set_red_LED true
-  waitMillis 500
-  pb_set_red_LED false
-  waitMillis 500
+script 106 52 {
+whenCondition ((pb_light_sensor) < 90)
+pb_set_rgb_color (colorSwatch 35 190 30 255)
 }
+
+script 105 151 {
+whenCondition ((pb_light_sensor) > 90)
+pb_turn_off_RGB
 }
 
 

@@ -2,159 +2,78 @@ module main
 author unknown
 version 1 0 
 description ''
-variables rhythm 
+variables noSelection randomColorIdx randomColorNameIdx score colorName RGB_color 
 
-script 512 40 {
-whenCondition (pb_button)
-OLEDwrite 'Now Playing...' 5 15 false
-repeat 2 {
-  'play tone' 'A' 0 (1000 / (rhythm + 1))
-  'play tone' 'E' 0 (500 / (rhythm + 1))
-  'play tone' 'E' 0 (500 / (rhythm + 1))
-  'play tone' 'E' 0 (500 / (rhythm + 1))
-  'play tone' 'E' 0 (500 / (rhythm + 1))
-  'play tone' 'E' 0 (500 / (rhythm + 1))
-  'play tone' 'E' 0 (500 / (rhythm + 1))
-  'play tone' 'F' 0 (500 / (rhythm + 1))
-  'play tone' 'E' 0 (500 / (rhythm + 1))
-  'play tone' 'D' 0 (500 / (rhythm + 1))
-  'play tone' 'F' 0 (500 / (rhythm + 1))
-  'play tone' 'E' 0 (1000 / (rhythm + 1))
-}
-OLEDclear
+  spec ' ' 'check_Button' 'check_Button'
+  spec ' ' 'random_color' 'random_color'
+
+to check_Button {
+  resetTimer
+  repeatUntil ((timer) >= 1500) {
+    if noSelection {if (and (pb_button) ((timer) <= 1500)) {
+      if (randomColorIdx == randomColorNameIdx) {
+        score += 10
+        noSelection = (booleanConstant false)
+      } else {
+        score += -10
+        noSelection = (booleanConstant false)
+      }
+    } (and (not (pb_button)) ((timer) >= 1500)) {
+      if (randomColorIdx == randomColorNameIdx) {
+        score += -10
+        noSelection = (booleanConstant false)
+      } else {
+        score += 10
+        noSelection = (booleanConstant false)
+      }
+    }}
+  }
 }
 
-script 40 42 {
+to random_color {
+  repeat 10 {
+    randomColorIdx = (random 1 4)
+    randomColorNameIdx = (random 1 4)
+    colorName = (at randomColorNameIdx ('[data:makeList]' 'RED  ' 'GREEN' 'BLUE ' 'WHITE'))
+    RGB_color = (at randomColorIdx ('[data:makeList]' (pb_rgb_color 255 0 0) (pb_rgb_color 0 255 0) (pb_rgb_color 0 0 255) (pb_rgb_color 255 255 255)))
+    pb_set_rgb_color RGB_color
+    OLEDwrite colorName 45 32 false
+    waitMillis 50
+  }
+}
+
+script 105 52 {
 whenStarted
 OLEDInit_I2C 'OLED_0.96in' '3C' 0 false
-forever {
-  rhythm = ((pb_potentiometer) / 128)
-  OLEDwrite ('[data:join]' 'Speed' rhythm) 10 35 false
+pb_turn_off_RGB
+score = 0
+OLEDwrite 'The game begins' 8 32 false
+waitMillis 2000
+OLEDclear
+repeat 10 {
+  random_color
+  noSelection = (booleanConstant true)
+  check_Button
+  OLEDclear
+  pb_turn_off_RGB
 }
-}
-
-
-module DHT Input
-author MicroBlocks
-version 1 1 
-tags sensor dht11 dht22 temperature humidity 
-description 'Support for the DHT11 and DHT22 environmental sensors. These sensors provide temperature and humidity readings.'
-variables _dht_temperature _dht_humidity _dhtData _dhtLastReadTime 
-
-  spec 'r' 'temperature_DHT11' 'temperature (Celsius) DHT11 pin _' 'auto' 4
-  spec 'r' 'humidity_DHT11' 'humidity DHT11 pin _' 'auto' 4
-  spec 'r' 'temperature_DHT22' 'temperature (Celsius) DHT22 pin _' 'auto' 4
-  spec 'r' 'humidity_DHT22' 'humidity DHT22 pin _' 'auto' 4
-  spec ' ' '_dhtReadData' '_dhtReadData pin _' 'auto any' 4
-  spec 'r' '_dhtChecksumOkay' '_dhtChecksumOkay' 'any'
-  spec ' ' '_dhtUpdate' '_dhtUpdate _ isDHT11 _' 'auto bool any' 4 true
-  spec 'r' '_dhtReady' '_dhtReady' 'any'
-
-to '_dhtChecksumOkay' {
-  local 'checksum' 0
-  for i 4 {
-    checksum += (at i _dhtData)
-  }
-  checksum = (checksum & 255)
-  return (checksum == (at 5 _dhtData))
+waitMillis 1500
+OLEDwrite 'Your Total Score' 0 24 false
+OLEDwrite ('[data:join]' score ' points') 30 40 false
 }
 
-to '_dhtReadData' pin {
-  comment 'Create DHT data array the first time'
-  if (_dhtData == 0) {
-    _dhtData = (newList 5)
-  }
-  comment 'Pull pin low for >18msec to request data'
-  digitalWriteOp pin false
-  waitMillis 20
-  local 'useDHTPrimitive' (booleanConstant true)
-  if useDHTPrimitive {
-    result = ('[sensors:readDHT]' pin)
-    if ((booleanConstant false) != result) {
-      _dhtData = result
-    }
-    return 0
-  }
-  comment 'Read DHT start pulses (H L H L)'
-  waitUntil (digitalReadOp pin)
-  waitUntil (not (digitalReadOp pin))
-  waitUntil (digitalReadOp pin)
-  waitUntil (not (digitalReadOp pin))
-  local 'i' 1
-  local 'byte' 0
-  local 'bit' 1
-  comment 'Read 40 bits (5 bytes)'
-  repeat 40 {
-    waitUntil (digitalReadOp pin)
-    local 'start' (microsOp)
-    waitUntil (not (digitalReadOp pin))
-    if (((microsOp) - start) > 40) {
-      comment 'Long pulse - append a "1" bit'
-      byte += 1
-    }
-    if (bit == 8) {
-      atPut i _dhtData byte
-      i += 1
-      byte = 0
-      bit = 1
-    } else {
-      byte = (byte << 1)
-      bit += 1
-    }
-    waitUntil (not (digitalReadOp pin))
-  }
+script 572 62 {
+to check_Button {}
 }
 
-to '_dhtReady' {
-  local 'elapsed' ((millisOp) - _dhtLastReadTime)
-  return (or (elapsed < 0) (elapsed > 2000))
-}
-
-to '_dhtUpdate' pin isDHT11 {
-  if ('_dhtReady') {
-    '_dhtReadData' pin
-    _dhtLastReadTime = (millisOp)
-  }
-  if ('_dhtChecksumOkay') {
-    if isDHT11 {
-      _dht_temperature = (at 3 _dhtData)
-      _dht_humidity = (at 1 _dhtData)
-    } else {
-      local 'n' (((at 1 _dhtData) * 256) + (at 2 _dhtData))
-      _dht_humidity = ((n + 5) / 10)
-      n = ((((at 3 _dhtData) & 127) * 256) + (at 4 _dhtData))
-      if (((at 3 _dhtData) & 128) != 0) {
-        n = (0 - n)
-      }
-      _dht_temperature = ((n + 5) / 10)
-    }
-  }
-}
-
-to humidity_DHT11 pin {
-  '_dhtUpdate' pin true
-  return _dht_humidity
-}
-
-to humidity_DHT22 pin {
-  '_dhtUpdate' pin false
-  return _dht_humidity
-}
-
-to temperature_DHT11 pin {
-  '_dhtUpdate' pin true
-  return _dht_temperature
-}
-
-to temperature_DHT22 pin {
-  '_dhtUpdate' pin false
-  return _dht_temperature
+script 113 644 {
+to random_color {}
 }
 
 
 module 'OLED Graphics' Output
 author 'Turgut Guneysu'
-version 1 10 
+version 1 12 
 choices DispTypeMenu 'OLED_0.96in' 'OLED_2.42in' 
 choices OnOffMenu On Off 
 choices VideoMenu Inverse Normal 
@@ -172,6 +91,7 @@ Changes:
 - removed dependencies
 - unified data format for chars, sprites, and images
 - image draw at any x,y
+- filled rectangle
 - image draw bug fix
 - stack overflow fix
 '
@@ -187,9 +107,9 @@ variables OLEDReady OLEDi2cAddr _GDBuffer _begCol _begRow _cDecTBL _comma _cTABL
   spec ' ' 'OLEDdrawImage' 'draw image _ at x _ y _' 'auto auto auto' 0 0 0
   spec ' ' 'OLEDdrawLine' 'draw line from x _ y _ to x _ y _ erase _' 'auto auto auto auto bool' 0 0 127 63 false
   spec ' ' 'OLEDdrawRect' 'draw rectangle x _ y _ w _ h _ erase _ rounding(3-15) _' 'auto auto auto auto bool auto' 0 0 127 63 false 0
-  spec ' ' 'fillRectangle' 'fill rectangle x _ y _ w _ h _ erase _' 'auto auto auto auto bool' 20 20 30 20 false
+  spec ' ' 'OLEDfillRect' 'fill rectangle x _ y _ w _ h _ erase _' 'auto auto auto auto bool' 20 20 30 20 false
   spec ' ' 'OLEDflip' '_flip display top _' 'bool' false
-  spec 'r' 'OLEDmakeImage' 'make image _ : ' 'microbitDisplay' 33084991
+  spec 'r' 'OLEDmakeImage' 'make image _' 'microbitDisplay' 33084991
   spec ' ' 'OLEDpixel' 'set pixel x _ y _ erase _' 'auto auto bool' 0 0 false
   spec ' ' 'OLEDsetVideo' 'set video _' 'str.VideoMenu' 'Inverse'
   spec 'r' 'OLEDwru' 'cursor location'
@@ -482,6 +402,17 @@ Does not check for reversed rectangle coordinates for round corners.'
   }
 }
 
+to OLEDfillRect x y w h erase {
+  for row h {
+    for col w {
+      OLEDpixel (x + (col - 1)) (y + (row - 1)) erase
+    }
+  }
+  if (not _delayGDUpd) {
+    OLEDshowGDBuffer
+  }
+}
+
 to OLEDflip flip {
   comment 'Flips the display initialization horizontally or vertically.
 Horizontal or vertical is based on the pin connector location.'
@@ -593,6 +524,9 @@ _textX and _textY are next write locations.'
   _delayGDUpd = true
   '_verifyXY' x y
   local 'origX' x
+  if (not (isType string 'string')) {
+    string = ('[data:join]' '' string)
+  }
   for char string {
     comment 'If in table process it - LINE SET is not supported.'
     if (('[data:find]' char _cTABLE) != -1) {
@@ -978,22 +912,11 @@ to 'defer display updates' {
   _delayGDUpd = (booleanConstant true)
 }
 
-to fillRectangle x y w h erase {
-  for row h {
-    for col w {
-      OLEDpixel (x + (col - 1)) (y + (row - 1)) erase
-    }
-  }
-  if (not _delayGDUpd) {
-    OLEDshowGDBuffer
-  }
-}
 
-
-module PicoBricks Output
-author 'Turgut Guneysu'
-version 2 1 
-depends DHT 
+module PicoBricks
+author MicroBlocks
+version 2 3 
+depends 'Temperature Humidity (DHT11, DHT22)' 
 description 'Robotistan PicoBricks Library
 
 This library controls these Pico Bricks components:
@@ -1006,8 +929,9 @@ This library controls these Pico Bricks components:
 - Potentiometer (variable resistor)
 - Light sensor (light dependent resistor)
 - Temperature and humidity sensor (DHT11)
+- switched to renamed DHT library
 
-Use separate librares to control:
+Use separate libraries to control:
 - Servo motors
 - Graphic display (OLED)
 - WIFI/Bluetooth expansion board
@@ -1020,7 +944,7 @@ variables _pb_initialized _pb_pin_RedLED _pb_pin_Button _pb_pin_DHT _pb_pin_Rela
   spec ' ' 'pb_beep' 'PicoBricks beep _ ms' 'auto' 500
   spec 'r' 'pb_button' 'PicoBricks button'
   spec 'r' 'pb_humidity' 'PicoBricks humidity'
-  spec 'r' 'pb_light_sensor (0-100) %' 'PicoBricks light sensor (0-100) %'
+  spec 'r' 'pb_light_sensor' 'PicoBricks light sensor (0-100) %'
   spec 'r' 'pb_potentiometer' 'PicoBricks potentiometer'
   spec 'r' 'pb_random_color' 'PicoBricks random color'
   spec 'r' 'pb_rgb_color' 'PicoBricks color r _ g _ b _ (0-255)' 'auto auto auto' 0 0 0
@@ -1030,7 +954,6 @@ variables _pb_initialized _pb_pin_RedLED _pb_pin_Button _pb_pin_DHT _pb_pin_Rela
   spec ' ' 'pb_set_rgb_color' 'PicoBricks set RGB LED color _' 'color'
   spec 'r' 'pb_temperature' 'PicoBricks temperature (°C)'
   spec ' ' 'pb_turn_off_RGB' 'PicoBricks turn off RGB LED'
-  spec 'r' '_pb_rescale' '_pb_rescale _ from  ( _ , _ ) to ( _ , _ )' 'auto auto auto auto auto' 0 0 0 0 0
   spec ' ' '_pb_init_pins' '_pb_init_pins'
 
 to '_pb_init_pins' {
@@ -1051,13 +974,6 @@ to '_pb_init_pins' {
   _pb_initialized = (booleanConstant true)
 }
 
-to '_pb_rescale' val in_min in_max out_min out_max {
-  comment 'map(long val, long in_min, long in_max, long out_min, long out_max) {
-  return (val - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
-}'
-  return ((((val - in_min) * (out_max - out_min)) / (in_max - in_min)) + out_min)
-}
-
 to pb_beep duration {
   '_pb_init_pins'
   local 'end time' ((millisOp) + duration)
@@ -1076,15 +992,14 @@ to pb_button {
 
 to pb_humidity {
   '_pb_init_pins'
-  '_dhtUpdate' _pb_pin_DHT true
-  return _dht_humidity
+  return (humidity_DHT11 _pb_pin_DHT)
 }
 
-to 'pb_light_sensor (0-100) %' {
+to pb_light_sensor {
   comment 'Returns Light Values s a percentage:
 0: dark,  100: light'
   '_pb_init_pins'
-  return ('_pb_rescale' (1023 - (analogReadOp _pb_pin_LDR)) 0 1023 0 100)
+  return ('[misc:rescale]' (1023 - (analogReadOp _pb_pin_LDR)) 0 1023 0 100)
 }
 
 to pb_potentiometer {
@@ -1139,8 +1054,7 @@ to pb_set_rgb_color color {
 
 to pb_temperature {
   '_pb_init_pins'
-  '_dhtUpdate' _pb_pin_DHT true
-  return _dht_temperature
+  return (temperature_DHT11 _pb_pin_DHT)
 }
 
 to pb_turn_off_RGB {
@@ -1150,154 +1064,125 @@ to pb_turn_off_RGB {
 }
 
 
-module Tone Output
+module 'Temperature Humidity (DHT11, DHT22)' Input
 author MicroBlocks
-version 1 6 
-tags tone sound music audio note speaker 
-description 'Audio tone generation. Make music with MicroBlocks!'
-variables _tonePin _toneInitalized _toneLoopOverhead _toneNoteNames _toneArezzoNotes _toneFrequencies 
+version 1 2 
+tags sensor dht11 dht22 temperature humidity 
+description 'Support for the DHT11 and DHT22 environmental sensors. These sensors provide temperature and humidity readings.'
+variables _dht_temperature _dht_humidity _dhtData _dhtLastReadTime 
 
-  spec ' ' 'play tone' 'play note _ octave _ for _ ms' 'auto num num' 'C' 0 500
-  spec ' ' 'playMIDIKey' 'play midi key _ for _ ms' 'num num' 60 500
-  spec ' ' 'play frequency' 'play frequency _ for _ ms' 'num num' 261 500
-  spec ' ' 'attach buzzer to pin' 'attach buzzer to pin _' 'auto' ''
-  spec 'r' '_measureLoopOverhead' '_measureLoopOverhead'
-  spec 'r' '_baseFreqForNote' '_baseFreqForNote _' 'auto' 'c'
-  spec 'r' '_baseFreqForSemitone' '_baseFreqForSemitone _' 'num' 0
-  spec ' ' '_toneLoop' '_toneLoop _ for _ ms' 'num num' 440000 100
-  spec 'r' '_trimmedLowercase' '_trimmedLowercase _' 'str' 'A. b C...'
+  spec 'r' 'temperature_DHT11' 'temperature (Celsius) DHT11 pin _' 'auto' 4
+  spec 'r' 'humidity_DHT11' 'humidity DHT11 pin _' 'auto' 4
+  spec 'r' 'temperature_DHT22' 'temperature (Celsius) DHT22 pin _' 'auto' 4
+  spec 'r' 'humidity_DHT22' 'humidity DHT22 pin _' 'auto' 4
+  spec ' ' '_dhtReadData' '_dhtReadData pin _' 'auto any' 4
+  spec 'r' '_dhtChecksumOkay' '_dhtChecksumOkay' 'any'
+  spec ' ' '_dhtUpdate' '_dhtUpdate _ isDHT11 _' 'auto bool any' 4 true
+  spec 'r' '_dhtReady' '_dhtReady' 'any'
 
-to '_baseFreqForNote' note {
-  comment 'Return the frequency for the given note in the middle-C octave
-scaled by 1000. For example, return 440000 (440Hz) for A.
-Note names may be upper or lower case. Note names
-may be followed by # for a sharp or b for a flat.'
-  local 'normalized note' ('_trimmedLowercase' note)
-  if (_toneNoteNames == 0) {
-    _toneNoteNames = ('[data:makeList]' 'c' 'c#' 'd' 'd#' 'e' 'f' 'f#' 'g' 'g#' 'a' 'a#' 'b' 'c_' 'db' 'd_' 'eb' 'e_' 'e#' 'f_' 'gb' 'g_' 'ab' 'a_' 'bb' 'b_' 'b#')
-    _toneArezzoNotes = ('[data:makeList]' 'do' 'do#' 're' 're#' 'mi' 'fa' 'fa#' 'sol' 'sol#' 'la' 'la#' 'si' 'do_' 'dob' 're_' 'reb' 'mi_' 'mi#' 'fa_' 'solb' 'sol_' 'lab' 'la_' 'sib' 'si_' 'si#')
+to '_dhtChecksumOkay' {
+  if (not (isType _dhtData 'list')) {return (booleanConstant false)}
+  local 'checksum' 0
+  for i 4 {
+    checksum += (at i _dhtData)
   }
-  if (('[data:find]' (v 'normalized note') _toneArezzoNotes) > 0) {
-    return ('_baseFreqForSemitone' ('[data:find]' (v 'normalized note') _toneArezzoNotes))
-  } else {
-    return ('_baseFreqForSemitone' ('[data:find]' (v 'normalized note') _toneNoteNames))
-  }
+  checksum = (checksum & 255)
+  return (checksum == (at 5 _dhtData))
 }
 
-to '_baseFreqForSemitone' semitone {
-  if (_toneFrequencies == 0) {_toneFrequencies = ('[data:makeList]' 261626 277183 293665 311127 329628 349228 369994 391995 415305 440000 466164 493883 246942 277183 277183 311127 311127 349228 329628 369994 369994 415305 415305 466164 466164 523252)}
-  if (and (1 <= semitone) (semitone <= (size _toneFrequencies))) {
-    return (at semitone _toneFrequencies)
-  } else {
-    comment 'Bad note name; return 10 Hz'
-    return 10000
+to '_dhtReadData' pin {
+  comment 'Create DHT data array the first time'
+  if (_dhtData == 0) {
+    _dhtData = (newList 5)
   }
-}
-
-to '_measureLoopOverhead' {
-  comment 'Measure the loop overhead on this device'
-  local 'halfCycle' 100
-  local 'startT' (microsOp)
-  repeat 100 {
-    digitalWriteOp _tonePin false
-    waitMicros halfCycle
-    digitalWriteOp _tonePin false
-    waitMicros halfCycle
-  }
-  local 'usecs' ((microsOp) - startT)
-  return ((usecs - 20000) / 200)
-}
-
-to '_toneLoop' scaledFreq ms {
-  if (_toneInitalized == 0) {'attach buzzer to pin' ''}
-  if ('[io:hasTone]') {
-    '[io:playTone]' _tonePin (scaledFreq / 1000)
-    waitMillis ms
-    '[io:playTone]' _tonePin 0
-  } else {
-    local 'halfCycle' ((500000000 / scaledFreq) - _toneLoopOverhead)
-    local 'cycles' ((ms * 500) / halfCycle)
-    repeat cycles {
-      digitalWriteOp _tonePin true
-      waitMicros halfCycle
-      digitalWriteOp _tonePin false
-      waitMicros halfCycle
+  comment 'fill with 1''s set checksum will be bad if read fails'
+  atPut 'all' _dhtData 1
+  comment 'Pull pin low for >18msec to request data'
+  digitalWriteOp pin false
+  waitMillis 20
+  local 'useDHTPrimitive' (booleanConstant true)
+  if useDHTPrimitive {
+    result = ('[sensors:readDHT]' pin)
+    if ((booleanConstant false) != result) {
+      _dhtData = result
     }
-  }
-}
-
-to '_trimmedLowercase' s {
-  comment 'Return a copy of the given string without whitespace
-or periods and all lowercase.'
-  local 'result' (newList (size s))
-  '[data:delete]' 'all' result
-  for i (size s) {
-    local 'ch' ('[data:unicodeAt]' i s)
-    if (and (ch > 32) (ch != 46)) {
-      if (and (65 <= ch) (ch <= 90)) {ch = (ch + 32)}
-      '[data:addLast]' ch result
-    }
-  }
-  return ('[data:unicodeString]' result)
-}
-
-to 'attach buzzer to pin' pinNumber {
-  if (pinNumber == '') {
-    comment 'Pin number not specified; use default pin for this device'
-    if ((boardType) == 'Citilab ED1') {
-      _tonePin = 26
-    } ((boardType) == 'M5Stack-Core') {
-      _tonePin = 25
-    } ((boardType) == 'M5StickC') {
-      _tonePin = 26
-    } ((boardType) == 'Calliope') {
-      digitalWriteOp 23 true
-      digitalWriteOp 24 true
-      _tonePin = 25
-    } ((boardType) == 'D1-Mini') {
-      _tonePin = 12
-    } else {
-      _tonePin = -1
-    }
-  } else {
-    _tonePin = pinNumber
-  }
-  _toneLoopOverhead = ('_measureLoopOverhead')
-  _toneInitalized = (booleanConstant true)
-}
-
-to 'play frequency' freq ms {
-  '_toneLoop' (freq * 1000) ms
-}
-
-to 'play tone' note octave ms {
-  local 'freq' ('_baseFreqForNote' note)
-  if (freq <= 10000) {
-    waitMillis ms
     return 0
   }
-  if (octave < 0) {
-    repeat (absoluteValue octave) {
-      freq = (freq / 2)
+  comment 'Read DHT start pulses (H L H L)'
+  waitUntil (digitalReadOp pin)
+  waitUntil (not (digitalReadOp pin))
+  waitUntil (digitalReadOp pin)
+  waitUntil (not (digitalReadOp pin))
+  local 'i' 1
+  local 'byte' 0
+  local 'bit' 1
+  comment 'Read 40 bits (5 bytes)'
+  repeat 40 {
+    waitUntil (digitalReadOp pin)
+    local 'start' (microsOp)
+    waitUntil (not (digitalReadOp pin))
+    if (((microsOp) - start) > 40) {
+      comment 'Long pulse - append a "1" bit'
+      byte += 1
     }
+    if (bit == 8) {
+      atPut i _dhtData byte
+      i += 1
+      byte = 0
+      bit = 1
+    } else {
+      byte = (byte << 1)
+      bit += 1
+    }
+    waitUntil (not (digitalReadOp pin))
   }
-  repeat octave {
-    freq = (freq * 2)
-  }
-  '_toneLoop' freq ms
 }
 
-to playMIDIKey key ms {
-  local 'freq' ('_baseFreqForSemitone' ((key % 12) + 1))
-  local 'octave' ((key / 12) - 5)
-  if (octave < 0) {
-    repeat (absoluteValue octave) {
-      freq = (freq / 2)
+to '_dhtReady' {
+  local 'elapsed' ((millisOp) - _dhtLastReadTime)
+  return (or (elapsed < 0) (elapsed > 2000))
+}
+
+to '_dhtUpdate' pin isDHT11 {
+  if ('_dhtReady') {
+    _dht_temperature = 0
+    _dht_humidity = 0
+    '_dhtReadData' pin
+    _dhtLastReadTime = (millisOp)
+  }
+  if ('_dhtChecksumOkay') {
+    if isDHT11 {
+      _dht_temperature = (at 3 _dhtData)
+      _dht_humidity = (at 1 _dhtData)
+    } else {
+      local 'n' (((at 1 _dhtData) * 256) + (at 2 _dhtData))
+      _dht_humidity = ((n + 5) / 10)
+      n = ((((at 3 _dhtData) & 127) * 256) + (at 4 _dhtData))
+      if (((at 3 _dhtData) & 128) != 0) {
+        n = (0 - n)
+      }
+      _dht_temperature = ((n + 5) / 10)
     }
   }
-  repeat octave {
-    freq = (freq * 2)
-  }
-  '_toneLoop' freq ms
+}
+
+to humidity_DHT11 pin {
+  '_dhtUpdate' pin true
+  return _dht_humidity
+}
+
+to humidity_DHT22 pin {
+  '_dhtUpdate' pin false
+  return _dht_humidity
+}
+
+to temperature_DHT11 pin {
+  '_dhtUpdate' pin true
+  return _dht_temperature
+}
+
+to temperature_DHT22 pin {
+  '_dhtUpdate' pin false
+  return _dht_temperature
 }
 
