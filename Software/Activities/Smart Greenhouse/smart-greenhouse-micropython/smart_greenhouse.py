@@ -16,8 +16,6 @@ print("MicroPython: \t" + uos.uname()[3])
 uart0 = machine.UART(0, baudrate=115200)
 print(uart0)
 
-dht_sensor.measure()
-
 def Connect_WiFi(cmd, uart=uart0, timeout=5000):
     print("CMD: " + cmd)
     uart.write(cmd)
