@@ -12,7 +12,7 @@
 ##### [- Magic Lamp](https://github.com/Robotistan/PicoBricks/tree/main/Software/Activities/Magic%20Lamp "Heading Link") 
 ##### [- Smart Cooler](https://github.com/Robotistan/PicoBricks/tree/main/Software/Activities/Smart%20Cooler "Heading Link") 
 ##### [- Buzz Wire Game](https://github.com/Robotistan/PicoBricks/tree/main/Software/Activities/Buzz%20Wire%20Game "Heading Link")
-##### [- Dinosaur Game](https://github.com/Robotistan/PicoBricks/tree/main/Software/Activities/Buzz%20Wire%20Game "Heading Link")
+##### [- Dinosaur Game](https://github.com/Robotistan/PicoBricks/tree/main/Software/Activities/Dinosaur%20Game "Heading Link")
 ##### [- Night and Day](https://github.com/Robotistan/PicoBricks/tree/main/Software/Activities/Night%20and%20Day "Heading Link")
 ##### [- Voice Controlled Robot Car](https://github.com/Robotistan/PicoBricks/tree/main/Software/Activities/Voice%20Controlled%20Robot%20Car "Heading Link")
 ##### [- Two Axis Robot Arm](https://github.com/Robotistan/PicoBricks/tree/main/Software/Activities/Two%20Axis%20Robot%20Arm "Heading Link")
