@@ -9,8 +9,8 @@
 #define DEBUG true
 
 DHT dht(DHTPIN, DHTTYPE);
-
 float temperature;
+
 int connectionId;
 
 void setup() {
@@ -44,19 +44,7 @@ void loop() {
 
   if (Serial1.find("+IPD,")) {
     delay(300);
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    = Serial1.read() - 48;
+    connectionId = Serial1.read() - 48;
     if (Serial1.find("/WATERING")) {
       Serial.println("Irrigation Start");
       digitalWrite(motor, HIGH);
