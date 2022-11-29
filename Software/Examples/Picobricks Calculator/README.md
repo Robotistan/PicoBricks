@@ -1,43 +1,19 @@
-## Rock Paper Scissors Details
+## Picobricks Calculator Using 4x4 Keypad
+This could be basis of solving all mathematical problems.
+So, how will you start the solution?
+Connect Picobricks to your computer and you will see “Picobricks Calculator Ready to Solve” text.
+Yes, you are ready to solve mathematical problem right now.
+Write the process you want to solve. You can use A B C D key while doing this.
+- A: You can do addition
+- B: You can do extraction 
+- C: You can do multiplication
+- D: You can do division
 
-Created by PeterMathijssen
-
-This project could be the basis for a school project. 
-
-RULES:
-
-* Scissors cuts Paper
-
-* Paper covers Rock
-
-* Rock crushes Scissors
-
-How could you make this nicer? 
-
-Think about :
-
-* Add a bigger button
-
-* Add a bigger OLED screen
-
-* Use images instead of text
-
-* Using a 3d printed arrow and board.
-
-
-
-Use your imagination... 
-
-## Wiring Diagram
-
-<img src="https://user-images.githubusercontent.com/111511331/201471175-cc40b779-f411-4e2c-892e-3e0ada267c23.png" width="600" height="1000">
-
-![image](https://user-images.githubusercontent.com/111511331/201471238-37a43eda-66ab-4970-ab5e-546cf320d260.png)
+After typing your process, you can see the result by pressing the square button.
 
 
 
 ## Project Image
-
-<img src="https://user-images.githubusercontent.com/111511331/201471266-a198bd82-8ffc-48bb-9730-5983ed2903d2.png" width="600" height="800">
+<img src="https://user-images.githubusercontent.com/112697142/204540619-4bc3c89f-df26-4a23-b4bf-2435271b04dc.PNG" width="600" height="400">
 
 
