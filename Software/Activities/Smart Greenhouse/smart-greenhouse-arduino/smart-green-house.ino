@@ -2,7 +2,6 @@
 #define RX 0
 #define TX 1
 
-#define LIMIT_TEMPERATURE     30 // will be change
 #define DHTPIN                11
 #define DHTTYPE               DHT11
 #define smo_sensor            27
@@ -10,8 +9,8 @@
 #define DEBUG true
 
 DHT dht(DHTPIN, DHTTYPE);
-float temperature;
 
+float temperature;
 int connectionId;
 
 void setup() {
@@ -45,7 +44,19 @@ void loop() {
 
   if (Serial1.find("+IPD,")) {
     delay(300);
-    connectionId = Serial1.read() - 48;
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    = Serial1.read() - 48;
     if (Serial1.find("/WATERING")) {
       Serial.println("Irrigation Start");
       digitalWrite(motor, HIGH);
