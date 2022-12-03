@@ -1,41 +1,27 @@
-## Magic 8 Ball Project Details
+## Moving Tail Project Details
 
 Created by PeterMathijssen
 
-This project could be the basis for a school project. 
+Make a moving tail with MicroBlocks and PicoBricks
 
-It is based upon the classic Magic 8 Ball game.
+You just need a box, some cardboard, some ribbon, and tape.
 
-* https://en.wikipedia.org/wiki/Magic_8_Ball
+See it in action here:
 
-Rules: Ask your PicoBricks a question and then press the button...
+* https://fosstodon.org/@petermathijssen/109443780926724623
 
-How could you make this nicer? 
+## Ideas
 
-Think about :
+* Make a flower with leaves instead.
+* Use this design to make a scorpion.
+* Make it into a hand.
+*Use the microphone, PIR, or distance sensor to detect intruders and strike...
 
-* Add a bigger button
-
-* Add a bigger OLED screen
-
-* Add more LEDs
-
-* Make fancier/funnier sentences
-
-* Build a magician that waves his arms with the help of servos and then displays the message.
-
-Use your imagination... 
-
-## Wiring Diagram
-
-<img src="https://user-images.githubusercontent.com/111511331/201104340-04c772c2-00a0-40f4-b287-a3c2c6e512b9.jpg" width="750" height="800">
-
+Have fun.....
 
 ## Project Image
 
-<img src="https://user-images.githubusercontent.com/111511331/201104972-a8c70715-2b8e-42a5-a060-8e5ccbb246ad.png" width="750" height="800">
-<img src="https://user-images.githubusercontent.com/111511331/201104715-635206b0-cf84-4233-b833-e57848050156.png" width="750" height="800">
-
+![image](https://user-images.githubusercontent.com/111511331/205437604-38d87576-dbb1-4f97-969f-3c31262b25a7.png)
 
 
 
