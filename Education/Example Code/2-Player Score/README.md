@@ -1,5 +1,5 @@
-## Propeller-Button
+## 2-Player Score
 
-![mot_05](https://user-images.githubusercontent.com/112697142/206384753-a7548ca7-e013-4898-85ce-384e4f5045a6.png)
+![player_2_04](https://user-images.githubusercontent.com/112697142/206391209-90e46d6e-9421-4acf-ac1a-6dfb0022b8d5.png)
 
-##### You can access the Microblocks code of the project by dragging the image to the Microblocks Run tab or clicking [here](https://microblocks.fun/run/microblocks.html#scripts=GP%20Scripts%0Adepends%20%27PicoBricks%27%0A%0Ascript%20531%2082%20%7B%0AwhenStarted%0Apb_set_motor_speed%201%20100%0A%7D%0A%0Ascript%20857%2078%20%7B%0AwhenCondition%20%28pb_button%29%0Apb_set_motor_speed%201%200%0A%7D%0A%0A "here").
+##### You can access the Microblocks code of the project by dragging the image to the Microblocks Run tab or clicking [here](https://microblocks.fun/run/microblocks.html#scripts=GP%20Scripts%0Adepends%20%27OLED%20Graphics%27%20%27PicoBricks%27%0A%0Ascript%20531%2078%20%7B%0AwhenStarted%0Aplayer1%20%3D%200%0Aplayer2%20%3D%200%0Aforever%20%7B%0A%20%20OLEDInit_I2C%20%27OLED_0.96in%27%20%273C%27%200%20false%0A%20%20if%20%28%28pb_light_sensor%29%20%3C%2050%29%20%7B%0A%20%20%20%20player1%20%2B%3D%201%0A%20%20%20%20OLEDwrite%20%27Player1%3A%20%27%200%200%20false%0A%20%20%20%20OLEDwrite%20player1%2065%200%20false%0A%20%20%7D%20true%20%7B%0A%20%20%20%20player2%20%2B%3D%201%0A%20%20%20%20OLEDwrite%20%27Player2%3A%20%27%200%2010%20false%0A%20%20%20%20OLEDwrite%20player2%2065%2010%20false%0A%20%20%7D%20else%20%7B%0A%20%20%20%20OLEDwrite%20%27Player1%3A%20%27%200%200%20false%0A%20%20%20%20OLEDwrite%20player1%2065%200%20false%0A%20%20%20%20OLEDwrite%20%27Player2%3A%20%27%200%2010%20false%0A%20%20%20%20OLEDwrite%20player2%2065%2010%20false%0A%20%20%7D%0A%7D%0A%7D%0A%0A "here").
