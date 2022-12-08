@@ -1,4 +1,4 @@
-## Rock Paper Scissor
+## Counter
 ![counter(1-10)](https://user-images.githubusercontent.com/112697142/206377687-709eefe6-af9e-4a34-bedd-444ad7326179.png)
 
 
