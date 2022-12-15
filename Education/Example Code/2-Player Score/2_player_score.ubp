@@ -2,16 +2,28 @@ module main
 author unknown
 version 1 0 
 description ''
-variables counter 
+variables player1 player2 
 
-script 213 40 {
+script 266 65 {
 whenStarted
-OLEDInit_I2C 'OLED_0.96in' '3C' 0 false
-counter = 0
-repeat 10 {
-  counter = (counter + 1)
-  OLEDwrite counter 64 32 false
-  waitMillis 500
+player1 = 0
+player2 = 0
+forever {
+  OLEDInit_I2C 'OLED_0.96in' '3C' 0 false
+  if ((pb_light_sensor) < 50) {
+    player1 += 1
+    OLEDwrite 'Player1: ' 0 0 false
+    OLEDwrite player1 65 0 false
+  } ((pb_button) == (booleanConstant true)) {
+    player2 += 1
+    OLEDwrite 'Player2: ' '' 10 false
+    OLEDwrite player2 65 10 false
+  } else {
+    OLEDwrite 'Player1: ' 0 0 false
+    OLEDwrite player1 65 0 false
+    OLEDwrite 'Player2: ' '' 10 false
+    OLEDwrite player2 65 10 false
+  }
 }
 }
 

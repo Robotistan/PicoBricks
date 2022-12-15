@@ -13,8 +13,9 @@ void loop() {
     
   }
   else{
-    digitalWrite(7,LOW);//turn the LED on by making the voltage LOW 
+    digitalWrite(7,LOW);//turn the LED off by making the voltage LOW 
   }
   delay(10);//wait for half second
+
 
 }
