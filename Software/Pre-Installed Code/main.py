@@ -4,8 +4,6 @@ from picobricks import SSD1306_I2C, WS2812, DHT11
 from resources import Note_img, Picobricks_img, Tones, Song
 import framebuf
 import random
-import array
-import rp2
 
 WIDTH  = 128   # oled display width
 HEIGHT = 64    # oled display height
@@ -55,8 +53,8 @@ light_level = ADC(27)
 conversion_factor = 3.3 / (65535)
 dht_sensor = DHT11(Pin(11))
 led = Pin(7, Pin.OUT)
-ws2812 = WS2812(13,6,brightness=0.4)
-brightness=0.4
+ws2812 = WS2812(6,brightness=0.4)
+
 button.irq(trigger=Pin.IRQ_RISING, handler=buttonInterruptHandler)  # Button 1 pressed interrupt is set. buttonInterruptHandler function will run when button is pressed
 
 oled.fill(0)
@@ -75,76 +73,8 @@ time.sleep(0.5)
 led.low()
 time.sleep(2)
 
-#led_count = 13
-
-#ar = array.array("I", [0 for _ in range(led_count)])
-#red = (255,0,0)
-#orange = (255,50,0)
-#orrange = (170,50,0)
-#green = (0,255,0)
-#blue = (0,0,255)
-#yellow = (255,120,0)
-#cyan = (0,255,255)
-#white = (255,255,255)
-#blank = (0,0,0)
-#colors = [blue,yellow,cyan,red,green,white]
-
-#step = 5
-#breath_amps = [ii for ii in range(0,255,step)]
-#breath_amps.extend([ii for ii in range(255,-1,-step)])
-    
 while True:
-    
-    
-    for i in range(1,5):
-        
-        
-        ws2812.pixels_set(i,(255,100,0))
-        time.sleep(0.05)
-        ws2812.pixels_show()
 
-     
-       
-    for i in range(5,7):
-    
-        ws2812.pixels_set(i,(255,50,0))
-        time.sleep(0.05)
-        ws2812.pixels_show()
-
-    for i in range(7,9):
-    
-        ws2812.pixels_set(i,(170,50,0))
-        time.sleep(0.05)
-        ws2812.pixels_show()
-        
-    for i in range(9,13):
-        ws2812.pixels_set(i,(255,10,0))
-        time.sleep(0.05)
-        ws2812.pixels_show()
-    
-    for i in range(0,13):
-        ws2812.pixels_set(i,(0,0,0))
-        time.sleep(0.02)
-        ws2812.pixels_show()
-    
-        
-
-    
-    #for ii in breath_amps:
-        #for jj in range(len(ar)):
-            #ws2812.pixels_set(jj, color) # show all colors
-        #ws2812.pixels_show(ii/255)
-        #time.sleep(0.05)
-        
-    #for color in colors: # emulate breathing LED (similar to Amazon's Alexa)
-        #breathing_led(color)
-        #time.sleep(0.05) # wait between colors
-
-           
-        
-             
-        
-        
     if time.time() - dht_read_time >= 3:
         dht_read_time = time.time()
         try:
@@ -159,6 +89,5 @@ while True:
     oled.text("TEMP:     {0:.2f}C".format(dht_sensor.temperature),0,40)
     oled.text("HUMIDITY: {0:.1f}%".format(dht_sensor.humidity),0,50)
     oled.show()
-    time.sleep(0.5)
+    time.sleep(1)
     oled.fill(0)
-
