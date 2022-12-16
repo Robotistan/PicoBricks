@@ -1,63 +1,164 @@
-#Include the library files
 import time
-from machine import Pin, freq, PWM
-from picobricks import NEC_16
-from time import sleep
+from machine import Pin, I2C, PWM, ADC
+from picobricks import SSD1306_I2C, WS2812, DHT11
+from resources import Note_img, Picobricks_img, Tones, Song
+import framebuf
+import random
+import array
+import rp2
 
-# User callback
-def ir_callback(data, addr, ctrl):
-    if data < 0:  # NEC protocol sends repeat codes.
-        pass
-    else:
-        print(data)
-        if data == Up: #24
-            forward()
-        elif data == Left: #8
-            left()
-        elif data == Right: #90
-            right()
-        elif data == Stop: #28
-            stop()
-        elif data == Circle: #69
-            stop()
-def decodeKeyValue(data):
-    return data
+WIDTH  = 128   # oled display width
+HEIGHT = 64    # oled display height
+NOTE_DURATION = 0.11
 
-def forward():
-        m1.high()
-        m2.high()
-def left():
-        m1.low()
-        m2.high()  
-def right():
-        m1.high()
-        m2.low()
-def stop():  
-        m1.low()
-        m2.low()
-def circle():
-        m1.high()
-        sleep(5.0)
-        m2.low()    
-#Define the IR receiver pin and motor pins
-ir = NEC_16(Pin(0, Pin.IN), ir_callback)
-m1 = Pin(21, Pin.OUT)
-m2 = Pin(22, Pin.OUT)
+# Function declaration
+def playtone(frequency):
+    buzzer.duty_u16(2000)
+    buzzer.freq(frequency)
+   
+def bequiet():
+    buzzer.duty_u16(0)
+   
+def buttonInterruptHandler(event):    # Interrupt event, that will work when button is pressed
+    if button.value() == 1:
+        oled.fill(0)
+        oled.blit(fb2, 0, 0)
+        oled.show()
+        for note in Song:
+            if button.value() == 0:  # if button is released then reset ws2812, oled, buzzer and return
+                ws2812.pixels_fill((0,0,0))
+                ws2812.pixels_show()
+                bequiet()
+                oled.fill(0)
+                oled.show()
+                break
+            if note[0] == "-":
+                bequiet()
+            else:
+                playtone(Tones[note[0]])
+                ws2812.pixels_fill((random.randint(0,255), random.randint(0,255), random.randint(0,255)))
+                ws2812.pixels_show()
+            time.sleep(NOTE_DURATION*note[1])
 
-m1.low()
-m2.low()
+i2c = I2C(0, scl=Pin(5), sda=Pin(4), freq=200000)   # Init I2C using pins
+oled = SSD1306_I2C(WIDTH, HEIGHT, i2c, addr=0x3c)   # Init oled display
+fb1 = framebuf.FrameBuffer(Picobricks_img, 128,64 , framebuf.MONO_HLSB) # Creating framebuffer for PicoBricks Logo
+fb2 = framebuf.FrameBuffer(Note_img, 128,64, framebuf.MONO_HLSB)        # Creating framebuffer for music note
 
-Up = 24
-Left = 8
-Right = 90
-Stop = 28
-ir_data = 0
-Circle = 69
-#ir = NEC_8(pin_ir, callback)  # Instantiate receiver
-#ir.error_function(print_error)  # Show debug information
+# Pin Initialization
+buzzer = PWM(Pin(20)) # setting GP20 as PWM pin
+buzzer.duty_u16(0)    # setting duty cycle to 0
+relay = Pin(12, Pin.OUT)
+button = Pin(10, Pin.IN) # setting GP10 PIN as input
+pot = ADC(26)
+light_level = ADC(27)
+conversion_factor = 3.3 / (65535)
+dht_sensor = DHT11(Pin(11))
+led = Pin(7, Pin.OUT)
+ws2812 = WS2812(13,6,brightness=0.4)
+brightness=0.4
+button.irq(trigger=Pin.IRQ_RISING, handler=buttonInterruptHandler)  # Button 1 pressed interrupt is set. buttonInterruptHandler function will run when button is pressed
 
-try:
-    while True:
-        pass
-except KeyboardInterrupt:
-    ir.close()
+oled.fill(0)
+oled.blit(fb1, 0, 0)
+oled.show()
+
+dht_read_time = time.time() # Defined a variable to keep last DHT11 read time
+
+# Testing LED and Relay
+relay.high()
+time.sleep(0.5)
+relay.low()
+time.sleep(0.5)
+led.high()
+time.sleep(0.5)
+led.low()
+time.sleep(2)
+
+#led_count = 13
+
+#ar = array.array("I", [0 for _ in range(led_count)])
+#red = (255,0,0)
+#orange = (255,50,0)
+#orrange = (170,50,0)
+#green = (0,255,0)
+#blue = (0,0,255)
+#yellow = (255,120,0)
+#cyan = (0,255,255)
+#white = (255,255,255)
+#blank = (0,0,0)
+#colors = [blue,yellow,cyan,red,green,white]
+
+#step = 5
+#breath_amps = [ii for ii in range(0,255,step)]
+#breath_amps.extend([ii for ii in range(255,-1,-step)])
+    
+while True:
+    
+    
+    for i in range(1,5):
+        
+        
+        ws2812.pixels_set(i,(255,100,0))
+        time.sleep(0.05)
+        ws2812.pixels_show()
+
+     
+       
+    for i in range(5,7):
+    
+        ws2812.pixels_set(i,(255,50,0))
+        time.sleep(0.05)
+        ws2812.pixels_show()
+
+    for i in range(7,9):
+    
+        ws2812.pixels_set(i,(170,50,0))
+        time.sleep(0.05)
+        ws2812.pixels_show()
+        
+    for i in range(9,13):
+        ws2812.pixels_set(i,(255,10,0))
+        time.sleep(0.05)
+        ws2812.pixels_show()
+    
+    for i in range(0,13):
+        ws2812.pixels_set(i,(0,0,0))
+        time.sleep(0.02)
+        ws2812.pixels_show()
+    
+        
+
+    
+    #for ii in breath_amps:
+        #for jj in range(len(ar)):
+            #ws2812.pixels_set(jj, color) # show all colors
+        #ws2812.pixels_show(ii/255)
+        #time.sleep(0.05)
+        
+    #for color in colors: # emulate breathing LED (similar to Amazon's Alexa)
+        #breathing_led(color)
+        #time.sleep(0.05) # wait between colors
+
+           
+        
+             
+        
+        
+    if time.time() - dht_read_time >= 3:
+        dht_read_time = time.time()
+        try:
+            dht_sensor.measure()
+        except Exception as e:
+            print("Warning: could not measure: " + str(e))
+   
+    oled.fill(0)
+    oled.text("PICOBRICKS",30, 0)
+    oled.text("POT:      {0:.2f}V".format(pot.read_u16() * conversion_factor),0,20)
+    oled.text("LIGHT:    {0:.2f}%".format((65535.0 - light_level.read_u16())/650.0),0,30)
+    oled.text("TEMP:     {0:.2f}C".format(dht_sensor.temperature),0,40)
+    oled.text("HUMIDITY: {0:.1f}%".format(dht_sensor.humidity),0,50)
+    oled.show()
+    time.sleep(0.5)
+    oled.fill(0)
+
