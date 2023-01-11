@@ -4,10 +4,18 @@ Your imagination is the limit of what you can do with PicoBricks!
 
 With PicoBricks, you can create most games you want using your creativity. For example, making a labyrinth can be pretty fun. With the new version PicoBricks, you can control it with a remote control.
 
+#### What you need: 
+- PicoBricks 
+- 2 x servo motors 
+- Maze body (can be made using a 3D printer or cardboard box.) 
+- Connection cable 
+- Plastic clamps 
+- Remote control
 
+#### The Images of The Project:
+![whatsapp-image-2023-01-04-at-14-11-26-281-29-min](https://user-images.githubusercontent.com/112697142/211733818-68241bdb-3ee8-4cdb-a176-4ddf67c1d1b0.jpg)
 
-![allScripts81441](https://user-images.githubusercontent.com/112697142/211733226-015cac8e-3d27-4599-bbc3-583bd41cf384.png)
+![whatsapp-image-2023-01-04-at-14-11-26-min](https://user-images.githubusercontent.com/112697142/211733839-d58e23e6-1801-4172-8abf-3812512efb9c.jpg)
 
-
-
-##### You can access the Microblocks codes of the project by dragging the image to the Microblocks Run tab or clicking [here](https://microblocks.fun/run/microblocks.html#scripts=GP%20Scripts%0Adepends%20%27IR%20Remote%27%20%27Servo%27%0A%0Ascript%20481%20101%20%7B%0AwhenStarted%0AsetServoAngle%2022%20-10%0AsetServoAngle%2021%20-7%0A%7D%0A%0Ascript%20477%20198%20%7B%0AwhenCondition%20%28%28receiveIR%29%20%3D%3D%2024%29%0Afor%20i%20%28%27%5Bdata%3Arange%5D%27%200%208%29%20%7B%0A%20%20deg%20%3D%20%28deg%20%2B%202%29%0A%20%20sayIt%20deg%0A%20%20setServoAngle%2022%20deg%0A%20%20waitMillis%2050%0A%7D%0A%7D%0A%0Ascript%20832%20195%20%7B%0AwhenCondition%20%28%28receiveIR%29%20%3D%3D%2082%29%0Afor%20i%20%28%27%5Bdata%3Arange%5D%27%200%20-8%29%20%7B%0A%20%20deg%20%3D%20%28deg%20-%202%29%0A%20%20sayIt%20deg%0A%20%20setServoAngle%2022%20deg%0A%20%20waitMillis%2050%0A%7D%0A%7D%0A%0Ascript%20478%20436%20%7B%0AwhenCondition%20%28%28receiveIR%29%20%3D%3D%208%29%0Afor%20i%20%28%27%5Bdata%3Arange%5D%27%200%208%29%20%7B%0A%20%20deg2%20%3D%20%28deg2%20%2B%202%29%0A%20%20sayIt%20deg2%0A%20%20setServoAngle%2021%20deg2%0A%20%20waitMillis%2050%0A%7D%0AstopServo%2021%0A%7D%0A%0Ascript%20830%20435%20%7B%0AwhenCondition%20%28%28receiveIR%29%20%3D%3D%2090%29%0Afor%20i%20%28%27%5Bdata%3Arange%5D%27%200%20-8%29%20%7B%0A%20%20deg2%20%3D%20%28deg2%20-%202%29%0A%20%20sayIt%20deg2%0A%20%20setServoAngle%2021%20deg2%0A%20%20waitMillis%2050%0A%7D%0AstopServo%2021%0A%7D%0A%0Ascript%201165%20424%20%7B%0AwhenCondition%20%28%28receiveIR%29%20%3D%3D%2028%29%0AsetServoAngle%2022%20deg%0AsetServoAngle%2021%20deg2%0AsayIt%20deg%0AwaitMillis%20100%0AstopServo%2022%0AstopServo%2021%0A%7D%0A%0A "here").
+#### Pin Diagram:
+![ads-c4-b1z-tasar-c4-b1m-282-29-optimized-281-29](https://user-images.githubusercontent.com/112697142/211733924-d3259100-505c-4916-b730-1e80782d386f.png)
