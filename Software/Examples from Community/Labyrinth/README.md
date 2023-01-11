@@ -19,3 +19,6 @@ With PicoBricks, you can create most games you want using your creativity. For e
 
 #### Pin Diagram:
 ![ads-c4-b1z-tasar-c4-b1m-282-29-optimized-281-29](https://user-images.githubusercontent.com/112697142/211733924-d3259100-505c-4916-b730-1e80782d386f.png)
+##### For the mechanical parts, we got references from [Thingiverse](https://www.thingiverse.com/thing:725924 "Thingiverse").
+
+
