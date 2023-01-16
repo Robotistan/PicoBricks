@@ -1,4 +1,4 @@
-## Propeller-Button
+## Pi Number Project
 
 ![pi_project](https://user-images.githubusercontent.com/112697142/212656424-c867daea-ca45-4aee-b727-2e9f98d1dcad.png)
 
