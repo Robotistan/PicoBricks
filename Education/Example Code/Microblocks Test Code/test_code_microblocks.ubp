@@ -1,0 +1,1418 @@
+module main
+author unknown
+version 1 0 
+description ''
+
+script 52 52 {
+whenCondition (pb_button)
+OLEDInit_I2C 'OLED_0.96in' '3C' 0 false
+OLEDwrite 'Hello Picobricks' 0 0 false
+OLEDwrite 'Temperature:' 0 10 false
+OLEDwrite (temperature_DHT11 11) 95 10 false
+OLEDwrite 'Humudity:' 0 20 false
+OLEDwrite (humidity_DHT11 11) 70 20 false
+pb_set_red_LED true
+pb_set_rgb_color (colorSwatch 200 39 14 255)
+waitMillis 500
+pb_set_rgb_color (colorSwatch 2 190 7 255)
+waitMillis 500
+pb_set_rgb_color (colorSwatch 12 22 190 255)
+waitMillis 500
+pb_set_rgb_color (colorSwatch 190 179 5 255)
+pb_beep 500
+pb_turn_off_RGB
+pb_set_relay true
+waitMillis 1000
+pb_set_relay false
+setServoAngle 21 90
+setServoAngle 22 45
+pb_set_motor_speed 1 100
+pb_set_motor_speed 2 100
+forever {
+  OLEDwrite 'Pot:' 0 30 false
+  OLEDwrite (pb_potentiometer) 40 30 false
+}
+}
+
+script 582 82 {
+whenCondition ((pb_light_sensor) < 90)
+pb_set_rgb_color (colorSwatch 200 39 14 255)
+waitMillis 500
+pb_set_rgb_color (colorSwatch 2 190 7 255)
+waitMillis 500
+pb_set_rgb_color (colorSwatch 12 22 190 255)
+waitMillis 500
+}
+
+
+module 'OLED Graphics' Output
+author 'Turgut Guneysu'
+version 1 12 
+choices ModeMenu Horizontal Vertical 
+choices OnOffMenu On Off 
+choices VideoMenu Inverse Normal 
+choices DispTypeMenu 'OLED_0.96in' 'OLED_2.42in' 
+description 'Supports 0.96in and 2.42in OLED Displays with SD1306 and SD1309 chipsets. Comm mode is I2C or SPI.
+Changes:
+- always display buffer
+- defer display updates block
+- remove reveal
+- switch to x (0-127), y (0-63)
+- Pruned commands and vars
+- textX and textY
+- Text at any x and y
+- handles newLines
+- removed dependencies
+- unified data format for chars, sprites, and images
+- image draw at any x,y
+- filled rectangle
+- image draw bug fix
+- stack overflow fix
+'
+variables OLEDReady OLEDi2cAddr _GDBuffer _begCol _begRow _cDecTBL _comma _cTABLE _comMode _dcPin _delayGDUpd _displayType _endCol _endRow _eol _resetPin _textX _textY _dataPrefix _byteCount _imgData _imgWidth _imgHeight 
+
+  spec ' ' 'OLEDInit_I2C' 'initialize i2c _ address(hex) _ reset pin# _ flip _' 'str.DispTypeMenu auto auto bool' 'OLED_0.96in' '3C' '-' false
+  spec ' ' 'OLEDInit_SPI' 'initialize spi _ d/c pin# _ reset pin# _ flip _' 'str.DispTypeMenu auto auto bool' 'OLED_2.42in' 16 8 false
+  spec ' ' 'OLEDwrite' 'write _ at x _ y _ inverse _' 'auto auto auto bool' 'Hello!' 0 0 false
+  spec ' ' 'OLEDshowGDBuffer' 'show display buffer'
+  spec ' ' 'OLEDclear' 'clear'
+  spec ' ' 'OLEDcontrast' 'set contrast (1-4) _' 'auto' 2
+  spec ' ' 'OLEDdrawCircle' 'draw circle at x _ y _ radius _ erase _' 'auto auto auto bool' 64 32 '10' false
+  spec ' ' 'OLEDdrawImage' 'draw image _ at x _ y _' 'auto auto auto' 0 0 0
+  spec ' ' 'OLEDdrawLine' 'draw line from x _ y _ to x _ y _ erase _' 'auto auto auto auto bool' 0 0 127 63 false
+  spec ' ' 'OLEDdrawRect' 'draw rectangle x _ y _ w _ h _ erase _ rounding(3-15) _' 'auto auto auto auto bool auto' 0 0 127 63 false 0
+  spec ' ' 'OLEDfillRect' 'fill rectangle x _ y _ w _ h _ erase _' 'auto auto auto auto bool' 20 20 30 20 false
+  spec ' ' 'OLEDflip' '_flip display top _' 'bool' false
+  spec 'r' 'OLEDmakeImage' 'make image _' 'microbitDisplay' 33084991
+  spec ' ' 'OLEDpixel' 'set pixel x _ y _ erase _' 'auto auto bool' 0 0 false
+  spec ' ' 'OLEDsetVideo' 'set video _' 'str.VideoMenu' 'Inverse'
+  spec 'r' 'OLEDwru' 'cursor location'
+  spec ' ' 'defer display updates' 'defer display updates'
+  spec ' ' '_GDDRAMoff' '_GDDRAMoff'
+  spec ' ' '_GDDRAMon' '_GDDRAMon'
+  spec ' ' '_OLEDcursorReset' '_cursor reset'
+  spec ' ' '_OLEDsetDisplay' '_set display _' 'str.OnOffMenu' 'On'
+  spec ' ' '_OLEDreset' '_set reset Pin# _' 'auto' '0'
+  spec ' ' '_SPIWriteCmd' '_SPIWriteCmd'
+  spec ' ' '_SPIWriteData' '_SPIWriteData'
+  spec ' ' '_T1' '_T1'
+  spec ' ' '_T2' '_T2'
+  spec ' ' '_T3' '_T3'
+  spec 'r' '_cBMP' '_cBMP _ InvYN _' 'auto bool' '' false
+  spec ' ' '_clearDisplay' '_clearDisplay'
+  spec ' ' '_corner' '_corner _ _ _ _ _' 'auto auto auto auto bool' 'TL' 32 1 0 true
+  spec 'r' '_dec2hex' '_dec2hex _' 'auto' 0
+  spec ' ' '_initChars' '_initChars'
+  spec ' ' '_initCheck' '_initCheck'
+  spec ' ' '_initDisplayHW' '_initDisplayHW'
+  spec ' ' '_initLibrary' '_initLibrary'
+  spec ' ' '_process image data' '_process image data _' 'auto' ' '
+  spec ' ' '_sendCmd' '_sendCmd _' 'auto' ''
+  spec ' ' '_verifyXY' '_verifyXY _ _' 'auto auto' 0 0
+
+to OLEDInit_I2C dispType i2cAddr resetPin flip {
+  comment 'Sets display type and interface and initializes HW settings.
+Do NOT set a ResetPin# unless one exists on the display hardware.
+NOTE:
+Displays supported:
+- OLED 0.96in (SD1306 chip) and
+- OLED 2.42" (SD1309 chip)
+Both displays are 128x64 pixels or 16x8 characters in size.
+Displays come in dual mode version (i2c and spi) and pure i2c.
+Pure i2c models do not have a Reset pin.
+
+flip setting controls display hardware write direction:
+- false: top to bottom
+- true: bottom to top'
+  _comma = ('[data:unicodeString]' 44)
+  _comMode = 'i2c'
+  OLEDi2cAddr = (hexToInt ('[data:join]' ('[data:unicodeString]' 32) i2cAddr))
+  if (dispType == 'OLED_0.96in') {
+    _displayType = 6
+    _resetPin = resetPin
+  } else {
+    _displayType = 9
+    _resetPin = resetPin
+  }
+  '_initDisplayHW'
+  if flip {
+    OLEDflip true
+  }
+  '_initLibrary'
+  OLEDclear
+}
+
+to OLEDInit_SPI dispType dcPin resetPin flip {
+  comment 'Sets display type and interface and initializes HW settings.
+SPI four wire in Mode-0 is supported. Max speed=10000000.
+
+Do NOT set a ResetPin# unless one exists on the display hardware.
+NOTE:
+Displays supported:
+- OLED 0.96in (SD1306 chip) and
+- OLED 2.42" (SD1309 chip)
+Both displays are 128x64 pixels or 16x8 characters in size.
+Displays come in dual mode version (i2c and spi) and pure i2c.
+Pure i2c models do not have a Reset pin.
+flip setting controls display hardware write direction:
+- false: top to bottom
+- true: bottom to top'
+  _comma = ('[data:unicodeString]' 44)
+  _comMode = 'spi'
+  _dcPin = dcPin
+  if (dispType == 'OLED_0.96in') {
+    _displayType = 6
+    _resetPin = resetPin
+  } else {
+    _displayType = 9
+    _resetPin = resetPin
+  }
+  '[sensors:spiSetup]' 10000000
+  '_initDisplayHW'
+  if flip {
+    OLEDflip true
+  }
+  '_initLibrary'
+  OLEDclear
+}
+
+to OLEDclear {
+  comment 'Set bounds to FullScreen and CLEARs display
+and GDBuffer.'
+  _GDBuffer = ('[data:newByteArray]' 1024)
+  '_initCheck'
+  '_OLEDcursorReset'
+  OLEDshowGDBuffer
+}
+
+to OLEDcontrast contrast {
+  comment 'Sets the brightness control of the display to one of four values.
+1 is the least bright, 4 is the brightest setting.'
+  '_initCheck'
+  local 'cLevels' ('[data:makeList]' 0 '1F' '2F' 'F0')
+  if (and (contrast >= 1) (contrast <= 4)) {
+    local 'i2cCmd' ('[data:join]' '81' _comma (at contrast cLevels))
+    '_sendCmd' i2cCmd
+  } else {
+    sayIt 'Error in CONTRAST Level'
+  }
+}
+
+to OLEDdrawCircle cx cy r erase {
+  comment 'Bresenham Circle:
+Draws circles, even partially bigger than the display.
+x: 0-127
+y: 0-63
+void plotCircle(int xm, int ym, int r)
+{
+   int x = -r, y = 0, err = 2-2*r; /* II. Quadrant */
+   do {
+      setPixel(xm-x, ym+y); /*   I. Quadrant */
+      setPixel(xm-y, ym-x); /*  II. Quadrant */
+      setPixel(xm+x, ym-y); /* III. Quadrant */
+      setPixel(xm+y, ym+x); /*  IV. Quadrant */
+      r = err;
+      if (r <= y) err += ++y*2+1;           /* e_xy+e_y < 0 */
+      if (r > x || err > y) err += ++x*2+1; /* e_xy+e_x > 0 or no 2nd y-step */
+   } while (x < 0);
+}'
+  '_initCheck'
+  local 'x' (-1 * r)
+  local 'y' 0
+  local 'err' (2 - (2 * r))
+  repeatUntil (x >= 0) {
+    OLEDpixel (cx - x) (cy + y) erase
+    OLEDpixel (cx - y) (cy - x) erase
+    OLEDpixel (cx + x) (cy - y) erase
+    OLEDpixel (cx + y) (cy + x) erase
+    r = err
+    if (r <= y) {
+      y += 1
+      err = (err + ((y * 2) + 1))
+    }
+    if (or (r > x) (err > y)) {
+      x += 1
+      err = (err + ((x * 2) + 1))
+    }
+  }
+  if (not _delayGDUpd) {
+    OLEDshowGDBuffer
+  }
+}
+
+to OLEDdrawImage image x y {
+  comment '_imgHeight has to be mod8 or 1-8'
+  for row# (maximum 1 ((minimum _imgHeight (64 - y)) / 8)) {
+    local 'GDidx' ((((y / 8) * 128) + x) + 1)
+    local 'imgDispl' ((row# - 1) * _imgWidth)
+    for byte# (minimum _imgWidth (128 - x)) {
+      comment 'If y is on page boundary, just copy'
+      if (0 == (y % 8)) {
+        atPut GDidx _GDBuffer (at (imgDispl + byte#) image)
+        GDidx += 1
+        if (GDidx > 1024) {
+          if (not _delayGDUpd) {OLEDshowGDBuffer}
+          return 0
+        }
+      } else {
+        comment 'Else, copy GDLowBits + shiftedByte + GDHiBits to GDBuffer and GDBuffer +128'
+        local 'shiftedByte' ('_dec2hex' ((at (imgDispl + byte#) image) << (y % 8)))
+        local 'temp' 0
+        local 'tempHI' ('[data:copyFromTo]' shiftedByte 1 2)
+        local 'tempLO' ('[data:copyFromTo]' shiftedByte 3 4)
+        local 'GDLowBits' ((1 << (y % 8)) - 1)
+        local 'GDHiBits' (255 - GDLowBits)
+        tempLO = ((hexToInt tempLO) | ((at GDidx _GDBuffer) & GDLowBits))
+        atPut GDidx _GDBuffer tempLO
+        if ((GDidx + 128) <= 1024) {
+          tempHI = ((hexToInt tempHI) | ((at (GDidx + 128) _GDBuffer) & GDHiBits))
+          atPut (GDidx + 128) _GDBuffer tempHI
+        }
+        GDidx += 1
+        if (GDidx > 1024) {
+          if (not _delayGDUpd) {OLEDshowGDBuffer}
+          return 0
+        }
+      }
+      waitMillis 0
+    }
+    y += 8
+  }
+  if (not _delayGDUpd) {
+    OLEDshowGDBuffer
+  }
+}
+
+to OLEDdrawLine x0 y0 x1 y1 erase {
+  comment 'Draws a line from x0,y0 to x1,y1 using the Bresenham Algorithm
+x: 0-127
+y: 0-63
+plotLine(int x0, int y0, int x1, int y1)
+    dx =  abs(x1-x0);
+    sx = x0<x1 ? 1 : -1;
+    dy = -abs(y1-y0);
+    sy = y0<y1 ? 1 : -1;
+    err = dx+dy;  /* error value e_xy */
+    while (true)   /* loop */
+        plot(x0, y0);
+        if (x0 == x1 && y0 == y1) break;
+        e2 = 2*err;
+        if (e2 >= dy) /* e_xy+e_x > 0 */
+            err += dy;
+            x0 += sx;
+        end if
+        if (e2 <= dx) /* e_xy+e_y < 0 */
+            err += dx;
+            y0 += sy;
+        end if
+    end while'
+  '_initCheck'
+  results = ('[data:makeList]')
+  local 'dx' (absoluteValue (x1 - x0))
+  local 'dy' (-1 * (absoluteValue (y1 - y0)))
+  local 'err' (dx + dy)
+  local 'e2' 0
+  local 'done' (booleanConstant false)
+  if (x0 < x1) {
+    local 'sx' 1
+  } else {
+    local 'sx' -1
+  }
+  if (y0 < y1) {
+    local 'sy' 1
+  } else {
+    local 'sy' -1
+  }
+  repeatUntil done {
+    OLEDpixel x0 y0 erase
+    if (and (x0 == x1) (y0 == y1)) {
+      done = (booleanConstant true)
+    }
+    e2 = (2 * err)
+    if (e2 >= dy) {
+      err += dy
+      x0 += sx
+    }
+    if (e2 <= dx) {
+      err += dx
+      y0 += sy
+    }
+  }
+  if (not _delayGDUpd) {
+    OLEDshowGDBuffer
+  }
+}
+
+to OLEDdrawRect TLx TLy width height erase cornerRad {
+  comment 'Draw Rectangle with optional rounded corners with radius R.
+Does not check for reversed rectangle coordinates for round corners.'
+  '_initCheck'
+  local 'oldDelayGDUpd' _delayGDUpd
+  _delayGDUpd = true
+  local 'BRx' (TLx + width)
+  local 'BRy' (TLy + height)
+  if (cornerRad >= 3) {
+    '_corner' 'TL' TLx TLy cornerRad erase
+    '_corner' 'TR' BRx TLy cornerRad erase
+    '_corner' 'BR' BRx BRy cornerRad erase
+    '_corner' 'BL' TLx BRy cornerRad erase
+    comment 'TOP - Adjust x'
+    OLEDdrawLine (TLx + cornerRad) TLy ((BRx - 1) - cornerRad) TLy erase
+    comment 'RIGHT- Adjust y'
+    OLEDdrawLine BRx ((TLy + 1) + cornerRad) BRx ((BRy - 1) - cornerRad) erase
+    comment 'BOTTOM - Adjust x'
+    OLEDdrawLine ((BRx - 1) - cornerRad) BRy ((TLx + 1) + cornerRad) BRy erase
+    comment 'LEFT - Adjust y'
+    OLEDdrawLine TLx ((BRy - 1) - cornerRad) TLx ((TLy + 1) + cornerRad) erase
+  } else {
+    OLEDdrawLine TLx TLy BRx TLy erase
+    OLEDdrawLine BRx (TLy + 1) BRx BRy erase
+    OLEDdrawLine (BRx - 1) BRy TLx BRy erase
+    OLEDdrawLine TLx (BRy - 1) TLx (TLy + 1) erase
+  }
+  _delayGDUpd = oldDelayGDUpd
+  if (not _delayGDUpd) {
+    OLEDshowGDBuffer
+  }
+}
+
+to OLEDfillRect x y w h erase {
+  for row h {
+    for col w {
+      OLEDpixel (x + (col - 1)) (y + (row - 1)) erase
+    }
+  }
+  if (not _delayGDUpd) {
+    OLEDshowGDBuffer
+  }
+}
+
+to OLEDflip flip {
+  comment 'Flips the display initialization horizontally or vertically.
+Horizontal or vertical is based on the pin connector location.'
+  if flip {
+    '_sendCmd' 'A0,C0'
+  } else {
+    '_sendCmd' 'A1,C8'
+  }
+}
+
+to OLEDmakeImage spr# {
+  comment 'Receives a spr# representing 5x5 image matrix.
+Converts it to a HOR array of 5 VERT bitmap numbers.
+This can be displayed with the draw image block.
+sprNum max is 33554431'
+  '_initCheck'
+  local 'spriteList' ('[data:newByteArray]' 5)
+  local 'val' 0
+  for col 5 {
+    for row ('[data:asByteArray]' ('[data:makeList]' 0 5 10 15 20)) {
+      local 'bit' (col + row)
+      local 'vertBit#' (bit / 5)
+      if ((spr# & (1 << (bit - 1))) != 0) {
+        if (col != 5) {
+          val += (1 << vertBit#)
+        } else {
+          val += (1 << (vertBit# - 1))
+        }
+      }
+    }
+    atPut col spriteList val
+    val = 0
+  }
+  _imgWidth = 5
+  _imgHeight = 5
+  return spriteList
+}
+
+to OLEDpixel x y erase {
+  comment 'Places a pixel at x,y in the virtual GDBuffer
+Use OLEDshowGDBuffer to display it
+1024 Locations
+x: 0-127
+y: 0-63
+page#: 0-7
+pagePixel#: 0-7
+GDIndex: 1-1024
+
+RangeCheck:
+verify x and y are in range of display limits
+if X <= num <= Y'
+  '_initCheck'
+  if (and (and (x >= 0) (x <= 127)) (and (y >= 0) (y <= 63))) {
+    local 'page#' (y / 8)
+    local 'pagePixel#' (y % 8)
+    local 'GDIndex' ((x + ((y / 8) * 128)) + 1)
+    local 'byteBMP' (at GDIndex _GDBuffer)
+    if (not erase) {
+      byteBMP = (byteBMP | (1 << pagePixel#))
+    } else {
+      comment 'Turn off n th bit'
+      byteBMP = (byteBMP & ('~' (1 << pagePixel#)))
+    }
+    atPut GDIndex _GDBuffer byteBMP
+  }
+}
+
+to OLEDsetVideo videoMode {
+  comment 'Switches the entire display:
+Inverse: inverse video mode (bit 0 = on)
+Normal: normal video mode (bit 1 = on).
+Any image on the display will be preserved when mode changes.'
+  '_initCheck'
+  if (videoMode == 'Inverse') {
+    local 'i2cCmd' 'A7'
+  } else {
+    local 'i2cCmd' 'A6'
+  }
+  '_sendCmd' i2cCmd
+}
+
+to OLEDshowGDBuffer {
+  comment 'Copies contents of virtual _GDBuffer to display
+i2c:
+   in 61 byte chunks for speed.
+   1 byte is used for the command 40
+spi:
+   fastest is dump buffer
+ _GDBuffer is in decimal'
+  '_initCheck'
+  if (_comMode == 'i2c') {
+    local 'idx' 0
+    repeat 17 {
+      '[sensors:i2cWrite]' OLEDi2cAddr ('[data:join]' _dataPrefix ('[data:copyFromTo]' _GDBuffer idx (idx + 60)))
+      idx += 61
+    }
+  } else {
+    '_SPIWriteData'
+    '[sensors:spiExchange]' ('[data:copyFromTo]' _GDBuffer 1)
+  }
+  _delayGDUpd = (booleanConstant false)
+}
+
+to OLEDwrite string x y invFlag {
+  comment 'Writes strings to display at any x,y; processing CR LF and wrapping at col x.
+_textX and _textY are next write locations.'
+  '_initCheck'
+  local 'oldDelayGDUpd' _delayGDUpd
+  _delayGDUpd = true
+  '_verifyXY' x y
+  local 'origX' x
+  if (not (isType string 'string')) {
+    string = ('[data:join]' '' string)
+  }
+  for char string {
+    comment 'If in table process it - LINE SET is not supported.'
+    if (('[data:find]' char _cTABLE) != -1) {
+      OLEDdrawImage ('_cBMP' char invFlag) x y
+      x += 8
+      if (x > 127) {
+        x = origX
+        y += 8
+        if (y > 63) {
+          y = 0
+        }
+      }
+    } (13 == ('[data:unicodeAt]' 1 char)) {
+      noop
+    } (10 == ('[data:unicodeAt]' 1 char)) {
+      x = origX
+      y += 8
+      if (y > 63) {
+        y = 0
+      }
+    } else {
+      comment 'bad char - STOP'
+      sayIt 'Invalid CHAR value:' char 'uniCode:' ('[data:unicodeAt]' 1 char)
+      stopTask
+    }
+  }
+  _textX = x
+  _textY = y
+  _delayGDUpd = oldDelayGDUpd
+  if (not _delayGDUpd) {
+    OLEDshowGDBuffer
+  }
+}
+
+to OLEDwru {
+  comment 'Next Row and Column to print
+_textY, _textX'
+  return ('[data:asByteArray]' ('[data:makeList]' _textY _textX))
+}
+
+to '_GDDRAMoff' {
+  comment 'Displays a full empty screen of reverse video.
+It disengages the hardware GDBuffer. '
+  local 'i2cCmd' 'A5'
+  '_sendCmd' i2cCmd
+}
+
+to '_GDDRAMon' {
+  comment 'It disables the GDDRAMoff mode and engages the hardware GDBuffer for display content.'
+  local 'i2cCmd' 'A4'
+  '_sendCmd' i2cCmd
+}
+
+to '_OLEDcursorReset' {
+  comment 'Sets display bounds to full range and resets cursor
+to the origin top-left (0,0)
+Rows: 0-7
+Cols: 0-127
+Cursor position is affected by any display operation
+and also by OLEDColMode block.'
+  '_initCheck'
+  local 'cmdString' '22,00,07,21,00,7F'
+  '_sendCmd' cmdString
+  _textX = 0
+  _textY = 0
+  _begCol = 0
+  _endCol = 127
+  _begRow = 0
+  _endRow = 7
+}
+
+to '_OLEDreset' pin {
+  comment 'Does a power off and on on the display,
+thus forcing a hardware initialization.'
+  digitalWriteOp pin false
+  waitMillis 1
+  digitalWriteOp pin true
+  waitMillis 1
+}
+
+to '_OLEDsetDisplay' onoff {
+  comment 'Puts the display into
+Off:SLEEP   On:WAKE   mode.
+Images on display are preserved.'
+  '_initCheck'
+  if (onoff == 'On') {
+    local 'i2cCmd' 'AF'
+  } else {
+    local 'i2cCmd' 'AE'
+  }
+  '_sendCmd' i2cCmd
+}
+
+to '_SPIWriteCmd' {
+  comment 'In SPI mode, we send either a write command
+or write data control code. Then follow it with
+the appropriate command/data bundle.'
+  digitalWriteOp _dcPin false
+}
+
+to '_SPIWriteData' {
+  comment 'In SPI mode, we send either a write command
+or write data control code. Then follow it with
+the appropriate command/data bundle.'
+  digitalWriteOp _dcPin true
+}
+
+to '_T1' {
+  comment 'THIN-SS Character Set
+Range: space - ?'
+  local '_cHEX1' '00000000000000000000005F00000000000007000007000000147F14147F140000242A6B6B2A12000046261008646200304A454D324848000000040300000000001C224100000000000041221C000000082A1C1C1C2A08000008083E080800000000806000000000000808080808080000000060000000000040201008040200003E615149453E000044427F4040000000625151494966000022414949493600101814527F5010000027454545453900003C4A4949493000000301710905030000364949494936000006494949291E00000000660000000000008066000000000008142241000000002424242424240000000041221408000002010151090600'
+  local 'idx' 1
+  for i 256 {
+    atPut i _cDecTBL (hexToInt ('[data:copyFromTo]' _cHEX1 idx (idx + 1)))
+    idx += 2
+  }
+  _cHEX1 = ''
+}
+
+to '_T2' {
+  comment 'THIN-SS Character Set
+Range: @ - _ (underscore)'
+  local '_cHEX2' '003E415D55551E00007C121111127C0000417F4949493600001C22414141220000417F4141221C0000417F495D41630000417F491D010300001C224151517200007F080808087F000000417F4100000000304040413F010000417F081422414000417F4140406000007F01020402017F007F010204087F00003E414141413E0000417F4909090600001E212131215E4000417F49192946000026494949493200000301417F410103003F404040403F00000F10204020100F003F40403840403F004122140814224100010244784402010043615149454361007F4141410000000102040810204000004141417F00000008040201020408008080808080808080'
+  local 'idx' 1
+  for i 256 {
+    atPut (256 + i) _cDecTBL (hexToInt ('[data:copyFromTo]' _cHEX2 idx (idx + 1)))
+    idx += 2
+  }
+  _cHEX2 = ''
+}
+
+to '_T3' {
+  comment 'THIN-SS Character Set
+Range: '' - . (last char)'
+  local '_cHEX3' '0000000304000000002054545454784000017F304848483000384444444428000030484848317F4000385454545418000000487E490102000098A4A4A4A4780400417F08040478000000447D400000000060808080847D0000017F10284440000000417F40000000007C040478040478007C08040404780000384444444438000084FC98242418000018242498FC840000447C480404180000485454545424000004043F44442000003C404040207C00000C10204020100C003C40403840403C0044281028440000009CA0A0A0A07C00004464544C44000000080836414100000000007700000000000041413608080000020101020201000000000000000000'
+  local 'idx' 1
+  for i 256 {
+    atPut (512 + i) _cDecTBL (hexToInt ('[data:copyFromTo]' _cHEX3 idx (idx + 1)))
+    idx += 2
+  }
+  _cHEX3 = ''
+}
+
+to '_cBMP' char invFlag {
+  comment 'Returns DEC char bitmap from _cHexTbl and
+optionally converts it to inverse (XOR).
+Line segments are NOT supported.
+A: 00,7c,12,11,12,7c,00
+dec:  0,124,18,17,17,124,0
+inv:    255,131,237,238,238,131,255'
+  local 'key' (((('[data:unicodeAt]' 1 char) - 32) * 8) + 1)
+  local 'charList' ('[data:copyFromTo]' _cDecTBL key (key + 7))
+  comment 'inverse'
+  if invFlag {
+    for item# (size charList) {
+      atPut item# charList ((at item# charList) ^ 255)
+    }
+  }
+  _imgWidth = 8
+  _imgHeight = 8
+  return charList
+}
+
+to '_clearDisplay' {
+  comment 'Clear Screen without initializing _GDBuffer'
+  '_initCheck'
+  '_OLEDcursorReset'
+  local 'clearBuff' ('[data:newByteArray]' 60 0)
+  if ('i2c' == _comMode) {
+    repeat 17 {
+      '[sensors:i2cWrite]' OLEDi2cAddr ('[data:join]' _dataPrefix clearBuff)
+    }
+    '[sensors:i2cWrite]' OLEDi2cAddr ('[data:join]' _dataPrefix clearBuff)
+  } else {
+    '_SPIWriteData'
+    '[sensors:spiExchange]' ('[data:newByteArray]' 1024)
+  }
+}
+
+to '_corner' loc cx cy r erase {
+  comment 'Calculates and displays the rounded corners for the rectangles.
+loc is one of TL, TR, BL, BR ... topLeft, topright, bottomleft, bottomright
+cx,cy are the corner coordinates for the rounded corner.
+r is the radius in pixels of the arc to be calculated.'
+  local 'x' (-1 * r)
+  local 'y' 0
+  local 'err' (2 - (2 * r))
+  if (loc == 'TL') {
+    cx += r
+    cy += r
+  } (loc == 'TR') {
+    cx += (-1 * r)
+    cy += r
+  } (loc == 'BL') {
+    cx += r
+    cy += (-1 * r)
+  } (loc == 'BR') {
+    cx += (-1 * r)
+    cy += (-1 * r)
+  }
+  repeatUntil (x >= 0) {
+    if (loc == 'TL') {
+      OLEDpixel (cx + x) (cy - y) erase
+    } (loc == 'TR') {
+      OLEDpixel (cx + y) (cy + x) erase
+    } (loc == 'BL') {
+      OLEDpixel (cx - y) (cy - x) erase
+    } (loc == 'BR') {
+      OLEDpixel (cx - x) (cy + y) erase
+    }
+    r = err
+    if (r <= y) {
+      y += 1
+      err = (err + ((y * 2) + 1))
+    }
+    if (or (r > x) (err > y)) {
+      x += 1
+      err = (err + ((x * 2) + 1))
+    }
+  }
+}
+
+to '_dec2hex' num {
+  comment 'Fast version w/o inversion. (~115uSecs)'
+  local '_hexTbl' '0123456789ABCDEF'
+  local 'hexNum' ''
+  repeatUntil (num < 0) {
+    if ((num / 16) != 0) {
+      hexNum = ('[data:join]' (at ((num % 16) + 1) _hexTbl) hexNum)
+      num = (num / 16)
+    } else {
+      hexNum = ('[data:join]' (at ((num % 16) + 1) _hexTbl) hexNum)
+      num = -1
+    }
+  }
+  comment 'If not half-byte length, pad it.'
+  repeatUntil (((size hexNum) % 4) == 0) {
+    hexNum = ('[data:join]' '0' hexNum)
+  }
+  return hexNum
+}
+
+to '_initChars' {
+  comment 'Creates the character set used in the Library (96 characters)
+used JOIN  for SPACE (uni-32) character so it won''t be deleted by mistake.
+For each character, _cDecTbl is updated with 8 byte array values.'
+  _cTABLE = ('[data:join]' ('[data:unicodeString]' 32) '!"#$%&''()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~.')
+  '_T1'
+  '_T2'
+  '_T3'
+}
+
+to '_initCheck' {
+  comment 'Verifies Library initialization status.'
+  if OLEDReady {
+    return 0
+  } else {
+    sayIt 'Display needs to be initialized before using the library blocks.'
+    stopTask
+  }
+}
+
+to '_initDisplayHW' {
+  comment '*** DO NOT CHANGE THESE WITHOUT UNDERSTANDING THEIR MEANINGS ***
+*** IT CAN MAKE THE DISPLAY NOT OPERATE CORRECTLY                          ***
+
+Initializes display HW timings
+OLED INITIALIZATION STRINGS:
+1306: pins are on top
+1309: pins are on the right
+
+A8 3F - Multiplex Ratio 0F-3F (16mux to 64mux)
+D3 00 - Display Offset (vertical) 00-63
+40    - Display Start Line 40-7F (40:0)
+A0    - Set Segment Remap A0: Remap 0:0, A1: 127:0                 [A0]
+C0    - Scan Direction C0:0-127, C8:127-0                                     [C0]
+DA 12 - COM pin hw config 02:double-high 12:normal bits
+81 7F - Set contrast 00-FF (00:dimmest, FF:brightest)
+A4    - A4:display shows GDRAM, A5:display all ON pixels
+A6    - A6:Normal video, A7:Inverse video
+D5 F0 - Set display clock HB:OSC freq / LB:divide ratio (00-FF)
+D9 22 - Set pre-charge period HB:Phase2 / LB:Phase1 (1-15 DCLK)
+DB 20 - Set Vcomh deselect level 20:1306(~0.77xVcc), 34:1309(~0.78xVcc)
+8D 14 - Charge Pump Setting 10:disable CP, 14:enable CP
+20 00 - Set HORIZONTAL mode
+AF    - Display ON/OFF AE:off (sleep mode), AF:on'
+  if (_resetPin != '-') {
+    '_OLEDreset' _resetPin
+  }
+  if (9 == _displayType) {
+    local 'initCmd' 'A8,3F,D3,00,40,A1,C8,DA,12,81,7F,A4,A6,D5,70,D9,22,DB,34,8D,14,20,00,AF'
+  } else {
+    local 'initCmd' 'A8,3F,D3,00,40,A1,C8,DA,12,81,7F,A4,A6,D5,70,D9,22,DB,20,8D,14,20,00,AF'
+  }
+  '_sendCmd' initCmd
+}
+
+to '_initLibrary' {
+  comment 'Sets all Library variables and initializes the display hardware.
+It also initializes the virtual GDBuffer, and clears the display.
+NOTE:
+Displays supported: OLED1306 (0.96in) and OLED1309 (2.42"), selected via boolean position.
+OLED1309 requires the connection of RESET pin to a digital pin.
+Both displays are 128x64 pixels or 16x8 characters in size.
+Make sure the character hex tables are \n (LF) terminated.
+Otherwise, extra lines are added in between and it gets messed up.
+eg: A: 00,7C,12,11,11,12,7C,00\n
+Max i2c IO is 64 bytes: buffered writes need to be max that size - 16 x 64'
+  _comma = ('[data:unicodeString]' 44)
+  _eol = ('[data:unicodeString]' 10)
+  comment 'Col starts are in HEX'
+  _dataPrefix = ('[data:newByteArray]' 1 (hexToInt '40'))
+  comment 'There is no FF/255 in th cHexTBL.
+this value is used to build the byteArray.'
+  _cDecTBL = ('[data:newByteArray]' 768 255)
+  _GDBuffer = ('[data:newByteArray]' 1024)
+  _textX = 0
+  _textY = 0
+  _begRow = 0
+  _begCol = 0
+  _endRow = 7
+  _endCol = 127
+  _delayGDUpd = (booleanConstant false)
+  '_initChars'
+  OLEDReady = (booleanConstant true)
+  '_OLEDsetDisplay' 'On'
+  setUserLED true
+  waitMillis 1000
+  setUserLED false
+}
+
+to '_process image data' image {
+  comment 'Processes the new hex image data format.
+Each _imgHex gets added to _imgData in DEC byteArray format.
+_byteCount keeps track of total bytes processed.
+_imgWidth and _imgHeight (mod8) are dimensions.'
+  local '_ptr' 1
+  comment '_imgData is not initialized yet.'
+  if (or (0 == _imgData) (not (isType _imgData 'byte array'))) {
+    _imgWidth = (hexToInt ('[data:copyFromTo]' image 1 2))
+    _imgHeight = (hexToInt ('[data:copyFromTo]' image 3 4))
+    image = ('[data:copyFromTo]' image 5)
+    comment 'If _imgHeight is partial byte, adjust to full byte'
+    if (not (0 == (_imgHeight % 8))) {
+      _imgHeight += (8 - (_imgHeight % 8))
+    }
+    _imgData = ('[data:newByteArray]' ((_imgWidth * _imgHeight) / 8))
+  }
+  for byte ((size image) / 2) {
+    atPut (_byteCount + byte) _imgData (hexToInt ('[data:copyFromTo]' image _ptr (_ptr + 1)))
+    _ptr += 2
+  }
+  _byteCount += byte
+}
+
+to '_sendCmd' cmdString {
+  comment 'Input is a comma sep. STRING.
+MAKE SURE ALL  INPUT PARAMETERS ARE HEX'
+  local '_cList' ('[data:split]' cmdString _comma)
+  local 'cmdPrefix' (hexToInt '80')
+  if ('i2c' == _comMode) {
+    for cmd _cList {
+      '[sensors:i2cWrite]' OLEDi2cAddr ('[data:asByteArray]' ('[data:makeList]' cmdPrefix (hexToInt cmd)))
+    }
+  } else {
+    '_SPIWriteCmd'
+    for cmd _cList {
+      spiSend (hexToInt cmd)
+    }
+  }
+}
+
+to '_verifyXY' x y {
+  if (and (and (x >= 0) (x <= 127)) (and (y >= 0) (y <= 63))) {
+    return 0
+  } else {
+    sayIt 'x or y value error:' ('[data:unicodeString]' 10) 'x:' x ' y:' y
+    stopTask
+  }
+}
+
+to 'defer display updates' {
+  _delayGDUpd = (booleanConstant true)
+}
+
+
+module PicoBricks
+author MicroBlocks
+version 2 3 
+depends 'Temperature Humidity (DHT11, DHT22)' 
+description 'Robotistan PicoBricks Library
+
+This library controls these Pico Bricks components:
+- Red LED
+- RGB LED
+- DC Motors
+- Piezo speaker
+- Relay Switch (5V-250V, 5A)
+- Button
+- Potentiometer (variable resistor)
+- Light sensor (light dependent resistor)
+- Temperature and humidity sensor (DHT11)
+- switched to renamed DHT library
+
+Use separate libraries to control:
+- Servo motors
+- Graphic display (OLED)
+- WIFI/Bluetooth expansion board
+
+See https://www.robotistan.com, 
+https://wiki.microblocks.fun/boards/pico
+'
+variables _pb_initialized _pb_pin_RedLED _pb_pin_Button _pb_pin_DHT _pb_pin_Relay _pb_pin_Pot _pb_pin_LDR _pb_pin_Buzzer _pb_pin_Motor1 _pb_pin_Motor2 _pb_pin_RGB_LED _pb_pin_TX _pb_pin_RX _pb_i2c_Addr 
+
+  spec ' ' 'pb_beep' 'PicoBricks beep _ ms' 'auto' 500
+  spec 'r' 'pb_button' 'PicoBricks button'
+  spec 'r' 'pb_humidity' 'PicoBricks humidity'
+  spec 'r' 'pb_light_sensor' 'PicoBricks light sensor (0-100) %'
+  spec 'r' 'pb_potentiometer' 'PicoBricks potentiometer'
+  spec 'r' 'pb_random_color' 'PicoBricks random color'
+  spec 'r' 'pb_rgb_color' 'PicoBricks color r _ g _ b _ (0-255)' 'auto auto auto' 0 0 0
+  spec ' ' 'pb_set_motor_speed' 'PicoBricks set motor _ speed _ (0-100)' 'auto num' 1 100
+  spec ' ' 'pb_set_red_LED' 'PicoBricks set red LED _' 'bool' true
+  spec ' ' 'pb_set_relay' 'PicoBricks set relay _' 'bool' true
+  spec ' ' 'pb_set_rgb_color' 'PicoBricks set RGB LED color _' 'color'
+  spec 'r' 'pb_temperature' 'PicoBricks temperature (°C)'
+  spec ' ' 'pb_turn_off_RGB' 'PicoBricks turn off RGB LED'
+  spec ' ' '_pb_init_pins' '_pb_init_pins'
+
+to '_pb_init_pins' {
+  if _pb_initialized {return}
+  _pb_pin_RGB_LED = 6
+  _pb_pin_RedLED = 7
+  _pb_pin_Button = 10
+  _pb_pin_DHT = 11
+  _pb_pin_Relay = 12
+  _pb_pin_Buzzer = 20
+  _pb_pin_Motor1 = 21
+  _pb_pin_Motor2 = 22
+  _pb_pin_Pot = 26
+  _pb_pin_LDR = 27
+  _pb_pin_TX = 0
+  _pb_pin_RX = 1
+  _pb_i2c_Addr = '3C'
+  _pb_initialized = (booleanConstant true)
+}
+
+to pb_beep duration {
+  '_pb_init_pins'
+  local 'end time' ((millisOp) + duration)
+  repeatUntil ((millisOp) >= (v 'end time')) {
+    digitalWriteOp _pb_pin_Buzzer true
+    waitMicros 1900
+    digitalWriteOp _pb_pin_Buzzer false
+    waitMicros 1900
+  }
+}
+
+to pb_button {
+  '_pb_init_pins'
+  return (digitalReadOp _pb_pin_Button)
+}
+
+to pb_humidity {
+  '_pb_init_pins'
+  return (humidity_DHT11 _pb_pin_DHT)
+}
+
+to pb_light_sensor {
+  comment 'Returns Light Values s a percentage:
+0: dark,  100: light'
+  '_pb_init_pins'
+  return ('[misc:rescale]' (1023 - (analogReadOp _pb_pin_LDR)) 0 1023 0 100)
+}
+
+to pb_potentiometer {
+  '_pb_init_pins'
+  return (analogReadOp _pb_pin_Pot)
+}
+
+to pb_random_color {
+  local 'n1' (random 100 200)
+  local 'n2' (random 0 100)
+  if (1 == (random 1 3)) {
+    return ((n1 << 16) | (n2 << 8))
+  } (1 == (random 1 2)) {
+    return ((n2 << 16) | n1)
+  } else {
+    return ((n1 << 8) | n2)
+  }
+}
+
+to pb_rgb_color r g b {
+  r = (maximum 0 (minimum r 255))
+  g = (maximum 0 (minimum g 255))
+  b = (maximum 0 (minimum b 255))
+  return (((r << 16) | (g << 8)) | b)
+}
+
+to pb_set_motor_speed which speed {
+  '_pb_init_pins'
+  speed = (maximum 0 (minimum speed 100))
+  if (which == 1) {
+    analogWriteOp _pb_pin_Motor1 ((1023 * speed) / 100)
+  } (which == 2) {
+    analogWriteOp _pb_pin_Motor2 ((1023 * speed) / 100)
+  }
+}
+
+to pb_set_red_LED aBoolean {
+  '_pb_init_pins'
+  digitalWriteOp _pb_pin_RedLED aBoolean
+}
+
+to pb_set_relay aBoolean {
+  '_pb_init_pins'
+  digitalWriteOp _pb_pin_Relay aBoolean
+}
+
+to pb_set_rgb_color color {
+  '_pb_init_pins'
+  '[display:neoPixelSetPin]' _pb_pin_RGB_LED false
+  '[display:neoPixelSend]' color
+}
+
+to pb_temperature {
+  '_pb_init_pins'
+  return (temperature_DHT11 _pb_pin_DHT)
+}
+
+to pb_turn_off_RGB {
+  '_pb_init_pins'
+  '[display:neoPixelSetPin]' _pb_pin_RGB_LED false
+  '[display:neoPixelSend]' 0
+}
+
+
+module Servo Output
+author MicroBlocks
+version 1 1 
+tags servo motor angle rotation position 
+description 'Control both positional (angle) and rotational servo motors.'
+variables _servoPin _servoPulseWidth 
+
+  spec ' ' 'setServoAngle' 'set servo _ to _ degrees (-90 to 90)' 'num num' 1 90
+  spec ' ' 'setServoSpeed' 'set servo _ to speed _ (-100 to 100)' 'num num' 1 100
+  spec ' ' 'stopServo' 'stop servo _' 'num' 1
+  spec 'r' '_servoIndex' '_servoIndex _' 'num' 1
+  spec ' ' '_servoPulse' '_servoPulse pin _ usecs _' 'num num' 1 1500
+  spec ' ' '_servoUpdateLoop' '_servoUpdateLoop'
+
+to '_servoIndex' which {
+  if (_servoPin == 0) {
+    _servoPin = ('[data:makeList]')
+    _servoPulseWidth = ('[data:makeList]')
+    sendBroadcast '_servoUpdateLoop'
+  }
+  local 'i' ('[data:find]' which _servoPin)
+  if (i < 0) {
+    comment 'Add new pin'
+    '[data:addLast]' which _servoPin
+    '[data:addLast]' '1500' _servoPulseWidth
+    i = (size _servoPin)
+  }
+  return i
+}
+
+to '_servoPulse' pin usecs {
+  if (usecs == 0) {
+    comment 'Servo stopped; do nothing'
+    return 0
+  }
+  usecs = (maximum 850 (minimum usecs 2150))
+  comment 'Split wait into a long wait followed by a wait of <= 30 usecs for greater accuracy'
+  local 'endTime' ((microsOp) + usecs)
+  digitalWriteOp pin true
+  waitMicros (usecs - 30)
+  waitMicros (endTime - (microsOp))
+  digitalWriteOp pin false
+}
+
+to '_servoUpdateLoop' {
+  forever {
+    if (_servoPin != 0) {
+      comment 'If the _servoPin list is not 0, update the servos'
+      for i (size _servoPin) {
+        local 'pin' (at i _servoPin)
+        local 'usecs' (at i _servoPulseWidth)
+        if (and (pin >= 0) (usecs != 0)) {
+          '_servoPulse' pin usecs
+        }
+      }
+      waitMillis 15
+    }
+  }
+}
+
+to setServoAngle which degrees optionalReverse {
+  local 'reversed' false
+  if ((pushArgCount) > 2) {
+    reversed = optionalReverse
+  }
+  if reversed {
+    degrees = (0 - degrees)
+  }
+  local 'pulseWidth' (1500 - (10 * degrees))
+  if ('[io:hasServo]') {
+    '[io:setServo]' which pulseWidth
+  } else {
+    atPut ('_servoIndex' which) _servoPulseWidth pulseWidth
+  }
+}
+
+to setServoSpeed which speed optionalReverse {
+  local 'reversed' false
+  if ((pushArgCount) > 2) {
+    reversed = optionalReverse
+  }
+  if reversed {
+    speed = (0 - speed)
+  }
+  local 'pulseWidth' (1500 - (10 * speed))
+  if ((absoluteValue speed) < 2) {
+    pulseWidth = 0
+  }
+  if ('[io:hasServo]') {
+    '[io:setServo]' which pulseWidth
+  } else {
+    atPut ('_servoIndex' which) _servoPulseWidth pulseWidth
+  }
+}
+
+to stopServo which {
+  if ('[io:hasServo]') {
+    '[io:setServo]' which 0
+  } else {
+    atPut ('_servoIndex' which) _servoPulseWidth 0
+  }
+}
+
+
+module 'Temperature Humidity (DHT11, DHT22)' Input
+author MicroBlocks
+version 1 2 
+tags sensor dht11 dht22 temperature humidity 
+description 'Support for the DHT11 and DHT22 environmental sensors. These sensors provide temperature and humidity readings.'
+variables _dht_temperature _dht_humidity _dhtData _dhtLastReadTime 
+
+  spec 'r' 'temperature_DHT11' 'temperature (Celsius) DHT11 pin _' 'auto' 4
+  spec 'r' 'humidity_DHT11' 'humidity DHT11 pin _' 'auto' 4
+  spec 'r' 'temperature_DHT22' 'temperature (Celsius) DHT22 pin _' 'auto' 4
+  spec 'r' 'humidity_DHT22' 'humidity DHT22 pin _' 'auto' 4
+  spec ' ' '_dhtReadData' '_dhtReadData pin _' 'auto any' 4
+  spec 'r' '_dhtChecksumOkay' '_dhtChecksumOkay' 'any'
+  spec ' ' '_dhtUpdate' '_dhtUpdate _ isDHT11 _' 'auto bool any' 4 true
+  spec 'r' '_dhtReady' '_dhtReady' 'any'
+
+to '_dhtChecksumOkay' {
+  if (not (isType _dhtData 'list')) {return (booleanConstant false)}
+  local 'checksum' 0
+  for i 4 {
+    checksum += (at i _dhtData)
+  }
+  checksum = (checksum & 255)
+  return (checksum == (at 5 _dhtData))
+}
+
+to '_dhtReadData' pin {
+  comment 'Create DHT data array the first time'
+  if (_dhtData == 0) {
+    _dhtData = (newList 5)
+  }
+  comment 'fill with 1''s set checksum will be bad if read fails'
+  atPut 'all' _dhtData 1
+  comment 'Pull pin low for >18msec to request data'
+  digitalWriteOp pin false
+  waitMillis 20
+  local 'useDHTPrimitive' (booleanConstant true)
+  if useDHTPrimitive {
+    result = ('[sensors:readDHT]' pin)
+    if ((booleanConstant false) != result) {
+      _dhtData = result
+    }
+    return 0
+  }
+  comment 'Read DHT start pulses (H L H L)'
+  waitUntil (digitalReadOp pin)
+  waitUntil (not (digitalReadOp pin))
+  waitUntil (digitalReadOp pin)
+  waitUntil (not (digitalReadOp pin))
+  local 'i' 1
+  local 'byte' 0
+  local 'bit' 1
+  comment 'Read 40 bits (5 bytes)'
+  repeat 40 {
+    waitUntil (digitalReadOp pin)
+    local 'start' (microsOp)
+    waitUntil (not (digitalReadOp pin))
+    if (((microsOp) - start) > 40) {
+      comment 'Long pulse - append a "1" bit'
+      byte += 1
+    }
+    if (bit == 8) {
+      atPut i _dhtData byte
+      i += 1
+      byte = 0
+      bit = 1
+    } else {
+      byte = (byte << 1)
+      bit += 1
+    }
+    waitUntil (not (digitalReadOp pin))
+  }
+}
+
+to '_dhtReady' {
+  local 'elapsed' ((millisOp) - _dhtLastReadTime)
+  return (or (elapsed < 0) (elapsed > 2000))
+}
+
+to '_dhtUpdate' pin isDHT11 {
+  if ('_dhtReady') {
+    _dht_temperature = 0
+    _dht_humidity = 0
+    '_dhtReadData' pin
+    _dhtLastReadTime = (millisOp)
+  }
+  if ('_dhtChecksumOkay') {
+    if isDHT11 {
+      _dht_temperature = (at 3 _dhtData)
+      _dht_humidity = (at 1 _dhtData)
+    } else {
+      local 'n' (((at 1 _dhtData) * 256) + (at 2 _dhtData))
+      _dht_humidity = ((n + 5) / 10)
+      n = ((((at 3 _dhtData) & 127) * 256) + (at 4 _dhtData))
+      if (((at 3 _dhtData) & 128) != 0) {
+        n = (0 - n)
+      }
+      _dht_temperature = ((n + 5) / 10)
+    }
+  }
+}
+
+to humidity_DHT11 pin {
+  '_dhtUpdate' pin true
+  return _dht_humidity
+}
+
+to humidity_DHT22 pin {
+  '_dhtUpdate' pin false
+  return _dht_humidity
+}
+
+to temperature_DHT11 pin {
+  '_dhtUpdate' pin true
+  return _dht_temperature
+}
+
+to temperature_DHT22 pin {
+  '_dhtUpdate' pin false
+  return _dht_temperature
+}
+
+
+module Tone Output
+author MicroBlocks
+version 1 6 
+tags tone sound music audio note speaker 
+description 'Audio tone generation. Make music with MicroBlocks!'
+variables _tonePin _toneInitalized _toneLoopOverhead _toneNoteNames _toneArezzoNotes _toneFrequencies 
+
+  spec ' ' 'play tone' 'play note _ octave _ for _ ms' 'auto num num' 'C' 0 500
+  spec ' ' 'playMIDIKey' 'play midi key _ for _ ms' 'num num' 60 500
+  spec ' ' 'play frequency' 'play frequency _ for _ ms' 'num num' 261 500
+  spec ' ' 'attach buzzer to pin' 'attach buzzer to pin _' 'auto' ''
+  spec 'r' '_measureLoopOverhead' '_measureLoopOverhead'
+  spec 'r' '_baseFreqForNote' '_baseFreqForNote _' 'auto' 'c'
+  spec 'r' '_baseFreqForSemitone' '_baseFreqForSemitone _' 'num' 0
+  spec ' ' '_toneLoop' '_toneLoop _ for _ ms' 'num num' 440000 100
+  spec 'r' '_trimmedLowercase' '_trimmedLowercase _' 'str' 'A. b C...'
+
+to '_baseFreqForNote' note {
+  comment 'Return the frequency for the given note in the middle-C octave
+scaled by 1000. For example, return 440000 (440Hz) for A.
+Note names may be upper or lower case. Note names
+may be followed by # for a sharp or b for a flat.'
+  local 'normalized note' ('_trimmedLowercase' note)
+  if (_toneNoteNames == 0) {
+    _toneNoteNames = ('[data:makeList]' 'c' 'c#' 'd' 'd#' 'e' 'f' 'f#' 'g' 'g#' 'a' 'a#' 'b' 'c_' 'db' 'd_' 'eb' 'e_' 'e#' 'f_' 'gb' 'g_' 'ab' 'a_' 'bb' 'b_' 'b#')
+    _toneArezzoNotes = ('[data:makeList]' 'do' 'do#' 're' 're#' 'mi' 'fa' 'fa#' 'sol' 'sol#' 'la' 'la#' 'si' 'do_' 'dob' 're_' 'reb' 'mi_' 'mi#' 'fa_' 'solb' 'sol_' 'lab' 'la_' 'sib' 'si_' 'si#')
+  }
+  if (('[data:find]' (v 'normalized note') _toneArezzoNotes) > 0) {
+    return ('_baseFreqForSemitone' ('[data:find]' (v 'normalized note') _toneArezzoNotes))
+  } else {
+    return ('_baseFreqForSemitone' ('[data:find]' (v 'normalized note') _toneNoteNames))
+  }
+}
+
+to '_baseFreqForSemitone' semitone {
+  if (_toneFrequencies == 0) {_toneFrequencies = ('[data:makeList]' 261626 277183 293665 311127 329628 349228 369994 391995 415305 440000 466164 493883 246942 277183 277183 311127 311127 349228 329628 369994 369994 415305 415305 466164 466164 523252)}
+  if (and (1 <= semitone) (semitone <= (size _toneFrequencies))) {
+    return (at semitone _toneFrequencies)
+  } else {
+    comment 'Bad note name; return 10 Hz'
+    return 10000
+  }
+}
+
+to '_measureLoopOverhead' {
+  comment 'Measure the loop overhead on this device'
+  local 'halfCycle' 100
+  local 'startT' (microsOp)
+  repeat 100 {
+    digitalWriteOp _tonePin false
+    waitMicros halfCycle
+    digitalWriteOp _tonePin false
+    waitMicros halfCycle
+  }
+  local 'usecs' ((microsOp) - startT)
+  return ((usecs - 20000) / 200)
+}
+
+to '_toneLoop' scaledFreq ms {
+  if (_toneInitalized == 0) {'attach buzzer to pin' ''}
+  if ('[io:hasTone]') {
+    '[io:playTone]' _tonePin (scaledFreq / 1000)
+    waitMillis ms
+    '[io:playTone]' _tonePin 0
+  } else {
+    local 'halfCycle' ((500000000 / scaledFreq) - _toneLoopOverhead)
+    local 'cycles' ((ms * 500) / halfCycle)
+    repeat cycles {
+      digitalWriteOp _tonePin true
+      waitMicros halfCycle
+      digitalWriteOp _tonePin false
+      waitMicros halfCycle
+    }
+  }
+}
+
+to '_trimmedLowercase' s {
+  comment 'Return a copy of the given string without whitespace
+or periods and all lowercase.'
+  local 'result' (newList (size s))
+  '[data:delete]' 'all' result
+  for i (size s) {
+    local 'ch' ('[data:unicodeAt]' i s)
+    if (and (ch > 32) (ch != 46)) {
+      if (and (65 <= ch) (ch <= 90)) {ch = (ch + 32)}
+      '[data:addLast]' ch result
+    }
+  }
+  return ('[data:unicodeString]' result)
+}
+
+to 'attach buzzer to pin' pinNumber {
+  if (pinNumber == '') {
+    comment 'Pin number not specified; use default pin for this device'
+    if ((boardType) == 'Citilab ED1') {
+      _tonePin = 26
+    } ((boardType) == 'M5Stack-Core') {
+      _tonePin = 25
+    } ((boardType) == 'M5StickC') {
+      _tonePin = 26
+    } ((boardType) == 'Calliope') {
+      digitalWriteOp 23 true
+      digitalWriteOp 24 true
+      _tonePin = 25
+    } ((boardType) == 'D1-Mini') {
+      _tonePin = 12
+    } else {
+      _tonePin = -1
+    }
+  } else {
+    _tonePin = pinNumber
+  }
+  _toneLoopOverhead = ('_measureLoopOverhead')
+  _toneInitalized = (booleanConstant true)
+}
+
+to 'play frequency' freq ms {
+  '_toneLoop' (freq * 1000) ms
+}
+
+to 'play tone' note octave ms {
+  local 'freq' ('_baseFreqForNote' note)
+  if (freq <= 10000) {
+    waitMillis ms
+    return 0
+  }
+  if (octave < 0) {
+    repeat (absoluteValue octave) {
+      freq = (freq / 2)
+    }
+  }
+  repeat octave {
+    freq = (freq * 2)
+  }
+  '_toneLoop' freq ms
+}
+
+to playMIDIKey key ms {
+  local 'freq' ('_baseFreqForSemitone' ((key % 12) + 1))
+  local 'octave' ((key / 12) - 5)
+  if (octave < 0) {
+    repeat (absoluteValue octave) {
+      freq = (freq / 2)
+    }
+  }
+  repeat octave {
+    freq = (freq * 2)
+  }
+  '_toneLoop' freq ms
+}
+
