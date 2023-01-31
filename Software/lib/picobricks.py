@@ -8,7 +8,7 @@ import utime, time
 from machine import Pin, PWM
 from micropython import const
 import framebuf
-import rp2
+import rp2<
 from math import ceil
  
 ##########DHT11 Library##########
