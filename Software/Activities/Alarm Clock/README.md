@@ -15,3 +15,4 @@ In this project, we will create a timer alarm that adjusts for daylight using th
 ![image](https://user-images.githubusercontent.com/111511331/200263342-772449a9-c4c8-4449-93aa-9e65c58a27e5.png)
 
  
+[<img src="https://r.resimlink.com/Vyfc6Iol.png" width="80%">](https://www.youtube.com/watch?v=QFx235Ijx5k "Now in Android: 55")
