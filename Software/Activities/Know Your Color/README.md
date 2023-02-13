@@ -21,4 +21,4 @@ LEDs are often used on electronic systems. Each button can have small LEDs next 
 
 
 
-[<img src="https://i.ytimg.com/vi/Hmb4V0TCYb8/maxresdefault.jpg" width="80%">](https://www.youtube.com/watch?v=l0WbZn8R1Cs "Now in Android: 55")
+[<img src="https://r.resimlink.com/vG2YKPfFjpy.jpg" width="80%">](https://www.youtube.com/watch?v=l0WbZn8R1Cs "Now in Android: 55")
