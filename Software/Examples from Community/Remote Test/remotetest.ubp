@@ -1,0 +1,210 @@
+module main
+author unknown
+version 1 0 
+description ''
+variables 'IR code' 
+
+script 470 112 {
+whenStarted
+attachIR 0
+forever {
+  'IR code' = (receiveIR)
+  sayIt ('[data:join]' 'Button ' (at ('[data:find]' (v 'IR code') ('[data:makeList]' 69 70 71 68 64 67 7 21 9 22 25 13 24 8 28 90 82)) ('[data:makeList]' 1 2 3 4 5 6 7 8 9 '*' 0 '#' 'Arrow Up' 'Arrow Left' 'OK' 'Arrow Right' 'Arrow Down')) ' Pressed')
+  sendBroadcast (v 'IR code')
+}
+}
+
+script 98 421 {
+whenBroadcastReceived '69'
+sayIt 'Button 1 pressed'
+}
+
+script 288 427 {
+whenBroadcastReceived '71'
+sayIt 'Button 3 pressed'
+}
+
+script 94 512 {
+whenBroadcastReceived '70'
+sayIt 'Button 2 pressed'
+}
+
+script 289 518 {
+whenBroadcastReceived '68'
+sayIt 'Button 4 pressed'
+}
+
+
+module 'IR Remote' Comm
+author MicroBlocks
+version 1 2 
+tags ir infrared remote 
+description 'Sends and receives infrared remote control messages like the ones used for TV sets or air conditioners. Currently supports only the NEC protocol, which is quite common but not the only IR protocol in use. An NEC message consists of a one byte device number and a one byte command. 
+
+Note: Transmitting IR does not work on ESP8266 boards.
+
+Receiving requires an IR receiver module, such as those built into the Circuit Playground Express and ED1 boards. Transmitting requires an IR transmitter LED, such as those built into the Circuit Playground Express and several M5 Stack products. Inexpensive IR LED transmitter and receivers are available for use with other boards.'
+variables _ir_pin _ir_pulse_times _ir_transmit_pin 
+
+  spec 'r' 'receiveIR' 'receive IR code'
+  spec ' ' 'attachIR' 'attach IR receiver to pin _' 'num' 0
+  spec ' ' '_testIR' 'test IR'
+  spec 'r' '_receiveIRFromDevice' 'receive IR code from device _' 'num' -1
+  spec ' ' '_captureIRMessage' '_captureIRMessage' 'any'
+  spec ' ' '_dumpIR' '_dumpIR' 'any'
+  spec 'r' '_getIRByte' '_getIRByte _' 'auto any' 4
+  spec 'r' '_got32Bits' '_got32Bits' 'any'
+  spec ' ' 'IR_Transmit' 'IR transmit device _ command _' 'num num' 48896 1
+  spec ' ' '_IR_SendByte' '_IR_SendByte _' 'auto' '10'
+
+to IR_Transmit device command {
+  if (_ir_transmit_pin == 0) {if (or ((boardType) == 'CircuitPlayground') ((boardType) == 'M5Atom-Matrix')) {
+    _ir_transmit_pin = 12
+  } ((boardType) == 'M5StickC') {
+    _ir_transmit_pin = 9
+  }}
+  comment 'Message start pulse and space'
+  '[io:playTone]' _ir_transmit_pin 38000
+  waitMicros 9000
+  '[io:playTone]' _ir_transmit_pin 0
+  waitMicros 4500
+  comment 'Send device and command and their inverses'
+  '_IR_SendByte' (device & 255)
+  '_IR_SendByte' ((device >> 8) & 255)
+  '_IR_SendByte' command
+  '_IR_SendByte' ('~' command)
+  comment 'Send stop bit'
+  '[io:playTone]' _ir_transmit_pin 38000
+  waitMicros 562
+  '[io:playTone]' _ir_transmit_pin 0
+}
+
+to '_IR_SendByte' byte {
+  local 'bit' 1
+  repeat 8 {
+    if (0 == (byte & bit)) {
+      '[io:playTone]' _ir_transmit_pin 38000
+      waitMicros 530
+      '[io:playTone]' _ir_transmit_pin 0
+      waitMicros 530
+    } else {
+      '[io:playTone]' _ir_transmit_pin 38000
+      waitMicros 530
+      '[io:playTone]' _ir_transmit_pin 0
+      waitMicros 1630
+    }
+    bit = (bit << 1)
+  }
+}
+
+to '_captureIRMessage' {
+  if (_ir_pulse_times == 0) {
+    _ir_pulse_times = (newList 200)
+    if (and (_ir_pin == 0) ((boardType) == 'CircuitPlayground')) {
+      _ir_pin = 11
+    } (and (_ir_pin == 0) ((boardType) == 'Citilab ED1')) {
+      _ir_pin = 35
+    } (and (_ir_pin == 0) ((boardType) == 'D1-Mini')) {
+      _ir_pin = 2
+    }
+  }
+  fillList _ir_pulse_times 0
+  local 'i' 1
+  comment 'Wait for IR signal -- this is the start of a new message.
+Note: THe pin goes low when an IR signal is detected.'
+  waitUntil (not (digitalReadOp _ir_pin))
+  local 'start' (microsOp)
+  forever {
+    comment 'Record the time until the end of the current IR pulse ("mark")'
+    waitUntil (digitalReadOp _ir_pin)
+    local 'end' (microsOp)
+    atPut i _ir_pulse_times (end - start)
+    i += 1
+    start = end
+    comment 'Record time until the start of the next IR pulse ("space")'
+    repeatUntil (not (digitalReadOp _ir_pin)) {
+      if (((microsOp) - start) > 5000) {
+        comment 'No IR pulse for 5000 usecs means "end of message"'
+        return 0
+      }
+    }
+    local 'end' (microsOp)
+    atPut i _ir_pulse_times (end - start)
+    i += 1
+    start = end
+  }
+}
+
+to '_dumpIR' {
+  comment 'Print raw pulse timings to the terminal.
+Can be used to analyze new protocols.'
+  local 'i' 1
+  printIt '-----'
+  repeat (size _ir_pulse_times) {
+    local 'mark usecs' (at i _ir_pulse_times)
+    local 'space usecs' (at (i + 1) _ir_pulse_times)
+    printIt (v 'mark usecs') (v 'space usecs')
+    i += 2
+    if ((v 'space usecs') == 0) {
+      printIt 'timing entries:' (i - 2)
+      return 0
+    }
+  }
+}
+
+to '_getIRByte' position {
+  local 'result' 0
+  local 'i' position
+  local 'bit' 1
+  repeat 8 {
+    if ((at i _ir_pulse_times) > 1000) {result = (result | bit)}
+    bit = (bit << 1)
+    i += 2
+  }
+  return result
+}
+
+to '_got32Bits' {
+  return (and ((at 67 _ir_pulse_times) != 0) ((at 68 _ir_pulse_times) == 0))
+}
+
+to '_receiveIRFromDevice' deviceID {
+  forever {
+    '_captureIRMessage'
+    if ('_got32Bits') {
+      local 'id' ('_getIRByte' 20 nil)
+      if (id == deviceID) {
+        return ('_getIRByte' 36 nil)
+      }
+    }
+  }
+}
+
+to '_testIR' {
+  forever {
+    '_captureIRMessage'
+    if ('_got32Bits') {
+      comment 'Four byte message format:
+<device low byte><device high byte><command><command, bit-inverted>'
+      local 'b1' ('_getIRByte' 4 nil)
+      local 'b2' ('_getIRByte' 20 nil)
+      local 'b3' ('_getIRByte' 36 nil)
+      local 'b4' ('_getIRByte' 52 nil)
+      sayIt 'Device:' ((b2 << 8) | b1) 'code:' b3
+    }
+  }
+}
+
+to attachIR pin {
+  _ir_pin = pin
+}
+
+to receiveIR {
+  forever {
+    '_captureIRMessage'
+    if ('_got32Bits') {
+      return ('_getIRByte' 36 nil)
+    }
+  }
+}
+
