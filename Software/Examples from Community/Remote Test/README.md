@@ -1,5 +1,5 @@
 ## Microblocks
-Created by [PeterMathijssen] (https://community.robotistan.com/profile/PeterMathijssen "PeterMathijssen")
+Created by [PeterMathijssen](https://community.robotistan.com/profile/PeterMathijssen "PeterMathijssen")
 
 The latest PicoBricks has a Raspberry Pi Pico W. That is why it has an IR sensor instead of a WiFi slot. To test your IR sensor with the remote you get with your Zero to Hero kit, you can use this script.
 
