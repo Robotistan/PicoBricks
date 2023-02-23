@@ -27,5 +27,6 @@ while True:
     utime.sleep(0.01)
     if int(getDistance())<=10:
         servo.duty_u16(4010) #70 degree
-        utime.sleep(0.3)
+        utime.sleep(1)
+    else:
         servo.duty_u16(1920)
