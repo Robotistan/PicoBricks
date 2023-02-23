@@ -28,6 +28,7 @@ def getDistance():
 while True:
     utime.sleep(0.01)
     if int(getDistance())<=5:  #if the distance variable is less than 5
-        servo.duty_u16(4010) 
-        utime.sleep(0.3)  #wait
+        servo.duty_u16(4010)
+        utime.sleep(1)  #wait
+    else:
         servo.duty_u16(6750)  
