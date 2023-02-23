@@ -1,5 +1,5 @@
 from machine import Pin, PWM
-from utime import sleep
+import utime
 
 servo=PWM(Pin(21,Pin.OUT))
 trigger = Pin(15, Pin.OUT)
@@ -24,7 +24,7 @@ def getDistance():
    return distance
 
 while True:
-    sleep(0.01)
+    utime.sleep(0.01)
     if int(getDistance())<=10:
         servo.duty_u16(4010) #70 degree
         utime.sleep(0.3)
