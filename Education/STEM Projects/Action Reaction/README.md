@@ -24,4 +24,4 @@ Every block we drag under this block works when the button is not pressed. Since
 ![allScripts11660](https://user-images.githubusercontent.com/112697142/222450699-b740b820-2bda-41d0-b9e0-8395da316cd7.png)
 
 
-##### You can access the Microblocks test code by dragging the image to the Microblocks Run tab or clicking [here](https://picobricks.com/action-reaction/ "here").
+##### [Click](https://picobricks.com/action-reaction/ "Click") to see the details of the project.
