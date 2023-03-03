@@ -15,4 +15,41 @@ Potentiometer is an analog input module. It is variable resistance. As the amoun
 - Repeat the second step twice.
 - Apply the second step until the button is pressed again.
 
-##### You can access the Microblocks test code by dragging the image to the Microblocks Run tab or clicking [here](https://microblocks.fun/run/microblocks.html#scripts=GP%20Scripts%0Adepends%20%27OLED%20Graphics%27%20%27PicoBricks%27%20%27Servo%27%20%27Temperature%20Humidity%20%28DHT11%2C%20DHT22%29%27%0A%0Ascript%20531%20-15%20%7B%0AwhenCondition%20%28pb_button%29%0AOLEDInit_I2C%20%27OLED_0.96in%27%20%273C%27%200%20false%0AOLEDwrite%20%27Hello%20Picobricks%27%200%200%20false%0AOLEDwrite%20%27Temperature%3A%27%200%2010%20false%0AOLEDwrite%20%28temperature_DHT11%2011%29%2095%2010%20false%0AOLEDwrite%20%27Humudity%3A%27%200%2020%20false%0AOLEDwrite%20%28humidity_DHT11%2011%29%2070%2020%20false%0Apb_set_red_LED%20true%0Apb_set_rgb_color%20%28colorSwatch%20200%2039%2014%20255%29%0AwaitMillis%20500%0Apb_set_rgb_color%20%28colorSwatch%202%20190%207%20255%29%0AwaitMillis%20500%0Apb_set_rgb_color%20%28colorSwatch%2012%2022%20190%20255%29%0AwaitMillis%20500%0Apb_set_rgb_color%20%28colorSwatch%20190%20179%205%20255%29%0Apb_beep%20500%0Apb_turn_off_RGB%0Apb_set_relay%20true%0AwaitMillis%201000%0Apb_set_relay%20false%0AsetServoAngle%2021%2090%0AsetServoAngle%2022%2045%0Apb_set_motor_speed%201%20100%0Apb_set_motor_speed%202%20100%0Aforever%20%7B%0A%20%20OLEDwrite%20%27Pot%3A%27%200%2030%20false%0A%20%20OLEDwrite%20%28%27%5Bdata%3AcopyFromTo%5D%27%20%28%27%5Bdata%3Ajoin%5D%27%20%28pb_potentiometer%29%20%27%20%20%27%29%201%204%29%2040%2030%20false%0A%7D%0A%7D%0A%0Ascript%201061%2015%20%7B%0AwhenCondition%20%28%28pb_light_sensor%29%20%3C%2090%29%0Apb_set_rgb_color%20%28colorSwatch%20200%2039%2014%20255%29%0AwaitMillis%20500%0Apb_set_rgb_color%20%28colorSwatch%202%20190%207%20255%29%0AwaitMillis%20500%0Apb_set_rgb_color%20%28colorSwatch%2012%2022%20190%20255%29%0AwaitMillis%20500%0A%7D%0A%0A "here").
+#### MicroBlocks Code of The Project
+Since we will print the speed value from the potentiometer on the OLED display when the project starts, let's start the OLED display and print "Speed:" on the display.
+
+Let's assign the value from the potentiometer to a variable named "rhythm". The value of the potentiometer is between 0-1023. We will use the "rescale" block  to change this value range to 1-7. This block is included in the operator blocks, but it is an advanced block. After clicking “show advanced blocks”, it will appear between operator blocks.
+
+![image](https://user-images.githubusercontent.com/112697142/222668615-b34ccaf7-6e08-4a9f-9f13-6ae5aeced14c.png)
+
+Let’s create the following code blocks to reduce the value of the potentiometer between 1-7 and define it to a variable called “rhythm”.
+![image](https://user-images.githubusercontent.com/112697142/222670020-1c9bc1f6-f004-479d-919b-7538d9ab1ffa.png)
+
+Let's print this variable on the OLED display. Then, let's create another variable called “beat” and define this value as 1000 / “rhythm” variable. This action determines how many seconds the tones will sound. Wait 50 milliseconds after this process.
+
+![image](https://user-images.githubusercontent.com/112697142/222670161-03105860-8c17-45bb-b2cc-e798a5f8010e.png)
+
+Since I want these steps to continue continuously, let’s drag it into the “forever” block.
+
+![image](https://user-images.githubusercontent.com/112697142/222670288-36935c00-09f3-4c57-a0f1-767de3d6b84c.png)
+
+#### After pressing the button, let’s do the following steps to make the tones play at the speed we have determined.
+
+![image](https://user-images.githubusercontent.com/112697142/222670433-453436b2-e75c-4e0f-b4f4-0307da3c4727.png)
+
+1. Now, let’s install the “Tone” library and set the tones required for our melody. Then, we determine how many milliseconds these tones will play with the “beat” variable.
+
+![image](https://user-images.githubusercontent.com/112697142/222670779-30ce0074-3a6f-4f79-be80-3c346f793271.png)
+
+2. Since we want to create a melody by repeating these tones twice, let's take them into the "repeat" block and set the repeat value to 2.
+
+![image](https://user-images.githubusercontent.com/112697142/222670952-651e88ab-c3c0-4848-9f34-a6040137b4fb.png)
+
+
+
+#### The Code of The Project Is Ready!
+
+![allScripts14501](https://user-images.githubusercontent.com/112697142/222666654-c008cc23-4b1a-4304-ba26-6aabcfdd191f.png)
+
+
+##### You can access the Microblocks test code by dragging the image to the Microblocks Run tab or clicking [here](https://picobricks.com/dominate-the-rhythm/ "here").
