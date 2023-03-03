@@ -1,6 +1,8 @@
 ## Action Reaction
 As Newton explained in his laws of motion, a reaction occurs against every action. Electronic systems receive commands from users and perform their tasks. Usually, a keypad, touch screen, or button is used for this job. Electronic devices respond verbally, in writing, or visually to inform the user that their task is over and what is going on during the task. In addition to informing the user of these reactions, it can help to understand where the fault may be in a possible malfunction.
 
+![image](https://user-images.githubusercontent.com/112697142/222731749-289cc318-c4ff-4549-a5f1-bf99fe4f7cf9.png)
+
 #### Project Details
 Different types of buttons are used in electronic systems. Locked buttons, push buttons, switched buttons... There is 1 push button on Picobricks. They work like a switch, they conduct current when pressed and do not conduct current when released. In the project, we will understand the pressing status by checking whether the button conducts current or not. If it is pressed, it will light the LED, if it is not pressed, we will turn off the LED.
 
