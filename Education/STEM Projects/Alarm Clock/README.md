@@ -45,4 +45,4 @@ After pressing the button, let's print "Have a nice day" on the OLED screen, tur
 
 ![allScripts6850](https://user-images.githubusercontent.com/112697142/222710088-be44d30b-b4e2-4c14-9881-1cf8b9fbd301.png)
 
-##### [Click](https://picobricks.com/alarm-clock/ "here") to see the details of the project.
+##### [Click](https://picobricks.com/alarm-clock/ "Click") to see the details of the project.
