@@ -1,4 +1,4 @@
-## Traffic Pass System
+## Traffic Barrier System
 PicoBricks Traffic Barrier System is a PicoBricks educational kit that allows passing when it detects an object on it thanks to the LDR sensor positioned on a wooden road. Traffic Barrier System uses the LDR sensor, RGB LED, motor driver and buzzer module from PicoBricks modules. In addition, a servo motor is included in the set to be attached to the motor driver module.
 
 
