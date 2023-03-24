@@ -97,7 +97,6 @@ ir = NEC_16(Pin(0, Pin.IN), ir_callback)
 motor_1 = Pin(21, Pin.OUT)
 motor_2 = Pin(22, Pin.OUT)
 button.irq(trigger=Pin.IRQ_RISING, handler=buttonInterruptHandler)  # Button 1 pressed interrupt is set. buttonInterruptHandler function will run when button is pressed
-screen1 = [[0, 0 , 'ip = ' + status[0]]]
 oled.fill(0)
 oled.blit(fb1, 0, 0)
 oled.show()
@@ -118,6 +117,7 @@ else:
     status = wlan.ifconfig()
     print( 'ip = ' + status[0] )
     
+screen1 = [[0, 0 , 'ip = ' + status[0]]]    
 # Testing LED and Relay
 relay.high()
 time.sleep(0.5)
