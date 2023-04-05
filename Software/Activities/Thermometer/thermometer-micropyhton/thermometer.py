@@ -13,10 +13,14 @@ i2c=machine.I2C(0, sda=sda, scl=scl, freq=2000000)#determine the frequency value
 oled=SSD1306_I2C(WIDTH, HEIGHT, i2c)
 pico_temp=DHT11(Pin(11))
 current_time=utime.time()
+
 while True:
-    if(utime.time() - current_time > 2):
+    if utime.time() - current_time >= 3:
         current_time = utime.time()
-        pico_temp.measure()
+        try:
+            pico_temp.measure()
+        except Exception as e:
+            print("Temp Hum Data might be old")
         oled.fill(0)#clear OLED
         oled.show()
         temperature=pico_temp.temperature
