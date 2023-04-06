@@ -4,29 +4,28 @@ version 1 0
 description ''
 variables potentiometer 
 
-script 88 43 {
+script 61 52 {
 whenStarted
-wifiConnect '--------------------' '----------------------'
-comment 'Type the information of your Wi-Fi network in the empty fields.'
+wifiConnect 'robotistan metro34' 'bmc34RbT124'
 waitMillis 500
 OLEDInit_I2C 'OLED_0.96in' '3C' 0 false
 OLEDwrite ('[data:join]' 'IP: ' (getIPAddress)) 0 0 false
-comment '1-RGB LED & OLED Screen
+comment '1=RGB LED & OLED Screen
 2-Red LED
 3-Temp & Hum
-4-Role
-5-Motor Driver
-6-buzzer
-7-Potansiyometre'
+4-Relay and Stop Motors
+5-Motors
+7-buzzer
+8-Potantiometer'
 }
 
-script 622 104 {
+script 595 113 {
 whenCondition ((receiveIR) == 69)
 OLEDwrite 'Hello PicoBricks' 0 10 false
 pb_set_rgb_color (colorSwatch 20 49 190 255)
 }
 
-script 1101 132 {
+script 1074 141 {
 whenCondition ((receiveIR) == 28)
 OLEDclear
 pb_turn_off_RGB
@@ -35,12 +34,12 @@ pb_set_motor_speed 1 0
 pb_set_motor_speed 2 0
 }
 
-script 622 257 {
+script 595 266 {
 whenCondition ((receiveIR) == 70)
 pb_set_red_LED true
 }
 
-script 95 331 {
+script 68 340 {
 whenCondition (pb_button)
 repeat 5 {
   pb_set_rgb_color (colorSwatch 30 24 190 255)
@@ -52,7 +51,7 @@ repeat 5 {
 pb_turn_off_RGB
 }
 
-script 1092 334 {
+script 1065 343 {
 whenCondition ((pb_light_sensor) < 60)
 repeat 5 {
   pb_set_rgb_color (colorSwatch 30 24 190 255)
@@ -64,12 +63,7 @@ repeat 5 {
 }
 }
 
-script 357 368 {
-whenCondition ((receiveIR) == 67)
-pb_beep 500
-}
-
-script 630 380 {
+script 603 389 {
 whenCondition ((receiveIR) == 71)
 OLEDwrite 'Temperature: ' 0 20 false
 OLEDwrite (pb_temperature) 100 20 false
@@ -77,25 +71,32 @@ OLEDwrite 'Humidity: ' 0 30 false
 OLEDwrite (pb_humidity) 100 30 false
 }
 
-script 96 602 {
-whenCondition ((receiveIR) == 7)
+script 70 611 {
+whenCondition ((receiveIR) == 21)
 forever {
-  OLEDwrite 'POT:' 0 40 false
+  OLEDwrite 'Potentiometer:' 0 40 false
   OLEDwrite ('[misc:rescale]' (pb_potentiometer) 0 1023 0 9) 100 40 false
 }
 }
 
-script 1099 622 {
+script 1072 631 {
 whenCondition ((receiveIR) == 64)
 pb_set_motor_speed 1 100
 pb_set_motor_speed 2 100
 }
 
-script 642 626 {
+script 616 635 {
 whenCondition ((receiveIR) == 68)
 pb_set_relay true
 waitMillis 500
 pb_set_relay false
+pb_set_motor_speed 1 0
+pb_set_motor_speed 2 0
+}
+
+script 1067 794 {
+whenCondition ((receiveIR) == 7)
+pb_beep 500
 }
 
 
