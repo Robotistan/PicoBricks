@@ -8,6 +8,12 @@
 
 ## The Project Video
 
+<p align="center">
+  <video src="https://user-images.githubusercontent.com/112697142/230607463-06d4b199-33a4-4dab-84db-df82a9cb4b4a.mp4" width=400/>
+<p/>
+
+
+
 ## PicoBricks Modules That You Need
 - RGB LED
 - OLED Display
