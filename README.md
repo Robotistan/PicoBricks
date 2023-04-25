@@ -88,6 +88,7 @@ You may obtain a copy of the License at
  See the License for the specific language governing permissions and
  limitations under the License.
 
+![Logo](https://user-images.githubusercontent.com/96052488/204985653-2f4abb78-9bd9-479f-b04d-71d595c210e7.jpeg)
 
 ## Note
 If you have any questions, please contact technical support on our [Robotistan Community](https://community.robotistan.com/).
