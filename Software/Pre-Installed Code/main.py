@@ -156,7 +156,6 @@ while True:
         try:
             dht_sensor.measure()
         except Exception as e:
-            print("Warning: could not measure: " + str(e))
             pass
     oled.fill(0)
     oled.text("PICOBRICKS",30, 0)
