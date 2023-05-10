@@ -5,5 +5,6 @@ PicoBricks Safe Box is an educational project kit that aims to make a case that 
 
 PicoBricks modules to use with wooden parts in the PicoBricks Safe Box kit: OLED screen, button&LED, motor driver, LDR sensor and potentiometer module are used.
 
+#### - You can watch the PicoBricks SafeBox video by clicking [here](https://youtu.be/vjeR2RnyNlo "here").
 
-You can access **ASCII Encryption-Decryption** project by clicking [here](https://github.com/Robotistan/PicoBricks/tree/main/Software/Examples%20from%20Community/ASCII%20Encryption-Decryption "here").
+#### - You can access ASCII Encryption-Decryption project by clicking [here](https://github.com/Robotistan/PicoBricks/tree/main/Software/Examples%20from%20Community/ASCII%20Encryption-Decryption "here").
