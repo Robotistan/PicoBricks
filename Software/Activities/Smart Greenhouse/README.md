@@ -6,5 +6,7 @@ The greenhouse model you will prepare will include a soil moisture sensor, and a
 
 ## Wiring Diagram
 
-![image](https://user-images.githubusercontent.com/111511331/200298365-99b930cb-0fb9-40bb-8065-b4cf37986703.png)
-  
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/112697142/234199607-a915df8a-d267-45e0-a949-33c6a9f96216.png" alt="animated" />
+</p>
+

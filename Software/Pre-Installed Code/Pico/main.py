@@ -4,7 +4,6 @@ from picobricks import SSD1306_I2C, WS2812, DHT11, NEC_16, IR_RX
 from resources import Note_img, Picobricks_img, Tones, Song
 import framebuf
 import random
-import network
 WIDTH  = 128   # oled display width
 HEIGHT = 64    # oled display height
 NOTE_DURATION = 0.11
@@ -13,15 +12,6 @@ NOTE_DURATION = 0.11
 ir_data = 0
 data_rcvd = False
 
-#Connect to Wifi
-ssid = "SSID"
-password = "PASSWORD"
-wlan = network.WLAN(network.STA_IF)
-wlan.active(True)
-wlan.connect(ssid, password)
-max_wait = 10
-
-status = wlan.ifconfig()
 i2c = I2C(0, scl=Pin(5), sda=Pin(4), freq=200000)   # Init I2C using pins
 oled = SSD1306_I2C(WIDTH, HEIGHT, i2c, addr=0x3c)   # Init oled display
 fb1 = framebuf.FrameBuffer(Picobricks_img, 128,64 , framebuf.MONO_HLSB) # Creating framebuffer for PicoBricks Logo
@@ -94,26 +84,10 @@ ir = NEC_16(Pin(0, Pin.IN), ir_callback)
 motor_1 = Pin(21, Pin.OUT)
 motor_2 = Pin(22, Pin.OUT)
 button.irq(trigger=Pin.IRQ_RISING, handler=buttonInterruptHandler)  # Button 1 pressed interrupt is set. buttonInterruptHandler function will run when button is pressed
-screen1 = [[0, 0 , 'ip = ' + status[0]]]
-oled.fill(0)
 oled.blit(fb1, 0, 0)
 oled.show()
 
 dht_read_time = time.time() # Defined a variable to keep last DHT11 read time
-
-while max_wait > 0:
-    if wlan.status() < 0 or wlan.status() >= 3:
-        break
-    max_wait -=1
-    print("waiting for connection...")
-    time.sleep(1)
-    
-if wlan.status() !=3:
-    print('network connection failed. Please Check ID and PASSWORD')
-else:
-    print('connected')
-    status = wlan.ifconfig()
-    print( 'ip = ' + status[0] )
     
 # Testing LED and Relay
 relay.high()
@@ -182,7 +156,6 @@ while True:
         try:
             dht_sensor.measure()
         except Exception as e:
-            print("Warning: could not measure: " + str(e))
             pass
     oled.fill(0)
     oled.text("PICOBRICKS",30, 0)
@@ -190,7 +163,6 @@ while True:
     oled.text("LIGHT:    {0:.2f}%".format((65535.0 - light_level.read_u16())/650.0),0,20)
     oled.text("TEMP:     {0:.2f}C".format(dht_sensor.temperature),0,30)
     oled.text("HUMIDITY: {0:.1f}%".format(dht_sensor.humidity),0,40)
-    oled.text("IP:" + status[0],0,50)
     oled.show()
     time.sleep(1)
     oled.fill(0)
