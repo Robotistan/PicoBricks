@@ -608,13 +608,11 @@ class IR_RX():
     number_4 = 0x44
     number_5 = 0x40
     number_6 = 0x43
-    number_7 = 0x07
-    number_8 = 0x15
-    number_9 = 0x09
     number_ok = 0x1c
     number_up = 0x18
     number_right = 0x5a
     number_left = 0x08
+    number_down = 0x52
     def __init__(self, pin, nedges, tblock, callback, *args):  # Optional args for callback
         self._pin = pin
         self._nedges = nedges
