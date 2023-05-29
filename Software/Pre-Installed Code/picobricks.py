@@ -601,7 +601,20 @@ class IR_RX():
     OVERRUN = -5
     BADDATA = -6
     BADADDR = -7
-
+    
+    number_1 = 0x45
+    number_2 = 0x46
+    number_3 = 0x47
+    number_4 = 0x44
+    number_5 = 0x40
+    number_6 = 0x43
+    number_7 = 0x07
+    number_8 = 0x15
+    number_9 = 0x09
+    number_ok = 0x1c
+    number_up = 0x18
+    number_right = 0x5a
+    number_left = 0x08
     def __init__(self, pin, nedges, tblock, callback, *args):  # Optional args for callback
         self._pin = pin
         self._nedges = nedges
@@ -621,11 +634,14 @@ class IR_RX():
     def _cb_pin(self, line):
         t = utime.ticks_us()
         # On overrun ignore pulses until software timer times out
+        
         if self.edge <= self._nedges:  # Allow 1 extra pulse to record overrun
             if not self.edge:  # First edge received
                 self.tim.init(period=self._tblock , mode=Timer.ONE_SHOT, callback=self.cb)
             self._times[self.edge] = t
             self.edge += 1
+        if self.edge > 68 :
+            self.edge = 0
 
     def do_callback(self, cmd, addr, ext, thresh=0):
         self.edge = 0
