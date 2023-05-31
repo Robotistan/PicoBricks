@@ -611,10 +611,15 @@ class IR_RX():
     number_7 = 0x07
     number_8 = 0x15
     number_9 = 0x09
+    number_0 = 0x19
     number_ok = 0x1c
     number_up = 0x18
+    number_down = 0x52
     number_right = 0x5a
     number_left = 0x08
+    number_star= 0x16
+    number_sharp= 0x0d
+    
     def __init__(self, pin, nedges, tblock, callback, *args):  # Optional args for callback
         self._pin = pin
         self._nedges = nedges
