@@ -55,20 +55,7 @@ def buttonInterruptHandler(event):    # Interrupt event, that will work when but
                 ws2812.pixels_show()
             time.sleep(NOTE_DURATION*note[1])
             
-def scroll_in_screen(screen):
-  for i in range (0, WIDTH+1, 2):
-    for line in screen:
-      oled.text(line[2], -WIDTH+i, line[1])
-    oled.show()
-    if i!= WIDTH:
-      oled.fill(0)
-def scroll_out_screen(speed):
-  for i in range ((WIDTH+1)/speed):
-    for j in range (WIDTH):
-      oled.pixel(i, j, 0)
-    oled.scroll(speed,0)
-    oled.show()
-    
+
 # Pin Initialization
 buzzer = PWM(Pin(20)) # setting GP20 as PWM pin
 buzzer.duty_u16(0)    # setting duty cycle to 0
@@ -147,10 +134,7 @@ while True:
             motor_1.low()
             motor_2.low()
             led.low()
-        if ir_data == IR_RX.number_up:
-            scroll_in_screen(screen1)
-            scroll_out_screen(4)
-            
+        
     if time.time() - dht_read_time >= 3:
         dht_read_time = time.time()
         try:
