@@ -13,7 +13,7 @@ while True:
     print(pot_val)
     time.sleep(0.5)
     
-    if pot_val > 150:
+    if pot_val > 350:
         motor_1.duty_u16(pot_val)
     else:
         motor_1.duty_u16(0)
