@@ -18,9 +18,8 @@ LDR sensor module is used to detect the intensity of light. When there is light,
 Relays are switches that open and close circuits electromechanically or electronically. Relays control one electrical circuit by opening and closing contacts in another circuit.
 - ##### Potentiometer
 A potentiometer is defined as a 3 terminal variable resistor in which the resistance is manually varied to control the flow of electric current. 
-- ##### ESP8266
-ESP8266 is a low Wi-Fi microcontroller with full TCP/IP stack. It has many GPIO (general purpose input output pins) for interfacing with different sensors. ESP8266 due to its good functionality is used a lot in prototyping IOT products.
-Its cross functionality with Arduino makes it easy to program with Arduino IDE.
+- ##### Infrared and Bluetooth Module
+Infrared and Bluetooth module is used to provide remote control and wireless communication by UART communication protocol.
 - ##### Buzzer
 A buzzer or beeper is an signaling device, which produces sound. 
 - ##### Protoboard
