@@ -1,5 +1,0 @@
-## MicroBlocks Code of The Project
-
-![trf_ps_s (1)](https://user-images.githubusercontent.com/112697142/228459723-8b3d94a5-4ab8-4534-a673-103a8bfb6c06.png)
-
-##### You can access the Microblocks code of the project by dragging the image to the Microblocks Run tab or clicking [here](https://microblocks.fun/run/microblocks.html#scripts=GP%20Scripts%0Adepends%20%27PicoBricks%27%20%27Servo%27%0A%0Ascript%20531%2078%20%7B%0AwhenStarted%0Aservo%20%3D%200%0AsetServoAngle%2021%20servo%0Aforever%20%7B%0A%20%20pb_set_rgb_color%20%28pb_rgb_color%20255%200%200%29%0A%20%20waitUntil%20%28%28pb_light_sensor%29%20%3C%2030%29%0A%20%20pb_set_rgb_color%20%28pb_rgb_color%20255%20255%200%29%0A%20%20repeatUntil%20%28servo%20%3E%3D%2090%29%20%7B%0A%20%20%20%20servo%20%2B%3D%205%0A%20%20%20%20setServoAngle%2021%20servo%0A%20%20%20%20pb_beep%2050%0A%20%20%7D%0A%20%20pb_set_rgb_color%20%28pb_rgb_color%200%20255%200%29%0A%20%20waitMillis%202000%0A%20%20repeatUntil%20%28servo%20%3C%3D%200%29%20%7B%0A%20%20%20%20servo%20%2B%3D%20-5%0A%20%20%20%20setServoAngle%2021%20servo%0A%20%20%20%20pb_beep%2050%0A%20%20%7D%0A%7D%0A%7D%0A%0A "here").
