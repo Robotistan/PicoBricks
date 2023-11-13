@@ -1,7 +1,10 @@
 ## Ferris Wheel
 A Ferris wheel is an amusement vehicle in which seating is positioned around a circle that spins around the axis of a revolving wheel. 
 
-![WhatsApp-Video-2023-03-10-at-13 57 17-_online-video-cutter com_-_1_](https://user-images.githubusercontent.com/112697142/224305328-0293eaa3-41d6-4ba4-9047-68c849bd0635.gif)
+
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/112697142/224305328-0293eaa3-41d6-4ba4-9047-68c849bd0635.gif" />
+</p>
 
 
 
