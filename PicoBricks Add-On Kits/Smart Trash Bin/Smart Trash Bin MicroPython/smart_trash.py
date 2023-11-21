@@ -5,8 +5,8 @@ import utime
 #define the libraries
 servo=PWM(Pin(21,Pin.OUT))
 
-trigger = Pin(7, Pin.OUT)
-echo = Pin(10, Pin.IN)
+trigger = Pin(15, Pin.OUT)
+echo = Pin(14, Pin.IN)
 pos = 5000
 
 servo.freq(50)
@@ -39,4 +39,3 @@ while True:
             pos -=2
             servo.duty_u16(pos) #70 degree
             utime.sleep(0.001)
-
