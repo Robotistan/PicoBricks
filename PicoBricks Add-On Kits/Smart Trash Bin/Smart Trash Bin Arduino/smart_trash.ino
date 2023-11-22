@@ -24,9 +24,9 @@ void loop() {
     state = 1;
     Serial.print(distance);
     Serial.println(" cm");
-    for(int i=100; i<179; i++){
+    for(int i=50; i<179; i=i+1){
       servo.write(i); 
-      delay(25);
+      delay(3);
     }
     delay(2000);
   }
@@ -35,9 +35,9 @@ void loop() {
     Serial.println(" cm");
     if(state == 1){
       state = 0;
-      for(int i=179; i>100; i=i-5){
+      for(int i=179; i>50; i=i-5){
         servo.write(i); 
-        delay(50);
+        delay(25);
       }
     }
   }
