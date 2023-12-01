@@ -1,2 +1,2 @@
-## PicoBricks Add-On Kits
+## PicoBricks STEM Activity Kits
 
