@@ -1,15 +1,11 @@
-## Smart Trash Bin
-The smart trash bin, is an educational robotic programming kit that aims to raise awareness of the clean environment entertainingly by making children robotic coding.
+## Robot Car
+Tanks, with their tracked structures, are vehicles that can easily maneuver in rough terrains. Tracks consist of multiple rows of wheels or rollers surrounded by a belt.
+
+<p align="center">
+  <img src="https://github.com/Robotistan/PicoBricks/assets/112697142/077a6005-6d56-45b3-a2b2-e99bb6aaa34f" alt="Sublime's custom image"/>
+</p>
+
+PicoBricks Robot Car Kit, is a wooden project kit that uses two DC motors and tracks. We can remotely control the mini tank with the remote control thanks to the IR receiver on it. The mini tank has a distance sensor in the front, allowing it to detect objects and make movement decisions accordingly.
 
 
-![WhatsApp-Video-2023-03-09-at-16 20 18-_online-video-cutter com_-_2_](https://user-images.githubusercontent.com/112697142/224038847-19bcb79b-5063-45bf-b491-c92ae60018c9.gif)
-
-The smart trash bin is an entertaining kit that can be created by using wooden pieces, an HC-SR04 distance sensor, a servo motor, a motor driver and Raspberry Pi Pico. The project aims to create an electronic trash bin that opens its lid by detecting objects thanks to the HC-SR04 distance sensor in front of it.
-
-### Modules on The Smart Trash Bin
-- Servo Motor: It is used to provide movement in mechanical projects that require angular movement.
-
-- Motor Driver: It is a circuit element that adjusts the speed and frequency of the circuit elements.
-
-- HC-SR04: It is a circuit element for detecting distance in projects that require distance measurement. 
 
