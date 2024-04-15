@@ -8,7 +8,7 @@ from picobricks import NEC_16,IR_RX
 trigger = Pin(15, Pin.OUT)
 echo = Pin(14, Pin.IN)
 
-def getDistance():S
+def getDistance():
    trigger.low()
    utime.sleep_us(2)
    trigger.high()
