@@ -32,33 +32,41 @@ control the movements of the robot car.
 
 1. Screw the first motor to the chassis of the 2WD robot car that comes out of the set and fix it.
 
- ![image](https://user-images.githubusercontent.com/111511331/200281946-a31955ee-f6a1-46e0-ad63-14a892dd8a38.png)
+![WhatsApp Image 2024-04-18 at 15 17 24 (4)](https://github.com/Robotistan/PicoBricks/assets/112697142/32875367-3053-4406-80c0-b888cd94edc7)
+
 
 
 2. Fix the second motor by screwing it to the chassis.
 3. Attach the wheels to the motors.
 
-![image](https://user-images.githubusercontent.com/111511331/200281975-25456171-6118-40ed-b0db-0dadde8f3e62.png)
-![image](https://user-images.githubusercontent.com/111511331/200281990-c3047368-6028-4650-ba91-921c2ce6b26f.png)
+
+![WhatsApp Image 2024-04-18 at 15 17 24 (2)](https://github.com/Robotistan/PicoBricks/assets/112697142/153b1283-85d2-400e-b1a2-dcc946bf4971)
+
 
 
 4. Fix the caster under the chassis using spacers.
 5. Fix the spacer with the nut from the top of the chassis.
 
-![image](https://user-images.githubusercontent.com/111511331/200282015-54ef72dc-8cc3-40e6-a923-52d2e604a5c2.png)
-![image](https://user-images.githubusercontent.com/111511331/200282027-f7f7251d-cc72-4c38-a0bc-b4256f46c190.png)
+![WhatsApp Image 2024-04-18 at 15 17 24 (3)](https://github.com/Robotistan/PicoBricks/assets/112697142/fc1f5918-7954-4fa4-8182-4e5a2852862c)
+
+![WhatsApp Image 2024-04-18 at 15 17 23 (3)](https://github.com/Robotistan/PicoBricks/assets/112697142/c47cd520-55d2-499a-84ee-2abd988590df)
+
+
 
 6. Fix 4 spacers on the four corners of the lower chassis.
 7. Fix the upper chassis with plug and nuts.
 
-![image](https://user-images.githubusercontent.com/111511331/200282056-5ea59afb-a05c-4d6a-b255-25410eab0e5e.png)
-![image](https://user-images.githubusercontent.com/111511331/200282072-eff566b4-79a5-4289-af89-f12f40548ff9.png)
+![WhatsApp Image 2024-04-18 at 15 17 24 (1)](https://github.com/Robotistan/PicoBricks/assets/112697142/af30bd9f-1ccc-474d-8b27-22b15cb7ddc9)
+
+![WhatsApp Image 2024-04-18 at 15 17 23](https://github.com/Robotistan/PicoBricks/assets/112697142/24f8e6cb-a579-4b60-94cf-bfc14b6262b2)
+
 
 8. Connect the cables of the motors to the terminals on the motor driver.
 9. Fix the motor driver, Bluetooth module, Picobricks board and battery box to the chassis using hot silicone.
 
-![image](https://user-images.githubusercontent.com/111511331/200282097-139f629a-7962-438d-838c-85cdc092a53b.png)
-![image](https://user-images.githubusercontent.com/111511331/200282115-90035184-095b-4bc6-82bd-18d07391170a.png)
+![WhatsApp Image 2024-04-18 at 15 17 22 (1)](https://github.com/Robotistan/PicoBricks/assets/112697142/2073f5fe-607b-4d3a-83c0-c7816ee77928)
+
+![WhatsApp Image 2024-04-18 at 15 17 21](https://github.com/Robotistan/PicoBricks/assets/112697142/8a883d78-6083-43fb-9d5a-d772d548a165)
 
 
 ## Mobile Application
