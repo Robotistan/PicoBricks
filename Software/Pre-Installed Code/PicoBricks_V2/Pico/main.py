@@ -1,6 +1,6 @@
 import time
 from machine import Pin, I2C, PWM, ADC, UART
-from picobricks import SSD1306_I2C, WS2812, DHT11, NEC_16, IR_RX, SHTC3, MotorDriver
+from picobricks import SSD1306_I2C, WS2812, NEC_16, IR_RX, SHTC3, MotorDriver
 from resources import Note_img, Picobricks_img, Tones, Song
 import framebuf
 import random
