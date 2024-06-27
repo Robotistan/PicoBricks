@@ -1,6 +1,6 @@
 import time
 from machine import Pin, I2C, PWM, ADC, UART
-from picobricks import SSD1306_I2C, WS2812, DHT11, NEC_16, IR_RX
+from picobricks import SSD1306_I2C, WS2812, DHT11, NEC_16, IR_RX, SHTC3, MotorDriver
 from resources import Note_img, Picobricks_img, Tones, Song
 import framebuf
 import random
@@ -12,10 +12,12 @@ NOTE_DURATION = 0.11
 ir_data = 0
 data_rcvd = False
 
-i2c = I2C(0, scl=Pin(5), sda=Pin(4), freq=200000)   # Init I2C using pins
+i2c = I2C(0, scl=Pin(5), sda=Pin(4))   # Init I2C using pins
 oled = SSD1306_I2C(WIDTH, HEIGHT, i2c, addr=0x3c)   # Init oled display
 fb1 = framebuf.FrameBuffer(Picobricks_img, 128,64 , framebuf.MONO_HLSB) # Creating framebuffer for PicoBricks Logo
 fb2 = framebuf.FrameBuffer(Note_img, 128,64, framebuf.MONO_HLSB)        # Creating framebuffer for music note
+motor = MotorDriver(i2c)
+shtc_sensor = SHTC3(i2c)
 
 # Function declaration
 def playtone(frequency):
@@ -45,7 +47,7 @@ def buttonInterruptHandler(event):    # Interrupt event, that will work when but
                 ws2812.pixels_show()
                 bequiet()
                 oled.fill(0)
-                oled.show()
+                #oled.show()
                 break
             if note[0] == "-":
                 bequiet()
@@ -64,17 +66,13 @@ button = Pin(10, Pin.IN) # setting GP10 PIN as input
 pot = ADC(26)
 light_level = ADC(27)
 conversion_factor = 3.3 / (65535)
-dht_sensor = DHT11(Pin(11))
 led = Pin(7, Pin.OUT)
 ws2812 = WS2812(6,brightness=1)
 ir = NEC_16(Pin(0, Pin.IN), ir_callback)
-motor_1 = Pin(21, Pin.OUT)
-motor_2 = Pin(22, Pin.OUT)
 button.irq(trigger=Pin.IRQ_RISING, handler=buttonInterruptHandler)  # Button 1 pressed interrupt is set. buttonInterruptHandler function will run when button is pressed
 oled.blit(fb1, 0, 0)
 oled.show()
 
-dht_read_time = time.time() # Defined a variable to keep last DHT11 read time
     
 # Testing LED and Relay
 relay.high()
@@ -87,8 +85,8 @@ led.low()
 time.sleep(2)
 
 while True:
-
     if data_rcvd == True:
+        print("ir receiced")
         data_rcvd = False
         if ir_data == IR_RX.number_1:
             ws2812.pixels_fill((random.randint(0,255), random.randint(0,255), random.randint(0,255)))
@@ -101,9 +99,9 @@ while True:
         if ir_data == IR_RX.number_3:
             relay.toggle()
         if ir_data == IR_RX.number_4:
-            motor_1.toggle()
+            motor.dc(1,255,1)
         if ir_data == IR_RX.number_5:
-            motor_2.toggle()
+            motor.dc(2,255,1)
         if ir_data == IR_RX.number_6:   
             buzzer.duty_u16(2000)
             buzzer.freq(831)
@@ -128,25 +126,24 @@ while True:
                     ws2812.pixels_fill((random.randint(0,255), random.randint(0,255), random.randint(0,255)))
                     ws2812.pixels_show()
                 time.sleep(NOTE_DURATION*note[1])
-            
+        if ir_data == IR_RX.number_8:
+            motor.servo(1,90)
+        if ir_data == IR_RX.number_9:
+            motor.servo(1,0)
         if ir_data == IR_RX.number_ok:
             relay.low()
-            motor_1.low()
-            motor_2.low()
+            motor.dc(1,0,1)
+            time.sleep(1)
+            motor.dc(1,0,1)
             led.low()
-        
-    if time.time() - dht_read_time >= 3:
-        dht_read_time = time.time()
-        try:
-            dht_sensor.measure()
-        except Exception as e:
-            pass
+    
+    tempSHTC = shtc_sensor.temperature()
+    humiditySHTC = shtc_sensor.humidity()
     oled.fill(0)
     oled.text("PICOBRICKS",30, 0)
     oled.text("POT:      {0:.2f}V".format(pot.read_u16() * conversion_factor),0,10)
     oled.text("LIGHT:    {0:.2f}%".format((65535.0 - light_level.read_u16())/650.0),0,20)
-    oled.text("TEMP:     {0:.2f}C".format(dht_sensor.temperature),0,30)
-    oled.text("HUMIDITY: {0:.1f}%".format(dht_sensor.humidity),0,40)
+    oled.text("TEMP:     {0:.2f}C".format(tempSHTC),0,30)
+    oled.text("HUMIDITY: {0:.1f}%".format(humiditySHTC),0,40)
     oled.show()
     time.sleep(1)
-    oled.fill(0)
