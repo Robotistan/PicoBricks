@@ -19,8 +19,8 @@ while True:
     speed = int (convert(pot_val, 200, 65535, 0, 255))
     
     if speed > 30:
-        motor.dc(1,speed,1)
-        motor.dc(2,speed,1)
+        motor.dc(1,speed,0)
+        motor.dc(2,speed,0)
     else:
-        motor.dc(1,0,1)
-        motor.dc(2,0,1)
+        motor.dc(1,0,0)
+        motor.dc(2,0,0)
