@@ -134,7 +134,7 @@ while True:
             relay.low()
             motor.dc(1,0,1)
             time.sleep(1)
-            motor.dc(1,0,1)
+            motor.dc(2,0,1)
             led.low()
     
     tempSHTC = shtc_sensor.temperature()
