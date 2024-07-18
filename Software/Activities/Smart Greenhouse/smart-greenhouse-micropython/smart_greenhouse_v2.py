@@ -2,7 +2,7 @@ import utime
 import uos
 import machine 
 from machine import Pin, ADC, I2C
-from picobricks import MotorDriver  
+from picobricks import SHTC3, MotorDriver  
 from utime import sleep 
 
 i2c = I2C(0, scl=Pin(5), sda=Pin(4))   # Init I2C using pins
