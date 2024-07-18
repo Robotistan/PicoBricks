@@ -132,9 +132,9 @@ while True:
             motor.servo(1,0)
         if ir_data == IR_RX.number_ok:
             relay.low()
-            motor.dc(1,0,1)
+            motor.dc(1,0,0)
             time.sleep(1)
-            motor.dc(2,0,1)
+            motor.dc(2,0,0)
             led.low()
     
     tempSHTC = shtc_sensor.temperature()
