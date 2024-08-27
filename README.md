@@ -8,7 +8,7 @@
 
 # Make, Run, Split, Merge
 
-<img src="[https://ksr-ugc.imgix.net/assets/036/949/333/19d4e8370190a56be1389832d344876f_original.jpg?ixlib=rb-4.0.2&w=680&fit=max&v=1649673985&gif-q=50&q=92&s=bf2c8ff527cd06c6e021dbbebd50887b](https://docs.picobricks.com/tr/latest/_images/wtb.gif)" width="600" height="400">
+<img src="https://docs.picobricks.com/tr/latest/_images/wtb.gif" width="600" height="400">
 
 
 
