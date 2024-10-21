@@ -1,5 +1,5 @@
-#define TRIGGER_PIN  15
-#define ECHO_PIN     14
+#define trigPin  15
+#define echoPin     14
 #define MAX_DISTANCE 400
 
 long distance = 0;
@@ -42,19 +42,19 @@ void loop() {
   }
 }
 
-void Forward(){
+void Forward(){   //if the distance is higher than 5, go straight
   digitalWrite(21,HIGH);
-  digitalWrite(22,HIGH); //if the distance is higher than 5, go straight
+  digitalWrite(22,HIGH); 
 }
-void Turn_Left(){
+void Left(){     //turn left
   digitalWrite(21,LOW);
-  digitalWrite(22,HIGH); //turn left
+  digitalWrite(22,HIGH);
 }
-void Turn_Right(){
+void Right(){   //turn right
   digitalWrite(21,HIGH);
-  digitalWrite(22,LOW);  //turn right
+  digitalWrite(22,LOW);  
 }
 void Stop(){
   digitalWrite(21,LOW);
-  digitalWrite(22,LOW); //wait
+  digitalWrite(22,LOW); 
 }
