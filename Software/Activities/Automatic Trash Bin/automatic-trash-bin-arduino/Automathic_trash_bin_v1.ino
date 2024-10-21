@@ -1,7 +1,10 @@
 #include <Servo.h>
+
 #define trigPin 14
 #define echoPin 15
+
 Servo servo;
+
 void setup() {
   Serial.begin (9600);
   pinMode(trigPin, OUTPUT);
@@ -23,7 +26,6 @@ void loop() {
     Serial.println(" cm");
     servo.write(179);
   }
-
   else if (distance<180) {
     Serial.print(distance);
     Serial.println(" cm");
