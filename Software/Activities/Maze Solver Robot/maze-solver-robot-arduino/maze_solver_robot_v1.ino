@@ -1,11 +1,21 @@
-#include <NewPing.h>
-
 #define TRIGGER_PIN  15
 #define ECHO_PIN     14
 #define MAX_DISTANCE 400
-//define sensor pins
 
-NewPing sonar(TRIGGER_PIN, ECHO_PIN, MAX_DISTANCE);
+long distance = 0;
+long duration = 0;
+
+int hcsr(){
+  long dis, dur;
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+  dur = pulseIn(echoPin, HIGH);
+  dis = (dur/2) / 29.1;
+  return dis;
+}
 
 void setup() {
   pinMode(21,OUTPUT);
@@ -13,23 +23,19 @@ void setup() {
 }
 
 void loop() {
-  
   delay(50);
-  int distance=sonar.ping_cm();
+  distance = hcsr();
   Forward();
-
   if(distance<5){
-
     Stop();
     delay(1000);
-    Turn_Right();
+    Right();
     delay(1000);
-    int distance=sonar.ping_cm();
-
-    if(distance<5){
+    distance = hcsr();
+    if(distance < 5){
       Stop();
       delay(1000);
-      Turn_Left();
+      Left();
       delay(500);
       // If the distance is less than 5, wait, turn right; if the distance is less than 5 again, move in the opposite direction
     }
