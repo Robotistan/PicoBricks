@@ -1,0 +1,842 @@
+module main
+author unknown
+version 1 0 
+description ''
+
+script 94 50 {
+whenStarted
+pb_set_servo_angle 1 -15
+}
+
+script 93 175 {
+whenCondition (('distance (cm)' 15 14) < 10)
+waitMillis 2000
+pb_set_servo_angle 1 -70
+waitMillis 2000
+pb_set_servo_angle 1 -15
+}
+
+
+module 'Distance (HC-SR04)' Input
+author 'Joan Guillén & Josep Ferràndiz'
+version 1 2 
+tags sensor 'hc-sr04' distance ultrasound 
+description 'Support for the HC-SR04 ultrasound distance sensor.'
+variables _sr04_last 
+
+  spec 'r' 'distance (cm)' 'distance (cm) trigger _ echo _' 'num num' 2 4
+  spec 'r' 'sr04_distanceOnePin' 'distance (cm) pin _' 'num' 0
+
+to 'distance (cm)' trig ech {
+  comment 'Contributed by Joan Guillén and Josep Ferràndiz'
+  digitalWriteOp trig false
+  waitMicros 2
+  digitalWriteOp trig true
+  waitMicros 50
+  digitalWriteOp trig false
+  local 'start' (microsOp)
+  waitUntil (or (not (digitalReadOp ech)) (((microsOp) - start) > 23320))
+  waitUntil (or (digitalReadOp ech) (((microsOp) - start) > 23320))
+  if (((microsOp) - start) > 23320) {
+    comment 'Distance sensor not ready; return the last distance reading'
+    return _sr04_last
+  }
+  comment 'Pulse sent. Measure time until echo is detected.'
+  start = (microsOp)
+  waitUntil (or (not (digitalReadOp ech)) (((microsOp) - start) > 23320))
+  _sr04_last = ((10 * ((microsOp) - start)) / 583)
+  comment 'Leave some time for reverberations to die away.'
+  waitMillis 10
+  if (_sr04_last == 0) {
+    zeroCount += 1
+  }
+  return _sr04_last
+}
+
+to sr04_distanceOnePin pin {
+  return ('distance (cm)' pin pin)
+}
+
+
+module 'IR Remote' Comm
+author MicroBlocks
+version 1 7 
+tags ir infrared remote 
+description 'Sends and receives infrared remote control messages like the ones used for TV sets or air conditioners. Currently supports only the NEC protocol, which is quite common but not the only IR protocol in use. An NEC message consists of a one byte device number and a one byte command.
+
+Note: Transmitting IR does not work on ESP8266 boards.
+
+Receiving requires an IR receiver module, such as those built into the Circuit Playground Express and ED1 boards. Transmitting requires an IR transmitter LED, such as those built into the Circuit Playground Express and several M5 Stack products. Inexpensive IR LED transmitter and receivers are available for use with other boards.
+'
+variables _ir_pin _ir_pulse_times _ir_last_code _ir_last_device _ir_transmit_pin 
+
+  spec ' ' 'attachIR' 'attach IR receiver to pin _' 'num' 0
+  spec 'r' 'ir_code_received' 'IR code received?'
+  spec 'r' 'ir_last_code' 'IR code'
+  space
+  spec ' ' 'IR_Transmit' 'IR transmit device _ command _' 'num num' 48896 1
+  spec ' ' 'attachIRTransmitter' 'attach IR transmitter to pin _' 'num' 0
+  space
+  spec 'r' 'receiveIR' 'receive IR code'
+  space
+  spec ' ' '_testIR' '_test IR'
+  spec 'r' '_receiveIRFromDevice' '_receive IR code from device _' 'num' 48896
+  space
+  spec ' ' '_captureIRMessage' '_captureIRMessage' 'any'
+  spec ' ' '_dumpIR' '_dumpIR' 'any'
+  spec 'r' '_getIRByte' '_getIRByte _' 'auto any' 4
+  spec 'r' '_got32Bits' '_got32Bits' 'any'
+  spec ' ' '_IR_SendByte' '_IR_SendByte _' 'auto' '10'
+
+to IR_Transmit device command {
+  if (_ir_transmit_pin == 0) {if (or ((boardType) == 'CircuitPlayground') ((boardType) == 'M5Atom-Matrix')) {
+    _ir_transmit_pin = 12
+  } (or ((boardType) == 'M5StickC') ((boardType) == 'M5StickC+')) {
+    _ir_transmit_pin = 9
+  }}
+  comment 'Message start pulse and space'
+  '[io:playTone]' _ir_transmit_pin 38000
+  waitMicros 9000
+  '[io:playTone]' _ir_transmit_pin 0
+  waitMicros 4500
+  comment 'Send device and command and their inverses'
+  '_IR_SendByte' (device & 255)
+  '_IR_SendByte' ((device >> 8) & 255)
+  '_IR_SendByte' command
+  '_IR_SendByte' ('~' command)
+  comment 'Send stop bit'
+  '[io:playTone]' _ir_transmit_pin 38000
+  waitMicros 562
+  '[io:playTone]' _ir_transmit_pin 0
+  comment 'Turn off IR transmit LED'
+  if (or ((boardType) == 'M5StickC') ((boardType) == 'M5StickC+')) {
+    comment 'IR pin is inverted so true means "off"'
+    digitalWriteOp _ir_transmit_pin true
+  } else {
+    digitalWriteOp _ir_transmit_pin false
+  }
+}
+
+to '_IR_SendByte' byte {
+  local 'bit' 1
+  repeat 8 {
+    if (0 == (byte & bit)) {
+      '[io:playTone]' _ir_transmit_pin 38000
+      waitMicros 530
+      '[io:playTone]' _ir_transmit_pin 0
+      waitMicros 530
+    } else {
+      '[io:playTone]' _ir_transmit_pin 38000
+      waitMicros 530
+      '[io:playTone]' _ir_transmit_pin 0
+      waitMicros 1630
+    }
+    bit = (bit << 1)
+  }
+}
+
+to '_captureIRMessage' {
+  if (_ir_pulse_times == 0) {
+    _ir_pulse_times = (newList 200)
+    if (_ir_pin == 0) {
+      if ((boardType) == 'CircuitPlayground') {
+        _ir_pin = 11
+      } ((boardType) == 'Citilab ED1') {
+        _ir_pin = 35
+      } ((boardType) == 'D1-Mini') {
+        _ir_pin = 2
+      } ((boardType) == 'MakerPort') {
+        _ir_pin = 18
+      } ((boardType) == 'MakerPort V3') {
+        _ir_pin = 22
+      }
+    }
+  }
+  atPut 'all' _ir_pulse_times 0
+  local 'i' 1
+  comment 'Wait for IR signal -- this is the start of a new message.
+Note: THe pin goes low when an IR signal is detected.'
+  waitUntil (not (digitalReadOp _ir_pin))
+  local 'start' (microsOp)
+  forever {
+    comment 'Record the time until the end of the current IR pulse ("mark")'
+    waitUntil (digitalReadOp _ir_pin)
+    local 'end' (microsOp)
+    atPut i _ir_pulse_times (end - start)
+    i += 1
+    start = end
+    comment 'Record time until the start of the next IR pulse ("space")'
+    repeatUntil (not (digitalReadOp _ir_pin)) {
+      if (((microsOp) - start) > 5000) {
+        comment 'No IR pulse for 5000 usecs means "end of message"'
+        return 0
+      }
+    }
+    local 'end' (microsOp)
+    atPut i _ir_pulse_times (end - start)
+    i += 1
+    start = end
+  }
+}
+
+to '_dumpIR' {
+  comment 'Print raw pulse timings to the terminal.
+Can be used to analyze new protocols.'
+  local 'i' 1
+  graphIt '-----'
+  repeat (size _ir_pulse_times) {
+    local 'mark usecs' (at i _ir_pulse_times)
+    local 'space usecs' (at (i + 1) _ir_pulse_times)
+    graphIt (v 'mark usecs') (v 'space usecs')
+    i += 2
+    if ((v 'space usecs') == 0) {
+      graphIt 'timing entries:' (i - 2)
+      return 0
+    }
+  }
+}
+
+to '_getIRByte' position {
+  local 'result' 0
+  local 'i' position
+  local 'bit' 1
+  repeat 8 {
+    if ((at i _ir_pulse_times) > 1000) {result = (result | bit)}
+    bit = (bit << 1)
+    i += 2
+  }
+  return result
+}
+
+to '_got32Bits' {
+  return (and ((at 67 _ir_pulse_times) != 0) ((at 68 _ir_pulse_times) == 0))
+}
+
+to '_receiveIRFromDevice' deviceID {
+  forever {
+    '_captureIRMessage'
+    if ('_got32Bits') {
+      local 'id_lowByte' ('_getIRByte' 4 nil)
+      local 'id_highByte' ('_getIRByte' 20 nil)
+      if (and (id_highByte == (deviceID >> 8)) (id_lowByte == (deviceID & 255))) {
+        return ('_getIRByte' 36 nil)
+      }
+    }
+  }
+}
+
+to '_testIR' {
+  forever {
+    '_captureIRMessage'
+    if ('_got32Bits') {
+      comment 'Four byte message format:
+<device low byte><device high byte><command><command, bit-inverted>'
+      local 'b1' ('_getIRByte' 4 nil)
+      local 'b2' ('_getIRByte' 20 nil)
+      local 'b3' ('_getIRByte' 36 nil)
+      local 'b4' ('_getIRByte' 52 nil)
+      sayIt 'Device:' ((b2 << 8) | b1) 'code:' b3
+    }
+  }
+}
+
+to attachIR pin {
+  _ir_pin = pin
+}
+
+to attachIRTransmitter pin {
+  _ir_transmit_pin = pin
+}
+
+to ir_code_received {
+  return ((receiveIR) >= 0)
+}
+
+to ir_last_code {
+  return _ir_last_code
+}
+
+to receiveIR {
+  forever {
+    '_captureIRMessage'
+    if ('_got32Bits') {
+      local 'id_lowByte' ('_getIRByte' 4 nil)
+      local 'id_highByte' ('_getIRByte' 20 nil)
+      _ir_last_device = ((id_highByte << 8) | id_lowByte)
+      _ir_last_code = ('_getIRByte' 36 nil)
+      atPut 'all' _ir_pulse_times 0
+      return _ir_last_code
+    }
+  }
+}
+
+
+module PicoBricks
+author 'Turgut Guneysu'
+version 2 8 
+depends 'Temperature Humidity (DHT11, DHT22)' 'Temperature Humidity (SHTC3)' 'IR Remote' 
+choices servoNumMenu '1' '2' '3' '4' ALL 
+choices dcNumMenu 'M1:1' 'M2:2' ALL 
+description 'Robotistan PicoBricks Library
+
+This library controls these Pico Bricks components:
+- Red LED
+- RGB LED
+- 2 x DC Motors 
+- 4 x Servos (using the NEW motor controller card) 
+- Piezo speaker
+- Relay Switch (5V-250V, 5A)
+- Button
+- Potentiometer (variable resistor)
+- Light sensor (light dependent resistor)
+- Temperature and Humidity sensor (DHT11 & SHTC3)
+- IR Remote
+
+Use separate libraries to control:
+- Servo motors (using old motor controller)
+- Graphic display (OLED) or TFT
+- WIFI/Bluetooth expansion board
+
+See https://www.robotistan.com, 
+https://wiki.microblocks.fun/boards/pico
+
+CHANGES:
+- switched to renamed DHT library: Temperature humidity (DHT11, DHT22)
+- motor card changed to I2C model: 2xDC bidirectional and 4xServo 
+- Auto detect old vs new motor cards
+- Auto detect old vs new Temp/Humid sensors
+- servo set to -90 to 90
+- Temp&Humidity sensor changed to SHTC3 for new boards
+- PicoBricks humidity & temperature return results based on the sensor used
+- uses: i2c device exists
+- Added IR Remote for new boards
+'
+variables _pb_initialized _pb_pin_RedLED _pb_pin_Button _pb_pin_DHT _pb_pin_IRrecv _pb_pin_Relay _pb_pin_Pot _pb_pin_LDR _pb_pin_Buzzer _pb_pin_Motor1 _pb_pin_Motor2 _pb_pin_RGB_LED _pb_pin_TX _pb_pin_RX _pb_motor_i2c 
+
+  spec ' ' 'pb_set_rgb_color' 'PicoBricks set RGB LED color _' 'color'
+  spec 'r' 'pb_rgb_color' 'PicoBricks color r _ g _ b _ (0-255)' 'auto auto auto' 0 0 0
+  spec 'r' 'pb_random_color' 'PicoBricks random color'
+  spec ' ' 'pb_turn_off_RGB' 'PicoBricks turn off RGB LED'
+  space
+  spec 'r' 'pb_button' 'PicoBricks button'
+  spec ' ' 'pb_set_red_LED' 'PicoBricks set red LED _' 'bool' true
+  space
+  spec 'r' 'pb_humidity' 'PicoBricks humidity'
+  spec 'r' 'pb_temperature' 'PicoBricks temperature (°C)'
+  space
+  spec ' ' 'pb_set_relay' 'PicoBricks set relay _' 'bool' true
+  space
+  spec 'r' 'pb_ir_code_received' 'PicoBricks IR Code Received?'
+  spec 'r' 'pb_ir_code' 'PicoBricks IR Code'
+  spec 'r' 'pb_ir_recv_code' 'PicoBricks Receive IR Code'
+  space
+  spec ' ' 'pb_beep' 'PicoBricks beep _ ms' 'auto' 100
+  space
+  spec 'r' 'pb_light_sensor' 'PicoBricks light sensor (0-100) %'
+  space
+  spec 'r' 'pb_potentiometer' 'PicoBricks potentiometer'
+  space
+  spec ' ' 'pb_set_motor_speed' 'PicoBricks set motor _ speed _ (-100 to 100)' 'menu.dcNumMenu num' 1 50
+  spec ' ' 'pb_set_servo_angle' 'PicoBricks set servo _ to _ degrees(-90 to 90)' 'menu.servoNumMenu num' 1 90
+  space
+  spec ' ' '_pb_init_pins' '_pb_init_pins'
+  spec 'r' '_pb_new_controller?' '_pb_new_controller?'
+
+to '_pb_init_pins' {
+  if _pb_initialized {return}
+  _pb_pin_RGB_LED = 6
+  _pb_pin_RedLED = 7
+  _pb_pin_Button = 10
+  _pb_pin_DHT = 11
+  _pb_pin_Relay = 12
+  _pb_pin_Buzzer = 20
+  _pb_pin_Motor1 = 21
+  _pb_pin_Motor2 = 22
+  _pb_pin_IRrecv = 0
+  attachIR _pb_pin_IRrecv
+  _pb_pin_Pot = 26
+  _pb_pin_LDR = 27
+  _pb_pin_TX = 0
+  _pb_pin_RX = 1
+  _pb_motor_i2c = (hexToInt '22')
+  _pb_initialized = (booleanConstant true)
+}
+
+to '_pb_new_controller?' {
+  comment 'Test I2C write to detect presence of NEW motor control TB6612.
+subsequent READ will return:
+  -4: no card found,   38: card present
+Result determines which type of control command to use.'
+  return (ifExpression ('[sensors:i2cExists]' (hexToInt '22')) (booleanConstant true) (booleanConstant false))
+}
+
+to pb_beep duration {
+  local 'buzzer pin' 20
+  '[io:playTone]' (v 'buzzer pin') 300
+  waitMillis duration
+  '[io:playTone]' (v 'buzzer pin') 0
+}
+
+to pb_button {
+  '_pb_init_pins'
+  return (digitalReadOp _pb_pin_Button)
+}
+
+to pb_humidity {
+  '_pb_init_pins'
+  if (and ((humidity_DHT11 11) == 0) ((temperature_DHT11 11) == 0)) {
+    return (shtc3_humidity)
+  } else {
+    return (humidity_DHT11 _pb_pin_DHT)
+  }
+}
+
+to pb_ir_code {
+  '_pb_init_pins'
+  return (ir_last_code)
+}
+
+to pb_ir_code_received {
+  '_pb_init_pins'
+  return (ir_code_received)
+}
+
+to pb_ir_recv_code {
+  '_pb_init_pins'
+  return (receiveIR)
+}
+
+to pb_light_sensor {
+  comment 'Returns Light Values s a percentage:
+0: dark,  100: light'
+  '_pb_init_pins'
+  return ('[misc:rescale]' (analogReadOp _pb_pin_LDR) 0 1023 100 0)
+}
+
+to pb_potentiometer {
+  '_pb_init_pins'
+  return (analogReadOp _pb_pin_Pot)
+}
+
+to pb_random_color {
+  local 'n1' (random 100 200)
+  local 'n2' (random 0 100)
+  if (1 == (random 1 3)) {
+    return ((n1 << 16) | (n2 << 8))
+  } (1 == (random 1 2)) {
+    return ((n2 << 16) | n1)
+  } else {
+    return ((n1 << 8) | n2)
+  }
+}
+
+to pb_rgb_color r g b {
+  r = (maximum 0 (minimum r 255))
+  g = (maximum 0 (minimum g 255))
+  b = (maximum 0 (minimum b 255))
+  return (((r << 16) | (g << 8)) | b)
+}
+
+to pb_set_motor_speed which speed {
+  comment 'New Motor Logic:
+Detects old/new motor controller card and adjusts accordingly.
+
+Fwd:0 Bwd:1
+WORKING Motor Control
+Does not drive single motor @ 60 and below
+and dual motors @128 and below'
+  '_pb_init_pins'
+  if ('_pb_new_controller?') {
+    speed = (ifExpression (speed < -100) -100 (ifExpression (speed > 100) 100 speed))
+    local 'dir' (ifExpression (speed >= 0) 0 1)
+    speed = ('[misc:rescale]' (absoluteValue speed) 0 100 0 255)
+    if ('ALL' == which) {
+      local 'from' 1
+      local 'to' 2
+    } else {
+      local 'from' which
+      local 'to' which
+    }
+    for i ('[data:range]' from to) {
+      '[sensors:i2cWrite]' _pb_motor_i2c ('[data:asByteArray]' ('[data:makeList]' (hexToInt '26') i speed dir ((i ^ speed) ^ dir)))
+    }
+  } else {
+    comment 'OLD motor controller'
+    speed = (maximum 0 (minimum speed 100))
+    if (which == 1) {
+      analogWriteOp _pb_pin_Motor1 ((1023 * speed) / 100)
+    } (which == 2) {
+      analogWriteOp _pb_pin_Motor2 ((1023 * speed) / 100)
+    } (which == 'ALL') {
+      analogWriteOp _pb_pin_Motor1 ((1023 * speed) / 100)
+      analogWriteOp _pb_pin_Motor2 ((1023 * speed) / 100)
+    }
+  }
+}
+
+to pb_set_red_LED aBoolean {
+  '_pb_init_pins'
+  digitalWriteOp _pb_pin_RedLED aBoolean
+}
+
+to pb_set_relay aBoolean {
+  '_pb_init_pins'
+  digitalWriteOp _pb_pin_Relay aBoolean
+}
+
+to pb_set_rgb_color color {
+  '_pb_init_pins'
+  '[display:neoPixelSetPin]' _pb_pin_RGB_LED false
+  '[display:neoPixelSend]' color
+  waitMillis 1
+}
+
+to pb_set_servo_angle which angle {
+  comment 'S1:3 S2:4 S3:5 S4:6 ALL'
+  '_pb_init_pins'
+  if ('_pb_new_controller?') {
+    angle = (ifExpression (angle < -90) -90 (ifExpression (angle > 90) 90 angle))
+    angle = (90 - angle)
+    if ('ALL' == which) {
+      local 'from' 3
+      local 'to' 6
+    } else {
+      local 's#' ('[data:makeList]' 3 4 5 6)
+      which = (at which s#)
+      local 'from' which
+      local 'to' which
+    }
+    for i ('[data:range]' from to) {
+      '[sensors:i2cWrite]' _pb_motor_i2c ('[data:asByteArray]' ('[data:makeList]' (hexToInt '26') i 0 angle (i ^ angle)))
+      waitMillis 75
+    }
+  } else {
+    sayIt 'For old motor controller modules 
+please use SERVO Library.'
+  }
+}
+
+to pb_temperature {
+  '_pb_init_pins'
+  if (and ((humidity_DHT11 11) == 0) ((temperature_DHT11 11) == 0)) {
+    return (shtc3_temperature)
+  } else {
+    return (temperature_DHT11 _pb_pin_DHT)
+  }
+}
+
+to pb_turn_off_RGB {
+  '_pb_init_pins'
+  '[display:neoPixelSetPin]' _pb_pin_RGB_LED false
+  '[display:neoPixelSend]' 0
+  waitMillis 1
+}
+
+
+module Servo Output
+author MicroBlocks
+version 1 3 
+tags servo motor angle rotation position 
+description 'Control both positional (angle) and rotational servo motors.
+'
+variables _servoPin _servoPulseWidth 
+
+  spec ' ' 'setServoAngle' 'set servo _ to _ degrees (-90 to 90)' 'num num' 1 90
+  spec ' ' 'setServoSpeed' 'set servo _ to speed _ (-100 to 100)' 'num num' 1 100
+  spec ' ' 'stopServo' 'stop servo _' 'num' 1
+  spec 'r' '_servoIndex' '_servoIndex _' 'num' 1
+  spec ' ' '_servoPulse' '_servoPulse pin _ usecs _' 'num num' 1 1500
+  spec ' ' '_servoUpdateLoop' '_servoUpdateLoop'
+
+to '_servoIndex' which {
+  if (_servoPin == 0) {
+    _servoPin = ('[data:makeList]')
+    _servoPulseWidth = ('[data:makeList]')
+    sendBroadcast '_servoUpdateLoop'
+  }
+  local 'i' ('[data:find]' which _servoPin)
+  if (i < 0) {
+    comment 'Add new pin'
+    '[data:addLast]' which _servoPin
+    '[data:addLast]' '1500' _servoPulseWidth
+    i = (size _servoPin)
+  }
+  return i
+}
+
+to '_servoPulse' pin usecs {
+  if (usecs == 0) {
+    comment 'Servo stopped; do nothing'
+    return 0
+  }
+  usecs = (maximum 850 (minimum usecs 2150))
+  comment 'Split wait into a long wait followed by a wait of <= 30 usecs for greater accuracy'
+  local 'endTime' ((microsOp) + usecs)
+  digitalWriteOp pin true
+  waitMicros (usecs - 30)
+  waitMicros (endTime - (microsOp))
+  digitalWriteOp pin false
+}
+
+to '_servoUpdateLoop' {
+  forever {
+    if (_servoPin != 0) {
+      comment 'If the _servoPin list is not 0, update the servos'
+      for i (size _servoPin) {
+        local 'pin' (at i _servoPin)
+        local 'usecs' (at i _servoPulseWidth)
+        if (and (pin >= 0) (usecs != 0)) {
+          '_servoPulse' pin usecs
+        }
+      }
+      waitMillis 15
+    }
+  }
+}
+
+to setServoAngle which degrees optionalReverse {
+  local 'reversed' false
+  if ((pushArgCount) > 2) {
+    reversed = optionalReverse
+  }
+  if reversed {
+    degrees = (0 - degrees)
+  }
+  local 'pulseWidth' (1500 - (10 * degrees))
+  if ('[io:hasServo]') {
+    '[io:setServo]' which pulseWidth
+  } else {
+    atPut ('_servoIndex' which) _servoPulseWidth pulseWidth
+  }
+}
+
+to setServoSpeed which speed optionalReverse {
+  local 'reversed' false
+  if ((pushArgCount) > 2) {
+    reversed = optionalReverse
+  }
+  if reversed {
+    speed = (0 - speed)
+  }
+  local 'pulseWidth' (1500 - (10 * speed))
+  if ((absoluteValue speed) < 2) {
+    pulseWidth = 0
+  }
+  if ('[io:hasServo]') {
+    '[io:setServo]' which pulseWidth
+  } else {
+    atPut ('_servoIndex' which) _servoPulseWidth pulseWidth
+  }
+}
+
+to stopServo which {
+  if ('[io:hasServo]') {
+    '[io:setServo]' which 0
+  } else {
+    atPut ('_servoIndex' which) _servoPulseWidth 0
+  }
+}
+
+
+module 'Temperature Humidity (DHT11, DHT22)' Input
+author MicroBlocks
+version 1 2 
+tags sensor dht11 dht22 temperature humidity 
+description 'Support for the DHT11 and DHT22 environmental sensors. These sensors provide temperature and humidity readings.'
+variables _dht_temperature _dht_humidity _dhtData _dhtLastReadTime 
+
+  spec 'r' 'temperature_DHT11' 'temperature (Celsius) DHT11 pin _' 'auto' 4
+  spec 'r' 'humidity_DHT11' 'humidity DHT11 pin _' 'auto' 4
+  spec 'r' 'temperature_DHT22' 'temperature (Celsius) DHT22 pin _' 'auto' 4
+  spec 'r' 'humidity_DHT22' 'humidity DHT22 pin _' 'auto' 4
+  spec ' ' '_dhtReadData' '_dhtReadData pin _' 'auto any' 4
+  spec 'r' '_dhtChecksumOkay' '_dhtChecksumOkay' 'any'
+  spec ' ' '_dhtUpdate' '_dhtUpdate _ isDHT11 _' 'auto bool any' 4 true
+  spec 'r' '_dhtReady' '_dhtReady' 'any'
+
+to '_dhtChecksumOkay' {
+  if (not (isType _dhtData 'list')) {return (booleanConstant false)}
+  local 'checksum' 0
+  for i 4 {
+    checksum += (at i _dhtData)
+  }
+  checksum = (checksum & 255)
+  return (checksum == (at 5 _dhtData))
+}
+
+to '_dhtReadData' pin {
+  comment 'Create DHT data array the first time'
+  if (_dhtData == 0) {
+    _dhtData = (newList 5)
+  }
+  comment 'fill with 1''s set checksum will be bad if read fails'
+  atPut 'all' _dhtData 1
+  comment 'Pull pin low for >18msec to request data'
+  digitalWriteOp pin false
+  waitMillis 20
+  local 'useDHTPrimitive' (booleanConstant true)
+  if useDHTPrimitive {
+    result = ('[sensors:readDHT]' pin)
+    if ((booleanConstant false) != result) {
+      _dhtData = result
+    }
+    return 0
+  }
+  comment 'Read DHT start pulses (H L H L)'
+  waitUntil (digitalReadOp pin)
+  waitUntil (not (digitalReadOp pin))
+  waitUntil (digitalReadOp pin)
+  waitUntil (not (digitalReadOp pin))
+  local 'i' 1
+  local 'byte' 0
+  local 'bit' 1
+  comment 'Read 40 bits (5 bytes)'
+  repeat 40 {
+    waitUntil (digitalReadOp pin)
+    local 'start' (microsOp)
+    waitUntil (not (digitalReadOp pin))
+    if (((microsOp) - start) > 40) {
+      comment 'Long pulse - append a "1" bit'
+      byte += 1
+    }
+    if (bit == 8) {
+      atPut i _dhtData byte
+      i += 1
+      byte = 0
+      bit = 1
+    } else {
+      byte = (byte << 1)
+      bit += 1
+    }
+    waitUntil (not (digitalReadOp pin))
+  }
+}
+
+to '_dhtReady' {
+  local 'elapsed' ((millisOp) - _dhtLastReadTime)
+  return (or (elapsed < 0) (elapsed > 2000))
+}
+
+to '_dhtUpdate' pin isDHT11 {
+  if ('_dhtReady') {
+    _dht_temperature = 0
+    _dht_humidity = 0
+    '_dhtReadData' pin
+    _dhtLastReadTime = (millisOp)
+  }
+  if ('_dhtChecksumOkay') {
+    if isDHT11 {
+      _dht_temperature = (at 3 _dhtData)
+      _dht_humidity = (at 1 _dhtData)
+    } else {
+      local 'n' (((at 1 _dhtData) * 256) + (at 2 _dhtData))
+      _dht_humidity = ((n + 5) / 10)
+      n = ((((at 3 _dhtData) & 127) * 256) + (at 4 _dhtData))
+      if (((at 3 _dhtData) & 128) != 0) {
+        n = (0 - n)
+      }
+      _dht_temperature = ((n + 5) / 10)
+    }
+  }
+}
+
+to humidity_DHT11 pin {
+  '_dhtUpdate' pin true
+  return _dht_humidity
+}
+
+to humidity_DHT22 pin {
+  '_dhtUpdate' pin false
+  return _dht_humidity
+}
+
+to temperature_DHT11 pin {
+  '_dhtUpdate' pin true
+  return _dht_temperature
+}
+
+to temperature_DHT22 pin {
+  '_dhtUpdate' pin false
+  return _dht_temperature
+}
+
+
+module 'Temperature Humidity (SHTC3)' Input
+author MicroBlocks
+version 1 4 
+description 'Support for the SHTC3 temperature and relative humidity sensor.'
+
+  spec 'r' 'shtc3_temperature' 'SHTC3 temperature (°C)'
+  spec 'r' 'shtc3_humidity' 'SHTC3 relative humidity (%)'
+  space
+  spec ' ' '_shtc3_send_cmd' '_shtc3_send_cmd _' 'num' 0
+  spec 'r' '_shtc3_read' '_shtc3_read'
+  spec 'r' '_shtc3_crcOkay' '_shtc3_crcOkay _ _ _' 'num num num' 0 0 0
+
+to '_shtc3_crcOkay' b1 b2 b3 {
+  local 'crc' 255
+  for i 2 {
+    if (1 == i) {
+      crc = (crc ^ b1)
+    } else {
+      crc = (crc ^ b2)
+    }
+    repeat 8 {
+      if ((crc & 128) != 0) {
+        crc = (((crc << 1) ^ 49) & 255)
+      } else {
+        crc = (crc << 1)
+      }
+    }
+  }
+  return (0 == (crc ^ b3))
+}
+
+to '_shtc3_read' {
+  local 'SHTC addr' (hexToInt '70')
+  comment 'Wakeup'
+  '_shtc3_send_cmd' (hexToInt '3517')
+  comment 'Read data, temperature first. Do not use clock stretching; it blocks the CPU for ~12 msecs!'
+  '_shtc3_send_cmd' (hexToInt '7866')
+  waitMillis 13
+  local 'sixBytes' (newList 6)
+  '[sensors:i2cRead]' (v 'SHTC addr') sixBytes
+  comment 'Do not send sleep command; that results in i2c error on next call'
+  return sixBytes
+}
+
+to '_shtc3_send_cmd' cmd {
+  local 'SHTC addr' (hexToInt '70')
+  '[sensors:i2cWrite]' (v 'SHTC addr') ('[data:makeList]' ((cmd >> 8) & 255) (cmd & 255))
+}
+
+to shtc3_humidity {
+  local 'data' ('_shtc3_read')
+  local 'high' (at 4 data)
+  local 'low' (at 5 data)
+  if (not ('_shtc3_crcOkay' high low (at 6 data))) {
+    return 0
+  }
+  local 'humidity' ((100 * ((high << 8) | low)) >> 16)
+  if ('Databot' == (boardType)) {
+    comment 'Adjust for extra heat from PC board'
+    humidity += 10
+  }
+  return humidity
+}
+
+to shtc3_temperature {
+  local 'data' ('_shtc3_read')
+  local 'high' (at 1 data)
+  local 'low' (at 2 data)
+  if (not ('_shtc3_crcOkay' high low (at 3 data))) {
+    return 0
+  }
+  local 'temperature' (((175 * ((high << 8) | low)) >> 16) - 45)
+  if ('Databot' == (boardType)) {
+    temperature += -10
+    comment 'Adjust for extra heat from PC board'
+  }
+  return temperature
+}
+
