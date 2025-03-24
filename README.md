@@ -5,6 +5,18 @@
 [![Documentation Status](https://readthedocs.org/projects/robotistan/badge/?version=latest)](https://docs.picobricks.com/en/latest/?badge=latest)
 [![Creative Commons ][cc-by-nc-sa-shield]][cc-by-nc-sa] 
 
+<a href="[https://github.com/kullanici/repo" style=](https://github.com/Robotistan/PicoBricks-for-MicroBit)"
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    color: white;
+    background-color: #0078D4;
+    text-decoration: none;
+    border-radius: 5px;
+    text-align: center;">
+   Click here to visit the PicoBricks for micro:bit GitHub page.
+</a>
 
 # Make, Run, Split, Merge
 
