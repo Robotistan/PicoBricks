@@ -5,7 +5,7 @@
 [![Documentation Status](https://readthedocs.org/projects/robotistan/badge/?version=latest)](https://docs.picobricks.com/en/latest/?badge=latest)
 [![Creative Commons ][cc-by-nc-sa-shield]][cc-by-nc-sa] 
 
-<a href="[https://github.com/kullanici/repo" style=](https://github.com/Robotistan/PicoBricks-for-MicroBit)"
+<a href="https://github.com/kullanici/repo" style=](https://github.com/Robotistan/PicoBricks-for-MicroBit"
     display: inline-block;
     padding: 10px 20px;
     font-size: 16px;
