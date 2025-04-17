@@ -1,58 +1,65 @@
-#include <Adafruit_NeoPixel.h>
-#ifdef __AVR__
-#include <avr/power.h> 
-#endif
-#define PIN        6 
+#include <Wire.h>               
+#include <picobricks.h>         
 
-#define NUMPIXELS 1 
-Adafruit_NeoPixel pixels(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
-#include <Wire.h>
-#include "ACROBOTIC_SSD1306.h"
-int button;
+// Define pins
+#define NEOPIXEL   6            
+#define BUTTON    10 
+#define LDR       27 
+#define BUZZER    20
+
+#define NUMPIXELS  1            // Number of NeoPixel LEDs
+
+NeoPixel pixels(NEOPIXEL, NUMPIXELS);  // Create NeoPixel object
+
+// OLED screen configuration
+#define SCREEN_WIDTH 128
+#define SCREEN_HEIGHT 64
+#define SCREEN_ADDRESS 0x3C     // I2C address of the OLED display
+
+SSD1306 OLED(SCREEN_ADDRESS, SCREEN_WIDTH, SCREEN_HEIGHT);  // Create OLED object
+
+int button = 0;  // Variable to store button state
+
 void setup() {
-  // put your setup code here, to run once:
-   Wire.begin();  
-  oled.init();                      
-  oled.clearDisplay(); 
-  
-#if defined(__AVR_ATtiny85__) && (F_CPU == 16000000)
-  clock_prescale_set(clock_div_1);
-#endif
-  pinMode(10,INPUT);
-  pinMode(27,INPUT);
-  pinMode(20,OUTPUT);
-  
-  pixels.begin();
-  pixels.setPixelColor(0, pixels.Color(0, 0, 0));
-  pixels.show();
+  Wire.begin();             // Start I2C communication
+  OLED.init();              // Initialize the OLED display
+  OLED.clear();             // Clear the OLED screen
+  OLED.show();              // Show the cleared screen
 
+  pinMode(BUTTON, INPUT);       // Set button pin as input
+  pinMode(LDR, INPUT);          // Set LDR pin as input
+  pinMode(BUZZER, OUTPUT);      // Set buzzer pin as output
+
+  pixels.setPixelColor(0, 0, 0, 0);    // Turn off LED initially
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-  oled.setTextXY(4,3);              
-    oled.putString("Good night");
-    
-    if (analogRead(27)<200){
+  OLED.setCursor(4, 3);                // Set text position on OLED
+  OLED.print("Good night");           // Display "Good night" message
+  OLED.show();                        // Refresh OLED screen
 
-      while(!(button == 1)){
-        
-        button=digitalRead(10);
-       
-        oled.setTextXY(4,2);              
-        oled.putString("Good morning");
-        pixels.setPixelColor(0, pixels.Color(255, 255, 255));
-        pixels.show();
-        tone(20,494);
-      }
-        oled.clearDisplay();
-        oled.setTextXY(4,1);              
-        oled.putString("Have a nice day");
-        noTone(20);
-        pixels.setPixelColor(0, pixels.Color(0, 0, 0));
-        pixels.show();
-        delay(10000);
+  // If it is dark (based on LDR reading)
+  if (analogRead(LDR) < 200) {
+    while (button != 1) {             // Wait for button press
+      button = digitalRead(BUTTON);       // Read button state
+      
+      OLED.setCursor(4, 2);
+      OLED.print("Good morning");     // Display "Good morning" message
+      OLED.show();
+
+      pixels.setPixelColor(0, 255, 255, 255); // Set LED to white
+
+      tone(BUZZER, 494);                  // Play sound on buzzer (B4 note)
     }
 
+    OLED.clear();                     // Clear OLED screen
+    OLED.setCursor(4, 1);
+    OLED.print("Have a nice day");    // Display farewell message
+    OLED.show();
 
+    noTone(BUZZER);                       // Stop buzzer
+    pixels.setPixelColor(0, 0, 0, 0); // Turn off LED
+
+    delay(10000);                     // Wait for 10 seconds before restarting loop
+  }
 }
