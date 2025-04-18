@@ -1,65 +1,78 @@
-#include <Wire.h>
-#include "ACROBOTIC_SSD1306.h"
+#include <Wire.h>              // I2C communication library
+#include <picobricks.h>        // PicoBricks hardware library
 
-int buzzer = 20;
-int pot =26;
-int button= 10;
-//define the buzzer, pot and button 
+// Define hardware pins
+#define BUTTON_PIN 10          // Button connected to pin 10
+#define BUZZER_PIN 20          // Buzzer connected to pin 20
+#define POT_PIN 26             // Potentiometer connected to pin 26
 
+// OLED screen configuration
+#define SCREEN_WIDTH 128       // OLED display width in pixels
+#define SCREEN_HEIGHT 64       // OLED display height in pixels
+#define SCREEN_ADDRESS 0x3C    // I2C address of OLED display
+
+// Define musical notes (frequencies in Hz)
 int Re = 294;
 int Mi = 330;
 int Fa = 349;
 int La = 440;
-//DEFİNE THE TONES
+
+char str[10];  // Buffer for displaying numbers as strings
+
+// Create an OLED object
+SSD1306 OLED(SCREEN_ADDRESS, SCREEN_WIDTH, SCREEN_HEIGHT);
+
 void setup()
 {
-  Wire.begin();  
-  oled.init();                      
-  oled.clearDisplay();              
+  OLED.init();            // Initialize the OLED display
+  OLED.clear();           // Clear the display
+  OLED.show();            // Update the display
 
-  pinMode(buzzer,OUTPUT);
-  pinMode(26,INPUT);
-  pinMode(button,INPUT);
-//determine our input and output pins
+  pinMode(BUZZER_PIN, OUTPUT);     // Set buzzer pin as output
+  pinMode(POT_PIN, INPUT);         // Set potentiometer pin as input
+  pinMode(BUTTON_PIN, INPUT);      // Set button pin as input
 }
 
 void loop()
 {
-  int rithm = (analogRead(pot))/146;
-  String char_rithm = String(rithm);
-  oled.setTextXY(3,4);              
-  oled.putString("Speed: ");
-  oled.setTextXY(3,10);              
-  oled.putString(char_rithm);
-  
-  //print "Speed: "  and speed value on the OLED at x=3 y=4
+  int rithm = (analogRead(POT_PIN)) / 146;   // Read potentiometer value and scale it for rhythm
+
+  // Display speed value on OLED
+  OLED.setCursor(3, 4);              
+  OLED.print("Speed: ");
+  OLED.setCursor(3, 10); 
+  sprintf(str, "%d", rithm);             
+  OLED.print(str);
+  OLED.show();
 
   delay(10); 
 
-  if (digitalRead(button) == 1){
+  // If button is pressed, start playing melody
+  if (digitalRead(BUTTON_PIN) == 1) {
 
-    oled.clearDisplay(); 
-    oled.setTextXY(3,2);              
-    oled.putString("Now playing...");
-    //print "Speed: "  and speed value on the OLED at x=3 y=4
-    tone(buzzer, La); delay (1000/(rithm+1));
-    tone(buzzer, Mi); delay (500/(rithm+1));
-    tone(buzzer, Mi); delay (500/(rithm+1));
-    tone(buzzer, Mi); delay (500/(rithm+1));
-    tone(buzzer, Mi); delay (500/(rithm+1));
-    tone(buzzer, Mi); delay (500/(rithm+1));
-    tone(buzzer, Mi); delay (500/(rithm+1));
-    tone(buzzer, Fa); delay (500/(rithm+1));
-    tone(buzzer, Mi); delay (500/(rithm+1));
-    tone(buzzer, Re); delay (500/(rithm+1));
-    tone(buzzer, Fa); delay (500/(rithm+1));
-    tone(buzzer, Mi); delay (1000/(rithm+1));
-    
-    //play the notes in the correct order and time when the button is pressed
+    OLED.clear(); 
+    OLED.show();
+    OLED.setCursor(3, 2);              
+    OLED.print("Now playing...");
+    OLED.show();
 
-    oled.clearDisplay();
-    //clear the screen
+    // Play a simple melody using the buzzer
+    tone(BUZZER_PIN, La); delay(1000 / (rithm + 1));
+    tone(BUZZER_PIN, Mi); delay(500 / (rithm + 1));
+    tone(BUZZER_PIN, Mi); delay(500 / (rithm + 1));
+    tone(BUZZER_PIN, Mi); delay(500 / (rithm + 1));
+    tone(BUZZER_PIN, Mi); delay(500 / (rithm + 1));
+    tone(BUZZER_PIN, Mi); delay(500 / (rithm + 1));
+    tone(BUZZER_PIN, Mi); delay(500 / (rithm + 1));
+    tone(BUZZER_PIN, Fa); delay(500 / (rithm + 1));
+    tone(BUZZER_PIN, Mi); delay(500 / (rithm + 1));
+    tone(BUZZER_PIN, Re); delay(500 / (rithm + 1));
+    tone(BUZZER_PIN, Fa); delay(500 / (rithm + 1));
+    tone(BUZZER_PIN, Mi); delay(1000 / (rithm + 1));
+
+    OLED.clear();         // Clear display after playing
+    OLED.show();
   }
-  noTone(buzzer);
-  //stop the buzzer
+
+  noTone(BUZZER_PIN);     // Stop buzzer after melody
 }
