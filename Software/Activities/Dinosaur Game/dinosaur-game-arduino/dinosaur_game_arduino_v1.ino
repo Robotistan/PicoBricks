@@ -1,25 +1,29 @@
-#include <Servo.h>
+#include <picobricks.h>  // Include PicoBricks hardware library
 
-Servo myservo;
+// Define pins
+#define MOTOR_2 22         // Servo motor connected to pin 22
+#define LDR_PIN 27         // Light-dependent resistor (LDR) connected to pin 27
+
+// Create Servo object on specified pin
+ServoSimple Servo(MOTOR_2); 
 
 void setup() {
-  // put your setup code here, to run once:
-  myservo.attach(22);
-  myservo.write(20);
-  pinMode(27,INPUT);
+  Servo.setAngle(20);           // Set initial angle of the servo motor
+  pinMode(LDR_PIN, INPUT);      // Set LDR pin as input to read light level
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-  int light_sensor=analogRead(27);
+  int light_sensor = analogRead(LDR_PIN);  // Read analog value from LDR
 
-  if(light_sensor>100){
-    int x=45;
-    int y=20;
+  // If light level is above threshold
+  if (light_sensor > 100) {
+    int x = 45;  // Target angle for servo
+    int y = 20;  // Return angle for servo
     
-    myservo.write(x);
-    delay(100);
-    myservo.write(y);
-    delay(500);
+    Servo.setAngle(x);  // Move servo to position x
+    delay(100);         // Wait for servo to reach position
+
+    Servo.setAngle(y);  // Move servo back to position y
+    delay(500);         // Wait before next check
   }
 }
