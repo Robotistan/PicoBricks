@@ -1,28 +1,36 @@
-#include <DHT.h>
+#include <picobricks.h>  // Include PicoBricks hardware library
 
-#define LIMIT_TEMPERATURE     27
-#define DHTPIN 11
-#define DHTTYPE DHT11
+// Define pins
+#define DHT_PIN 11       // Pin connected to DHT11 temperature sensor
+#define MOTOR_1 21       // Pin connected to fan or motor
 
-DHT dht(DHTPIN, DHTTYPE);
-float temperature;
+#define LIMIT_TEMPERATURE 27  // Temperature threshold in °C
+
+float temperature;            // Variable to store temperature reading
+
+DHT11 dht(DHT_PIN);           // Create DHT11 sensor object
 
 void setup() {
-  // put your setup code here, to run once:
-  Serial.begin(115200);
-  dht.begin();
-  pinMode(21,OUTPUT);
+  Serial.begin(115200);       // Start serial communication for debugging
+  dht.begin();                // Initialize DHT11 sensor
+  pinMode(MOTOR_1, OUTPUT);   // Set motor pin as output
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-  delay(100);
+  // Read temperature from DHT11 sensor
   temperature = dht.readTemperature();
+
+  // Print the temperature value to the Serial Monitor
   Serial.print("Temp: ");
   Serial.println(temperature);
-  if(temperature > LIMIT_TEMPERATURE){
-    digitalWrite(21,HIGH);
-  } else{
-    digitalWrite(21,LOW);    
+
+  // If the temperature exceeds the limit, turn on the motor (fan)
+  if (temperature > LIMIT_TEMPERATURE) {
+    digitalWrite(MOTOR_1, HIGH);  // Turn motor ON
+  } 
+  else {
+    digitalWrite(MOTOR_1, LOW);   // Turn motor OFF
   }
+
+  delay(100);  // Small delay before next reading
 }
