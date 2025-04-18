@@ -32,16 +32,6 @@ char str[10];
 // Variables for distance measurement
 long duration, cm;
 
-void setup() {
-  pinMode(BUZZER, OUTPUT);         // Set buzzer pin as output
-  pinMode(TRIGGER_PIN, OUTPUT);    // Set ultrasonic trigger pin as output
-  pinMode(ECHO_PIN, INPUT);        // Set ultrasonic echo pin as input
-
-  Wire.begin();                    // Start I2C communication
-  OLED.init();                     // Initialize OLED
-  OLED.clear();                    // Clear the screen
-}
-
 // Measure distance using the ultrasonic sensor
 void measureDistance() {
   delay(40);
@@ -54,6 +44,16 @@ void measureDistance() {
 
   duration = pulseIn(ECHO_PIN, HIGH);   // Read the time of the echo pulse
   cm = (duration / 2) / 29.1;           // Convert duration to centimeters
+}
+
+void setup() {
+  pinMode(BUZZER, OUTPUT);         // Set buzzer pin as output
+  pinMode(TRIGGER_PIN, OUTPUT);    // Set ultrasonic trigger pin as output
+  pinMode(ECHO_PIN, INPUT);        // Set ultrasonic echo pin as input
+
+  Wire.begin();                    // Start I2C communication
+  OLED.init();                     // Initialize OLED
+  OLED.clear();                    // Clear the screen
 }
 
 void loop() {
