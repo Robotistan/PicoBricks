@@ -1,111 +1,128 @@
-#include <Adafruit_NeoPixel.h>
-#define PIN        6 
-#define NUMPIXELS 1
-Adafruit_NeoPixel pixels(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
-#define DELAYVAL 500
-#include <Wire.h>
-#include "ACROBOTIC_SSD1306.h" //define libraries
-int OLED_color;
-int RGB_color;
-int score = 0;
-int button = 0;
+#include <picobricks.h>   // Include the PicoBricks library
+#include <Wire.h>         // Include the I2C communication library
 
+// Define pins
+#define RGB_PIN 6         // RGB LED pin
+#define BUTTON_PIN 10     // Button pin
+#define LDR_PIN 27        // LDR sensor pin
 
+#define RGB_COUNT 1       // Number of RGB LEDs
+
+// OLED screen configuration
+#define SCREEN_WIDTH 128
+#define SCREEN_HEIGHT 64
+#define SCREEN_ADDRESS 0x3C
+
+// Create RGB and OLED display objects
+NeoPixel strip(RGB_PIN, RGB_COUNT);
+SSD1306 OLED(SCREEN_ADDRESS, SCREEN_WIDTH, SCREEN_HEIGHT);
+
+// Game state variables
+int OLED_color;     // The color name shown on OLED
+int RGB_color;      // The color shown on the RGB LED
+int score = 0;      // Player score
+int button = 0;     // Button state
+char str[10];       // Character array for displaying numbers
 
 void setup() {
-  // put your setup code here, to run once:
   Wire.begin();  
-  oled.init();                      
-  oled.clearDisplay(); 
+  OLED.init();         // Initialize OLED
+  OLED.clear();        // Clear the display
+  OLED.show();         // Show the initial blank screen
 
-
-  pixels.begin();
-  pixels.clear(); 
-  randomSeed(analogRead(27));
-
+  strip.setPixelColor(0, 0, 0, 0);  // Turn off RGB LED initially
+  randomSeed(analogRead(LDR_PIN)); // Use LDR to randomize seed for true randomness
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-  oled.clearDisplay();
-  oled.setTextXY(3,1);              
-  oled.putString("The game begins");
-  pixels.setPixelColor(0, pixels.Color(0, 0, 0));
-  pixels.show();
+  // Start screen
+  OLED.clear();
+  OLED.show();
+  OLED.setCursor(3, 1);              
+  OLED.print("The game begins");
+  strip.setPixelColor(0, 0, 0, 0);  // Turn off LED
   delay(2000);
-  oled.clearDisplay();
+  OLED.clear();
+  OLED.show();
   
-  for (int i=0;i<10;i++){
-    button = digitalRead(10);
-    random_color();
-    pixels.show();
+  // Run game loop for 10 rounds
+  for (int i = 0; i < 10; i++) {
+    button = digitalRead(BUTTON_PIN);
+    random_color();  // Generate new color round
+
+    // Wait for player input (max 2 seconds)
     unsigned long start_time = millis();
     while (button == 0) {
-        button = digitalRead(10);
-        if (millis() - start_time > 2000)
-          break;
+      button = digitalRead(BUTTON_PIN);
+      if (millis() - start_time > 2000)
+        break;
     }
-    if (button == 1){
-  
-        if(OLED_color==RGB_color){
-          score=score+10;
-        }
-        if(OLED_color!=RGB_color){
-          score=score-10;
-        }
-        delay(200);
+
+    // Check if button was pressed and evaluate result
+    if (button == 1) {
+      if (OLED_color == RGB_color) {
+        score += 10;  // Correct match
+      } else {
+        score -= 10;  // Wrong match
+      }
+      delay(200); // Small delay to avoid bouncing
     }
-    oled.clearDisplay();
-    pixels.setPixelColor(0, pixels.Color(0, 0, 0));
-    pixels.show();
+
+    // Prepare for next round
+    OLED.clear();
+    OLED.show();
+    strip.setPixelColor(0, 0, 0, 0);  // Turn off LED
   }
 
-  String string_scrore=String(score);
-  oled.clearDisplay();
-  oled.setTextXY(2,5);              
-  oled.putString("Score: ");
-  oled.setTextXY(4,7);              
-  oled.putString(string_scrore);
-  oled.setTextXY(6,5);              
-  oled.putString("points");
-  // print final score on OLED screen
+  // Show final score
+  OLED.clear();
+  OLED.show();
+  OLED.setCursor(2, 5);              
+  OLED.print("Score: ");
+  OLED.setCursor(4, 7);
+  sprintf(str, "%d", score);              
+  OLED.print(str);
+  OLED.setCursor(6, 5);              
+  OLED.print("points");
+  OLED.show();
   
-  delay(10000);
+  delay(10000); // Show score for 10 seconds
 }
 
-void random_color(){
+// Function to assign and display a random color
+void random_color() {
+  OLED_color = random(1, 5); // Random color name
+  RGB_color = random(1, 5);  // Random RGB color
 
-  OLED_color = random(1,5);
-  RGB_color = random(1,5); 
-  // generate numbers between 1 and 5 randomly and print them on the screen
-    if (OLED_color == 1){
-      oled.setTextXY(3,7);              
-      oled.putString("red");
+  // Show the color name on OLED
+  if (OLED_color == 1) {
+    OLED.setCursor(3, 7);              
+    OLED.print("red");
   }
-    if (OLED_color == 2){
-      oled.setTextXY(3,6);              
-      oled.putString("green");
+  if (OLED_color == 2) {
+    OLED.setCursor(3, 6);              
+    OLED.print("green");
   }
-    if (OLED_color == 3){
-      oled.setTextXY(3,6);              
-      oled.putString("blue");
+  if (OLED_color == 3) {
+    OLED.setCursor(3, 6);              
+    OLED.print("blue");
   }
-    if (OLED_color == 4){
-      oled.setTextXY(3,6);              
-      oled.putString("white");
-  } 
-    if (RGB_color == 1){
-      pixels.setPixelColor(0, pixels.Color(255, 0, 0));
-  }
-    if (RGB_color == 2){
-      pixels.setPixelColor(0, pixels.Color(0, 255, 0));
-  }
-    if (RGB_color == 3){
-      pixels.setPixelColor(0, pixels.Color(0, 0, 255));
-  }
-    if (RGB_color == 4){
-      pixels.setPixelColor(0, pixels.Color(255, 255, 255));
+  if (OLED_color == 4) {
+    OLED.setCursor(3, 6);              
+    OLED.print("white");
   }
 
-
+  // Show the actual color on RGB LED
+  if (RGB_color == 1) {
+    strip.setPixelColor(0, 255, 0, 0);      // Red
+  }
+  if (RGB_color == 2) {
+    strip.setPixelColor(0, 0, 255, 0);      // Green
+  }
+  if (RGB_color == 3) {
+    strip.setPixelColor(0, 0, 0, 255);      // Blue
+  }
+  if (RGB_color == 4) {
+    strip.setPixelColor(0, 255, 255, 255);  // White
+  }
 }
