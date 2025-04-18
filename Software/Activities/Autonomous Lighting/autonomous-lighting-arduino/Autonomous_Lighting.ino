@@ -1,33 +1,37 @@
-#include <Adafruit_NeoPixel.h>
-#define PIN            6
-#define NUMLEDS        1
-#define LIGHT_SENSOR_PIN 27
+#include <picobricks.h>
 
-Adafruit_NeoPixel leds = Adafruit_NeoPixel(NUMLEDS, PIN, NEO_GRB + NEO_KHZ800);
-//define the libraries
+// Define the pin for the RGB NeoPixel and LDR sensor
+#define RGB_PIN  6           
+#define LDR_PIN  27          
 
-int delayval = 250; // delay for half a second
+#define RGB_COUNT 1          // Number of RGB LEDs
+
+int analogValue = 0;         // Variable to store LDR sensor reading
+
+NeoPixel strip(RGB_PIN, RGB_COUNT);  // Initialize NeoPixel strip
 
 void setup() 
 {
-  leds.begin(); 
+  pinMode(LDR_PIN, INPUT);  // Set LDR pin as input
 }
 
 void loop() 
 {
-  int analogValue = analogRead(LIGHT_SENSOR_PIN);
-  for(int i=0;i < NUMLEDS;i++)
+  analogValue = analogRead(LDR_PIN);  // Read light level from LDR sensor
+
+  for (int i = 0; i < RGB_COUNT; i++)  // Loop through each LED (only 1 here)
   {
-      if (analogValue > 200) {
-          // pixels.Color takes RGB values, from 0,0,0 up to 255,255,255
-          leds.setPixelColor(i, leds.Color(255,255,255));
-          leds.show(); // This sends the updated pixel color to the hardware.
-          delay(delayval); 
-      }
-       else {
-         leds.setPixelColor(i, leds.Color(0,0,0));  //white color code.
-         leds.show(); // This sends the updated pixel color to the hardware.
-      }
+    if (analogValue > 200) {
+      // If it's bright, turn on white light
+      strip.setPixelColor(i, 255, 255, 255);  // White light
+      delay(250); 
+    } 
+    else {
+      // If it's dark, turn off the LED
+      strip.setPixelColor(i, 0, 0, 0);  // Turn off LED
     }
-    delay(10);
+  }
+
+  strip.Show();  // Update the NeoPixel strip to reflect color changes
+  delay(10);     // Small delay for stability
 }
