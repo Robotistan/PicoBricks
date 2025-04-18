@@ -1,32 +1,38 @@
-#include <Wire.h>
-#include <DHT.h>
-#include <Adafruit_SSD1306.h>
+#include <Wire.h>             // Include library for I2C communication
+#include <picobricks.h>       // Include the main PicoBricks library
 
-#define DHTPIN 11
-#define DHTTYPE DHT11
-#define SCREEN_ADDRESS 0x3D
+#define DHT_PIN 11            // Define the GPIO pin where the DHT11 sensor is connected
 
-DHT dht(DHTPIN, DHTTYPE);
-Adafruit_SSD1306 oled(128, 64, &Wire);
-float temperature;
+// OLED screen configuration
+#define SCREEN_WIDTH 128      // OLED display width in pixels
+#define SCREEN_HEIGHT 64      // OLED display height in pixels
+#define SCREEN_ADDRESS 0x3C   // I2C address of the OLED display
+
+float temperature;            // Variable to hold the temperature value
+char str[10];                 // Character buffer for converting temperature to string
+
+DHT11 dht(DHT_PIN);           // Create DHT11 object
+SSD1306 OLED(SCREEN_ADDRESS, SCREEN_WIDTH, SCREEN_HEIGHT);  // Create OLED object
 
 void setup() {
-  Serial.begin(115200);
-  Wire.begin();  
-  dht.begin();
-  oled.begin(SSD1306_SWITCHCAPVCC, 0x3C);
-  oled.clearDisplay();
-  oled.setTextColor(WHITE);
+  Serial.begin(115200);       // Initialize serial communication for debugging
+  Wire.begin();               // Start I2C communication
+  dht.begin();                // Initialize the DHT11 sensor
+  OLED.init();                // Initialize the OLED display
+  OLED.clear();               // Clear any previous display content
+  OLED.show();                // Show the cleared screen
 }
 
 void loop() {
-  temperature = dht.readTemperature();
-  Serial.print("Temp: ");
-  Serial.println(temperature);
-  oled.setCursor(0, 0);
-  oled.print("Temp: ");
-  oled.setCursor(35, 0);
-  oled.print(String(temperature));
-  oled.display();
-  delay(100);
+  temperature = dht.readTemperature();     // Read the temperature from the DHT11 sensor
+  Serial.print("Temp: ");                  // Print to serial for debugging
+  Serial.println(temperature);             // Print the temperature value
+
+  OLED.setCursor(0, 0);                    // Set OLED cursor to start of the first line
+  OLED.print("Temp: ");                    // Display label on OLED
+  OLED.setCursor(35, 0);                   // Move cursor to show temperature value
+  sprintf(str, "%d", temperature);         // Convert temperature value to string
+  OLED.print(str);                         // Display temperature on OLED
+  OLED.show();                             // Update the OLED screen
+  delay(100);                              // Delay before the next reading
 }
