@@ -1,97 +1,109 @@
 #include <Wire.h>
-#include "ACROBOTIC_SSD1306.h"
+#include <picobricks.h>
 
+// Define hardware pins
+#define BUTTON_PIN 10       // Button input to start/stop the timer
+#define POT_PIN 26          // Potentiometer input to set timer value
+
+// OLED screen configuration
+#define SCREEN_WIDTH 128    
+#define SCREEN_HEIGHT 64    
+#define SCREEN_ADDRESS 0x3C 
+
+// Timer variables
 int minute;
 int second = 59;
 int milisecond = 9;
-int setTimer;
+int setTimer;               // Timer duration set by potentiometer
+char str[10];               // Buffer for string formatting
+
+// Create OLED object
+SSD1306 OLED(SCREEN_ADDRESS, SCREEN_WIDTH, SCREEN_HEIGHT);
 
 void setup() {
-  // put your setup code here, to run once:
-  pinMode(10,INPUT);
-  pinMode(26,INPUT);
+  pinMode(BUTTON_PIN, INPUT);  // Set button pin as input
+  pinMode(POT_PIN, INPUT);     // Set potentiometer pin as input
 
-  Wire.begin();  
-  oled.init();                      
-  oled.clearDisplay(); 
-
-
+  Wire.begin();                // Initialize I2C communication
+  OLED.init();                 // Initialize OLED
+  OLED.clear();                // Clear display
+  OLED.show();                 // Show initial screen
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-  oled.setTextXY(1,2);              
-  oled.putString("<<My Timer>>");
-  oled.setTextXY(3,1);              
-  oled.putString("Please use the");
-  oled.setTextXY(4,1);              
-  oled.putString("Potantiometer");
-  oled.setTextXY(5,0);              
-  oled.putString("to set the Timer");
+  // Display instruction on OLED
+  OLED.setCursor(1, 2);              
+  OLED.print("<<My Timer>>");
+  OLED.setCursor(3, 1);              
+  OLED.print("Please use the");
+  OLED.setCursor(4, 1);              
+  OLED.print("Potentiometer");
+  OLED.setCursor(5, 0);              
+  OLED.print("to set the Timer");
+  OLED.show();
   delay(3000);
-  oled.clearDisplay(); 
+  OLED.clear();
+  OLED.show(); 
   
-    while(!(digitalRead(10) == 1))
-  {
-    setTimer = (analogRead(26)*60)/1023;
-    oled.setTextXY(3,1);              
-    oled.putString("set to:");
-    oled.setTextXY(3,8);              
-    oled.putString(String(setTimer));
-    oled.setTextXY(3,11);              
-    oled.putString("min.");
+  // Allow user to set timer with potentiometer
+  while (!(digitalRead(BUTTON_PIN) == 1)) {
+    setTimer = (analogRead(POT_PIN) * 60) / 1023;  // Map analog input to 0-60 minutes
+    OLED.setCursor(3, 1);              
+    OLED.print("set to:");
+    OLED.setCursor(3, 8); 
+    sprintf(str, "%d", setTimer);             
+    OLED.print(str);
+    OLED.setCursor(3, 11);              
+    OLED.print("min.");
+    OLED.show();
   }
-    oled.clearDisplay(); 
-    oled.setTextXY(1,1);              
-    oled.putString("The Countdown");
-    oled.setTextXY(2,3);              
-    oled.putString("has begin!");
-    
-    while(!(digitalRead(10) == 1))
-  {
-    milisecond = 9- (millis()%100)/10;
-    second = 59-(millis()%60000)/1000;
-    minute = (setTimer-1)-((millis()%360000)/60000);
-    
-    oled.setTextXY(5,3);              
-    oled.putString(String(minute));
-    oled.setTextXY(5,8);              
-    oled.putString(String(second));
-    oled.setTextXY(5,13);              
-    oled.putString(String(milisecond));
-    oled.setTextXY(5,6);              
-    oled.putString(":");
-    oled.setTextXY(5,11);              
-    oled.putString(":");
+
+  // Display countdown start message
+  OLED.clear();
+  OLED.show();
+  OLED.setCursor(1, 1);              
+  OLED.print("The Countdown");
+  OLED.setCursor(2, 3);              
+  OLED.print("has begun!");
+
+  // Countdown logic until button is pressed
+  while (!(digitalRead(BUTTON_PIN) == 1)) {
+    milisecond = 9 - (millis() % 100) / 10;
+    second = 59 - (millis() % 60000) / 1000;
+    minute = (setTimer - 1) - ((millis() % 360000) / 60000);
+
+    OLED.setCursor(5, 3);   
+    sprintf(str, "%d", minute); OLED.print(str);           
+    OLED.setCursor(5, 8); 
+    sprintf(str, "%d", second); OLED.print(str);              
+    OLED.setCursor(5, 13);  
+    sprintf(str, "%d", milisecond); OLED.print(str);  
+
+    // Print time separators
+    OLED.setCursor(5, 6); OLED.print(":");
+    OLED.setCursor(5, 11); OLED.print(":");
+    OLED.show();
   }
-    oled.setTextXY(5,3);              
-    oled.putString(String(minute));
-    oled.setTextXY(5,8);              
-    oled.putString(String(second));
-    oled.setTextXY(5,13);              
-    oled.putString(String(milisecond));
-    oled.setTextXY(5,6);              
-    oled.putString(":");
-    oled.setTextXY(5,11);              
-    oled.putString(":");
+
+  // After button is pressed, display the stopped time
+  OLED.setCursor(5, 3);   sprintf(str, "%d", minute); OLED.print(str);           
+  OLED.setCursor(5, 8);   sprintf(str, "%d", second); OLED.print(str);              
+  OLED.setCursor(5, 13);  sprintf(str, "%d", milisecond); OLED.print(str);           
+  OLED.setCursor(5, 6);   OLED.print(":");
+  OLED.setCursor(5, 11);  OLED.print(":");
+  OLED.show();
+  delay(10000);
+
+  // If the timer reached zero
+  if (minute == 0 && second == 0 && milisecond == 0) {
+    OLED.setCursor(5, 3);   sprintf(str, "%d", minute); OLED.print(str);           
+    OLED.setCursor(5, 8);   sprintf(str, "%d", second); OLED.print(str);            
+    OLED.setCursor(5, 13);  sprintf(str, "%d", milisecond); OLED.print(str);             
+    OLED.setCursor(5, 6);   OLED.print(":");
+    OLED.setCursor(5, 11);  OLED.print(":");  
+    OLED.print("-finished-");
+    OLED.setCursor(7, 5); 
+    OLED.show();
     delay(10000);
-
-    if (minute==0 & second==0 & milisecond==0){
-
-    oled.setTextXY(5,3);              
-    oled.putString(String(minute));
-    oled.setTextXY(5,8);              
-    oled.putString(String(second));
-    oled.setTextXY(5,13);              
-    oled.putString(String(milisecond));
-    oled.setTextXY(5,6);              
-    oled.putString(":");
-    oled.setTextXY(5,11);              
-    oled.putString(":");  
-    oled.putString("-finished-");
-    oled.setTextXY(7,5); 
-    delay(10000);
-    }
-
-
+  }
 }
