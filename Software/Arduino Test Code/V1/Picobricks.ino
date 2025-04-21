@@ -1,5 +1,6 @@
 // Include libraries
 #include <picobricks.h>
+#include <pitches.h>
 #include <IRremote.h>
 #include <WiFi.h>
 
