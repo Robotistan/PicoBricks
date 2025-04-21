@@ -1,8 +1,8 @@
 // Include libraries
 #include <picobricks.h>
 #include <pitches.h>
-#include <IRremote.h>
-#include <WiFi.h>
+#include <IRremote.h> 
+#include <WiFi.h>      //WifiNINA by Arduino
 
 // Define hardware pins
 #define IR_PIN 0
