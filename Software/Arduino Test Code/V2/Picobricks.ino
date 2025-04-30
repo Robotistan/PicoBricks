@@ -1,8 +1,11 @@
+/*
+You must select the "Raspberry Pico W" board from the Arduino IDE board manager for PicoBricks library.
+*/
+
 // Include libraries
 #include <picobricks.h>
 #include <pitches.h>
-#include <IRremote.h>
-#include <WiFi.h>       //WifiNINA by Arduino
+#include <WiFi.h>    //WifiNINA by Arduino
 
 // Define hardware pins
 #define IR_PIN 0
@@ -13,8 +16,6 @@
 #define BUZZER_PIN 20
 #define POT_PIN 26
 #define LDR_PIN 27
-
-#define DECODE_NEC
 
 // OLED screen configuration
 #define SCREEN_WIDTH 128    // OLED display width, in pixels
@@ -33,22 +34,33 @@ int ldr;                           // Light level percentage
 char str[10];                      // String buffer for display
 float noteDuration;                // Duration of a musical note
 int WiFiStatus = 0;                // Status of WiFi connection
+int irCode = 0;
+volatile bool irReceived = false;
 
 // Replace with your network credentials
 const char* ssid = "SSID";
 const char* password = "PASSWORD";
 
 // Function Declaration
-SSD1306 OLED(SCREEN_ADDRESS, SCREEN_WIDTH, SCREEN_HEIGHT);  // OLED screen
-NeoPixel strip (RGB_PIN, RGB_COUNT);  // RGB LED strip
-SHTC3 shtc(0x70);   // SHTC3 sensor
-motorDriver motor;  // Motor driver
+SSD1306 OLED(SCREEN_ADDRESS, SCREEN_WIDTH, SCREEN_HEIGHT);    // OLED screen
+NeoPixel strip (RGB_PIN, RGB_COUNT);                          // RGB LED strip
+SHTC3 shtc(0x70);                                             // SHTC3 sensor
+motorDriver motor;                                            // Motor driver
+IRPico ir(IR_PIN);                                            // Start IR receiver
 
 // Interrupt service routine for the button
 void buttonInterruptHandler() {
   buttonState = digitalRead(BUTTON_PIN);
   if (buttonState == HIGH) {
     music_stt = 1;  // Flag to start playing music
+  }
+}
+
+// Interrupt service routine for IR
+void irInterruptHandler() {
+  if (ir.decode()) {
+    irCode = ir.getCode();
+    irReceived = true;
   }
 }
 
@@ -108,6 +120,8 @@ void setup() {
 
   // Attach interrupt to button
   attachInterrupt(digitalPinToInterrupt(BUTTON_PIN), buttonInterruptHandler, CHANGE);
+  // Attach interrupt to ir
+  attachInterrupt(digitalPinToInterrupt(IR_PIN), irInterruptHandler, FALLING);
 
   // Attempt to connect to WiFi
   WiFi.begin(ssid, password);
@@ -130,7 +144,6 @@ void setup() {
   OLED.show();
 
   shtc.begin();   // Start SHTC sensor
-  IrReceiver.begin(IR_PIN);  // Start IR receiver
 
   // Relay on/off
   digitalWrite(RELAY_PIN, HIGH);
@@ -141,46 +154,47 @@ void setup() {
 
 void loop() {
   OLED.clear();  // Clear display before drawing new data
-  IrReceiver.decodedIRData.command = 0; // Reset IR command
-  if (IrReceiver.decode()) {
-    Serial.println(IrReceiver.decodedIRData.command);
-    IrReceiver.resume();  // Ready to receive next IR signal
-  } 
 
-  if (IrReceiver.decodedIRData.command == number_1) { // RGB LED Walking light effect
-    strip.setPixelColor(0, random(0, 255), random(0, 255), random(0, 255));
-    delay(1000);
-    strip.setPixelColor(0, 0, 0, 0);
-  }
-  if (IrReceiver.decodedIRData.command == number_2) { // Relay ON
-    digitalWrite(RELAY_PIN, HIGH); 
-    delay(100); 
-  }
-  if (IrReceiver.decodedIRData.command == number_3) { // Relay OFF
-    digitalWrite(RELAY_PIN, LOW); 
-    delay(100);  
-  }
-  if (IrReceiver.decodedIRData.command == number_4) { // DC Motors On
-    motor.dc(1,255,0);
-    motor.dc(2,255,0);
-  }
-  if (IrReceiver.decodedIRData.command == number_5) { // DC Motors Off
-    motor.dc(1,0,0);
-    motor.dc(2,0,0);
-  }
-  if (IrReceiver.decodedIRData.command == number_6) { //Buzzer
-    for (long i = 0; i < 200; i++) {
-      digitalWrite(BUZZER_PIN, HIGH);
-      delayMicroseconds(500);
-      digitalWrite(BUZZER_PIN, LOW);
-      delayMicroseconds(500);
+  if (irReceived) {
+    Serial.println(irCode, HEX);
+
+    if (irCode == number_1) { // RGB LED Walking light effect
+      strip.setPixelColor(0, random(0, 255), random(0, 255), random(0, 255));
+      delay(1000);
+      strip.setPixelColor(0, 0, 0, 0);
     }
-  }
-  if (IrReceiver.decodedIRData.command == number_8) { // Servo1 to 0 degrees
-      motor.servo(1,0);
-  }
-  if (IrReceiver.decodedIRData.command == number_9) { // Servo1 to 90 degrees
-      motor.servo(1,90);
+    if (irCode == number_2) { // Relay ON
+      digitalWrite(RELAY_PIN, HIGH); 
+      delay(100); 
+    }
+    if (irCode == number_3) { // Relay OFF
+      digitalWrite(RELAY_PIN, LOW); 
+      delay(100);  
+    }
+    if (irCode == number_4) { // DC Motors On
+      motor.dc(1,255,0);
+      motor.dc(2,255,0);
+    }
+    if (irCode == number_5) { // DC Motors Off
+      motor.dc(1,0,0);
+      motor.dc(2,0,0);
+    }
+    if (irCode == number_6) { //Buzzer
+      for (long i = 0; i < 200; i++) {
+        digitalWrite(BUZZER_PIN, HIGH);
+        delayMicroseconds(500);
+        digitalWrite(BUZZER_PIN, LOW);
+        delayMicroseconds(500);
+      }
+    }
+    if (irCode == number_8) { // Servo1 to 0 degrees
+        motor.servo(1,0);
+    }
+    if (irCode == number_9) { // Servo1 to 90 degrees
+        motor.servo(1,90);
+    }
+    irReceived = false;
+    irCode = 0;
   }
 
   // Music player status
