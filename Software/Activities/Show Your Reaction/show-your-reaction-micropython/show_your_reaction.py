@@ -8,7 +8,7 @@ HEIGHT=64
 #define the width and height values
 sda=machine.Pin(4)
 scl=machine.Pin(5)
-i2c=machine.I2C(0,sda=sda, scl=scl, freq=2000000)
+i2c=machine.I2C(0,sda=sda, scl=scl)
 oled= SSD1306_I2C(WIDTH, HEIGHT, i2c)
 button = Pin(10,Pin.IN,Pin.PULL_DOWN)
 led=Pin(7,Pin.OUT)
