@@ -4,4 +4,5 @@
 <img width="1859" height="836" alt="Adsız" src="https://github.com/user-attachments/assets/db857d4b-5f9a-4686-9212-48bc0c6153f0" />
 
 
-<img width="540" height="290" alt="Screenshot_4" src="https://github.com/user-attachments/assets/a38e2ede-b86f-4829-922f-d9aa0b03371c" />
+<img width="4454" height="2934" alt="388421568-a3e46b73-1338-4d95-b831-74ee94b503fc" src="https://github.com/user-attachments/assets/fb0996e2-1651-4a3d-87ae-12036df50469" />
+
