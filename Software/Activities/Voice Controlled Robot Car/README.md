@@ -62,7 +62,9 @@ control the movements of the robot car.
 
 ## Mobile Application (Picobricks Go)
 
-<img width="540" height="290" alt="Screenshot_4" src="https://github.com/user-attachments/assets/8c4a2254-220b-4b64-ba7b-6cc53da09284" />
+<img width="4454" height="2934" alt="388421568-a3e46b73-1338-4d95-b831-74ee94b503fc" src="https://github.com/user-attachments/assets/d6934479-8f5d-4244-8057-3abfda4a41cd" />
+
+
 
   
 
