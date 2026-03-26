@@ -26,7 +26,8 @@ control the movements of the robot car.
 
 ## Wiring Diagram
 
-  ![image](https://user-images.githubusercontent.com/111511331/200281661-11c09580-f78f-441f-b912-1cd07a2e5a5f.png)
+<img width="805" height="586" alt="Screenshot_1" src="https://github.com/user-attachments/assets/17afdf58-3869-4968-900f-99bd6feee8aa" />
+
   
 ## Construction Stages of the Project
 
@@ -59,17 +60,14 @@ control the movements of the robot car.
 
 
 8. Connect the cables of the motors to the terminals on the motor driver.
-9. Fix the motor driver, Bluetooth module, Picobricks board and battery box to the chassis using hot silicone.
+
+<img width="851" height="404" alt="Screenshot_2" src="https://github.com/user-attachments/assets/7037d27d-c78d-4795-b12b-4f626d893d47" />
 
 
-![Paragraf metniniz (5)](https://github.com/Robotistan/PicoBricks/assets/112697142/61b585a8-0ae1-4208-91c8-b7117d211b8d)
+## Mobile Application (Picobricks Go)
 
-![Paragraf metniniz (6)](https://github.com/Robotistan/PicoBricks/assets/112697142/bc62bece-ffbb-4ff6-b7d1-11fa31a56588)
+<img width="540" height="290" alt="Screenshot_4" src="https://github.com/user-attachments/assets/8c4a2254-220b-4b64-ba7b-6cc53da09284" />
 
-
-## Mobile Application
   
-Click [here](https://play.google.com/store/apps/details?id=appinventor.ai_cempehlivan92.Arduino_Sesli_Kontrol&hl=tr "Heading Link") download the mobile application for android devices from the link below and install it on the phone.
- 
- You can open the language options with the Language button and edit the language in English with the "en" option
+
 
