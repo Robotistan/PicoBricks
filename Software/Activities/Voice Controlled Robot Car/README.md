@@ -15,12 +15,8 @@ control by talking. PicoBricks allows you to communicate wirelessly with 2 6V DC
 motors and bluetooth. 
 
 In the project, the robot car kit that comes out of the set will be assembled and
-controlled via mobile phone. The HC05 bluetooth module is a module that enables
-us to communicate wirelessly between PicoBricks and a mobile phone. Thanks to
-the mobile application installed on the mobile phone in the project, the commands
-sent from the phone will be transmitted to PicoBricks via the HC05 module and the
-robot car will move according to these data. We can direct the robot car with the
-forward, backward, right, left buttons from the mobile phone, as well as send data
+controlled via mobile phone. We can direct the robot car with the
+microfone from the mobile phone, as well as send data
 to PicoBricks with voice command. In the project, we will give voice commands to
 control the movements of the robot car.
 
