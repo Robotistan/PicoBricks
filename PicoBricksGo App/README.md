@@ -1,8 +1,10 @@
-
-![WhatsApp Image 2026-03-26 at 13 52 05](https://github.com/user-attachments/assets/eb5ec888-99b6-4d38-9a8c-4422d58a11ae)
-
-<img width="1859" height="836" alt="Adsız" src="https://github.com/user-attachments/assets/db857d4b-5f9a-4686-9212-48bc0c6153f0" />
-
-
-<img width="4454" height="2934" alt="388421568-a3e46b73-1338-4d95-b831-74ee94b503fc" src="https://github.com/user-attachments/assets/fb0996e2-1651-4a3d-87ae-12036df50469" />
-
+<img width="1920" height="1080" alt="1" src="https://github.com/user-attachments/assets/0a513cb9-afed-4edb-9205-0f05281237bf" />
+<img width="1920" height="1080" alt="2" src="https://github.com/user-attachments/assets/43918919-b9d6-4eec-bd97-4085db8c5567" />
+<img width="1920" height="1080" alt="3" src="https://github.com/user-attachments/assets/4062afc5-368e-4c87-8842-54f6fb990ce2" />
+<img width="1920" height="1080" alt="4" src="https://github.com/user-attachments/assets/45579aaf-4d1d-4f36-bba5-cab87b114e87" />
+<img width="1920" height="1080" alt="5" src="https://github.com/user-attachments/assets/f2bbbd82-8b73-4489-81d4-a3e73f16d9af" />
+<img width="1920" height="1080" alt="6" src="https://github.com/user-attachments/assets/c9731946-60a8-4722-8c93-393e90f2c507" />
+<img width="1920" height="1080" alt="7" src="https://github.com/user-attachments/assets/1eaac7b2-1049-4896-99e3-3f38cf10661f" />
+<img width="1920" height="1080" alt="8" src="https://github.com/user-attachments/assets/e99759ac-eadb-40ce-a774-67aa4eda4d30" />
+<img width="1920" height="1080" alt="9" src="https://github.com/user-attachments/assets/3bf99141-ce32-465b-add7-b4ce2b8d7483" />
+<img width="1920" height="1080" alt="10" src="https://github.com/user-attachments/assets/ca9109cf-63da-44cf-9d97-25f42f89084f" />
