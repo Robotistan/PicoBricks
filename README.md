@@ -36,24 +36,6 @@ https://user-images.githubusercontent.com/78815495/222435165-6ca83c3e-1fc9-4d5b-
 ##### Click [here](https://www.youtube.com/watch?v=k4_ww3uv2Uc "Heading Link") to watch Picobricks The Split video on YouTube.
 
 
-
-
-
-
-<img width="1920" height="1080" alt="5(1)" src="https://github.com/user-attachments/assets/82511278-fb0f-4273-b9d6-5614d4f34cbc" />
-<img width="1920" height="1080" alt="4(1)" src="https://github.com/user-attachments/assets/43798c1f-801e-4068-a783-f38e7f437856" />
-<img width="1920" height="1080" alt="3(1)" src="https://github.com/user-attachments/assets/d22bbd8b-ef4a-487f-b1a6-a3a2bea86593" />
-<img width="1920" height="1080" alt="2(1)" src="https://github.com/user-attachments/assets/126a72c1-4fd6-4f65-ad91-ba8745843325" />
-<img width="1920" height="1080" alt="1(1)" src="https://github.com/user-attachments/assets/160e9909-b2c6-470c-8e81-f14a8c9cf961" />
-<img width="1920" height="1080" alt="10(1)" src="https://github.com/user-attachments/assets/3bb40320-6657-45a6-81af-f0aecf01b515" />
-<img width="1920" height="1080" alt="9(1)" src="https://github.com/user-attachments/assets/60f7387c-6a6f-4ea1-a2a7-dbdea819cfed" />
-<img width="1920" height="1080" alt="8(1)" src="https://github.com/user-attachments/assets/dc48ded5-5263-4d21-8269-0256407d540f" />
-<img width="1920" height="1080" alt="7(1)" src="https://github.com/user-attachments/assets/a6e7ab6a-99de-4aaf-9e8c-af93c96cffaf" />
-<img width="1920" height="1080" alt="6(1)" src="https://github.com/user-attachments/assets/fb82ee63-4510-4cd7-99d1-2d092e9219d2" />
-
-
-
-
 ## Repository Contents
 
 - ##### [Bootloader](https://github.com/Robotistan/PicoBricks/tree/main/Bootloader)
