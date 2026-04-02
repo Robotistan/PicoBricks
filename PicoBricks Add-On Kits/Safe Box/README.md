@@ -8,7 +8,3 @@ PicoBricks modules to use with wooden parts in the PicoBricks Safe Box kit: OLED
 #### - You can watch the PicoBricks SafeBox video by clicking [here](https://youtu.be/vjeR2RnyNlo "here").
 
 #### - You can access ASCII Encryption-Decryption project by clicking [here](https://github.com/Robotistan/PicoBricks/tree/main/Software/Examples%20from%20Community/ASCII%20Encryption-Decryption "here").
-
-## Mobile Application (Picobricks Go)
-
-<img width="4454" height="2934" alt="388421568-a3e46b73-1338-4d95-b831-74ee94b503fc" src="https://github.com/user-attachments/assets/4cf6de01-b338-4e9b-b0cd-47428518fa8c" />
