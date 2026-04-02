@@ -11,5 +11,11 @@ The smart trash bin is an entertaining kit that can be created by using wooden p
 
 - Motor Driver: It is a circuit element that adjusts the speed and frequency of the circuit elements.
 
-- HC-SR04: It is a circuit element for detecting distance in projects that require distance measurement. 
+- HC-SR04: It is a circuit element for detecting distance in projects that require distance measurement.
+
+## Mobile Application (Picobricks Go)
+
+<img width="4454" height="2934" alt="388421568-a3e46b73-1338-4d95-b831-74ee94b503fc" src="https://github.com/user-attachments/assets/1b5f5ac1-0b7f-4285-b60b-ffc430bde997" />
+
+
 
