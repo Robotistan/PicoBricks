@@ -16,3 +16,7 @@ PicoBricks - Ferris Wheel is a project kit that you can adjust the speed of the 
 - Motor Driver: It is a circuit element that adjusts the speed and frequency of the circuit elements.
 
 - DC Motor: It provides rotational motion in mechanical projects that require rotational movement
+
+## Mobile Application (Picobricks Go)
+
+<img width="4454" height="2934" alt="388421568-a3e46b73-1338-4d95-b831-74ee94b503fc" src="https://github.com/user-attachments/assets/d387da6c-bb96-4947-97d4-11c7f2025945" />
