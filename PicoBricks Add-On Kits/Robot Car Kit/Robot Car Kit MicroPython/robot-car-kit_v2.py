@@ -65,7 +65,7 @@ def getDistance():
     timepassed = signalon - signaloff
     distance = (timepassed * 0.0343) / 2
     utime.sleep(0.1)
-    #print(distance,"cm")
+    print(distance,"cm")
     return distance
 
 def ir_callback(data, addr, ctrl):
@@ -95,6 +95,9 @@ motor.dc(1,0,0)
 motor.dc(2,0,0)
 
 while True:
+    if (getDistance()) < (10):
+        motor.dc(1,0,0)
+        motor.dc(2,0,0)
     if sp.is_connected():
         distance = int(getDistance())
         dist_bytes = distance.to_bytes(2, 'little')
@@ -145,7 +148,6 @@ while True:
                 motor.dc(2,0,0)
                 time.sleep(2)
         if buffer:
-            print(buffer[2])
             if (buffer[0] == 72 and buffer[1] == 1):
                 if (buffer[2] == 1): #Joystick
                     if((buffer[3] == 0) and (buffer[4] == 0)):
@@ -178,25 +180,18 @@ while True:
         time.sleep(0.2)
     if data_rcvd == True: #remote mode
         data_rcvd = False
-        if (getDistance()) < (10):
-            stop()
-            time.sleep((1))
-            backward()
-        elif ir_data == IR_RX.number_up: #forward
-            motor.dc(1,255,0)
-            motor.dc(2,255,0)
+        if ir_data == IR_RX.number_up: #forward
+            motor.dc(1,130,0)
+            motor.dc(2,130,0)
         elif ir_data == IR_RX.number_down: #backward
-            motor.dc(1,255,1)
-            motor.dc(2,255,1)
+            motor.dc(1,130,1)
+            motor.dc(2,130,1)
         elif ir_data == IR_RX.number_left: #left
             motor.dc(1,0,0)
-            motor.dc(2,255,0)
+            motor.dc(2,130,0)
         elif ir_data == IR_RX.number_right: #right
-            motor.dc(1,255,0)
+            motor.dc(1,130,0)
             motor.dc(2,0,0)
         elif ir_data == IR_RX.number_ok: #stop
             motor.dc(1,0,0)
             motor.dc(2,0,0)
-
-
-
